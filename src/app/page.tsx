@@ -551,10 +551,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-white">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Stop Losing Money You Don't Even Know You're Losing
+              Stop Losing Money You Don&apos;t Even Know You&apos;re Losing
             </h2>
             <p className="text-xl mb-10 opacity-90 max-w-3xl mx-auto">
-              Join 10,000+ people who've taken control of their finances and found an average of $500+ in monthly savings they didn't know they had.
+              Join 10,000+ people who&apos;ve taken control of their finances and found an average of $500+ in monthly savings they didn&apos;t know they had.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
