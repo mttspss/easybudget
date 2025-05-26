@@ -27,5 +27,14 @@ export const authOptions = {
   session: {
     strategy: "jwt" as const,
   },
+  events: {
+    signIn: async (message: any) => {
+      console.log('User signed in:', message);
+    },
+    error: async (message: any) => {
+      console.error('Auth error:', message);
+    },
+  },
+  debug: process.env.NODE_ENV === 'development',
   secret: process.env.NEXTAUTH_SECRET,
 } 

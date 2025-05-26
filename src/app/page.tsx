@@ -104,10 +104,16 @@ export default function Home() {
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How it Works</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
-              <Button onClick={() => signIn("google")} variant="outline" size="sm">
+              <Button onClick={() => {
+                console.log("Sign In clicked");
+                signIn("google");
+              }} variant="outline" size="sm">
                 Sign In
               </Button>
-              <Button onClick={() => signIn("google")} size="sm" className="bg-primary hover:bg-primary/90">
+              <Button onClick={() => {
+                console.log("Get Started clicked");
+                signIn("google");
+              }} size="sm" className="bg-primary hover:bg-primary/90">
                 Get Started
               </Button>
             </div>
@@ -166,7 +172,10 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button 
                 size="lg" 
-                onClick={() => signIn("google")}
+                onClick={() => {
+                  console.log("Start Your Financial Transformation clicked");
+                  signIn("google");
+                }}
                 className="bg-primary hover:bg-primary/90 text-lg px-8 py-4 h-auto"
               >
                 Start Your Financial Transformation
