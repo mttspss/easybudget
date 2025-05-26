@@ -288,8 +288,174 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-gray-50">
+             {/* User Types Section */}
+       <section className="py-24 bg-white">
+         <div className="container mx-auto px-4">
+           <div className="text-center mb-16">
+             <h2 className="text-4xl font-bold text-gray-900 mb-4">
+               Built for Every Financial Journey
+             </h2>
+             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+               From students tracking their first budget to entrepreneurs managing multiple businesses
+             </p>
+           </div>
+
+           <div className="grid md:grid-cols-3 gap-8">
+             {/* Individuals */}
+             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 p-8">
+               <div className="text-center">
+                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Users className="h-8 w-8 text-blue-600" />
+                 </div>
+                 <h3 className="text-2xl font-bold text-gray-900 mb-4">For Individuals</h3>
+                 <p className="text-gray-600 mb-6">
+                   Perfect for students, young professionals, and anyone starting their financial journey.
+                 </p>
+                 <ul className="text-left space-y-3 text-gray-600">
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Single dashboard for all personal accounts</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Easy CSV import from any bank</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Personal goals & emergency fund tracking</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Subscription management</span>
+                   </li>
+                 </ul>
+               </div>
+             </Card>
+
+             {/* Entrepreneurs */}
+             <Card className="border-2 border-primary shadow-xl scale-105 p-8">
+               <div className="text-center">
+                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <TrendingUp className="h-8 w-8 text-primary" />
+                 </div>
+                 <h3 className="text-2xl font-bold text-gray-900 mb-4">For Entrepreneurs</h3>
+                 <p className="text-gray-600 mb-6">
+                   Manage multiple businesses and personal finances without the complexity.
+                 </p>
+                 <ul className="text-left space-y-3 text-gray-600">
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Multiple account dashboards (4+ credit cards, 2+ businesses)</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Separate business & personal tracking</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Advanced reporting & analytics</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Cash flow predictions for each business</span>
+                   </li>
+                 </ul>
+               </div>
+             </Card>
+
+             {/* Families */}
+             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 p-8">
+               <div className="text-center">
+                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Shield className="h-8 w-8 text-purple-600" />
+                 </div>
+                 <h3 className="text-2xl font-bold text-gray-900 mb-4">For Families</h3>
+                 <p className="text-gray-600 mb-6">
+                   Coordinate household finances and teach kids about money management.
+                 </p>
+                 <ul className="text-left space-y-3 text-gray-600">
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Shared family dashboard access</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Multiple savings goals (vacation, education, etc.)</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Household expense categorization</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                     <span>Family budget planning & tracking</span>
+                   </li>
+                 </ul>
+               </div>
+             </Card>
+           </div>
+         </div>
+       </section>
+
+       {/* CSV Import Highlight */}
+       <section className="py-24 bg-gradient-to-br from-primary/5 to-primary/10">
+         <div className="container mx-auto px-4">
+           <div className="max-w-4xl mx-auto text-center">
+             <h2 className="text-4xl font-bold text-gray-900 mb-6">
+               Import Any Bank Statement in Seconds
+             </h2>
+             <p className="text-xl text-gray-600 mb-12">
+               Our smart CSV parser automatically detects dates, descriptions, and amounts from any bank format. 
+               Positive amounts = income, negative = expenses. It&apos;s that simple.
+             </p>
+             
+             <div className="grid md:grid-cols-2 gap-12 items-center">
+               <div className="text-left">
+                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Supported Features:</h3>
+                 <ul className="space-y-4">
+                   <li className="flex items-center">
+                     <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
+                     <span className="text-lg">Auto-detect date formats (DD/MM/YYYY, MM/DD/YYYY, etc.)</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
+                     <span className="text-lg">Smart amount parsing (+ for income, - for expenses)</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
+                     <span className="text-lg">Description cleaning & categorization</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
+                     <span className="text-lg">Support for all major bank formats</span>
+                   </li>
+                   <li className="flex items-center">
+                     <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
+                     <span className="text-lg">Bulk import thousands of transactions</span>
+                   </li>
+                 </ul>
+               </div>
+               
+               <div className="bg-white rounded-lg shadow-xl p-8">
+                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Sample CSV Format:</h4>
+                 <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm">
+                   <div className="text-gray-600 mb-2">Date,Description,Amount</div>
+                   <div className="text-green-600">2024-01-15,Salary Deposit,+3200.00</div>
+                   <div className="text-red-600">2024-01-16,Grocery Store,-85.50</div>
+                   <div className="text-red-600">2024-01-17,Gas Station,-45.00</div>
+                   <div className="text-green-600">2024-01-18,Freelance Payment,+500.00</div>
+                 </div>
+                 <p className="text-sm text-gray-500 mt-4">
+                   EasyBudget automatically categorizes and organizes your data
+                 </p>
+               </div>
+             </div>
+           </div>
+         </div>
+       </section>
+
+       {/* How It Works */}
+       <section id="how-it-works" className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
