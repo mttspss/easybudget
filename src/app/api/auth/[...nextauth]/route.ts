@@ -11,4 +11,6 @@ console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
 const handler = NextAuth(authOptions)
 
-export { handler as GET, handler as POST } 
+export { handler as GET, handler as POST }
+
+// Test with new MongoDB database - 2024-05-27 
