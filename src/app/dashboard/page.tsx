@@ -15,13 +15,10 @@ import {
   Target,
   CreditCard,
   PieChart,
-  BarChart3,
-  Calendar,
   Settings,
   LogOut,
   Home,
-  Bell,
-  Search
+  Bell
 } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
@@ -94,7 +91,7 @@ export default function Dashboard() {
             Welcome back, {session.user?.name?.split(' ')[0]}! 👋
           </h1>
           <p className="text-gray-600">
-            Here's what's happening with your finances today.
+            Here&apos;s what&apos;s happening with your finances today.
           </p>
         </div>
 
@@ -192,7 +189,7 @@ export default function Dashboard() {
               </div>
               <CardTitle className="text-xl">Add Transaction</CardTitle>
               <CardDescription className="text-base">
-                Manually add income or expenses that aren't in your bank statements.
+                Manually add income or expenses that aren&apos;t in your bank statements.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
