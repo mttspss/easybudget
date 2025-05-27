@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
+import { Card, CardContent } from "@/components/ui/card"
 import { 
   DollarSign,
   TrendingUp,
@@ -11,17 +12,19 @@ import {
   Target,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
-  Clock,
-  AlertCircle
+  Plus,
+  MoreHorizontal,
+  Calendar,
+  Filter
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
@@ -31,326 +34,255 @@ export default function Dashboard() {
     redirect("/")
   }
 
-  const kpiData = [
+  // Static data for now - will be replaced with real data from database
+  const stats = [
     {
-      title: "Balance",
-      value: "$12,345",
-      trend: "+5.2%",
-      isPositive: true,
-      icon: DollarSign
+      title: "Total Balance",
+      value: "$12,847.50",
+      change: "+5.2%",
+      changeType: "increase",
+      icon: DollarSign,
+      description: "vs last month"
     },
     {
-      title: "Income", 
-      value: "$5,420",
-      trend: "+12.3%",
-      isPositive: true,
-      icon: TrendingUp
+      title: "Monthly Income",
+      value: "$5,420.00",
+      change: "+12.3%",
+      changeType: "increase", 
+      icon: TrendingUp,
+      description: "vs last month"
     },
     {
-      title: "Expenses",
-      value: "$3,210", 
-      trend: "+8.1%",
-      isPositive: false,
-      icon: TrendingDown
+      title: "Monthly Expenses",
+      value: "$3,210.75",
+      change: "+8.1%",
+      changeType: "increase",
+      icon: TrendingDown,
+      description: "vs last month"
     },
     {
-      title: "Savings",
-      value: "$2,135",
-      trend: "+15.7%", 
-      isPositive: true,
-      icon: Target
+      title: "Savings Goal",
+      value: "$2,136.75",
+      change: "71%",
+      changeType: "neutral",
+      icon: Target,
+      description: "of $3,000 goal"
     }
   ]
 
-  const tasks = [
-    { id: 1, title: "Review Q2 expenses", status: "pending", priority: "high" },
-    { id: 2, title: "Upload bank statements", status: "pending", priority: "medium" },
-    { id: 3, title: "Categorize transactions", status: "completed", priority: "low" },
-    { id: 4, title: "Update savings goal", status: "pending", priority: "high" },
-    { id: 5, title: "Monthly budget review", status: "overdue", priority: "high" }
+  const recentTransactions = [
+    {
+      id: 1,
+      description: "Grocery Store",
+      category: "Food & Dining",
+      amount: -85.42,
+      date: "Today",
+      status: "completed"
+    },
+    {
+      id: 2,
+      description: "Salary Deposit",
+      category: "Income",
+      amount: 2710.00,
+      date: "Dec 1",
+      status: "completed"
+    },
+    {
+      id: 3,
+      description: "Electric Bill",
+      category: "Utilities",
+      amount: -124.50,
+      date: "Dec 1",
+      status: "completed"
+    },
+    {
+      id: 4,
+      description: "Coffee Shop",
+      category: "Food & Dining",
+      amount: -12.50,
+      date: "Yesterday",
+      status: "completed"
+    },
+    {
+      id: 5,
+      description: "Gas Station",
+      category: "Transportation",
+      amount: -45.20,
+      date: "Yesterday",
+      status: "completed"
+    }
+  ]
+
+  const categories = [
+    { name: "Food & Dining", spent: 485.20, budget: 600, color: "#10B981" },
+    { name: "Transportation", spent: 245.80, budget: 300, color: "#3B82F6" },
+    { name: "Entertainment", spent: 156.40, budget: 200, color: "#8B5CF6" },
+    { name: "Utilities", spent: 324.50, budget: 350, color: "#F59E0B" },
+    { name: "Shopping", spent: 189.90, budget: 250, color: "#EF4444" }
   ]
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title="Dashboard" />
+        <Header title="Overview" />
         
-        <main className="flex-1 overflow-auto">
-          <div className="main-grid">
-            {/* Row 1: KPI Cards */}
-            <div className="col-span-12 grid grid-cols-4 gap-6 mb-8">
-              {kpiData.map((kpi, index) => (
-                <div key={index} className="kpi-card">
-                  <div className="flex items-center justify-between">
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      {kpi.title}
-                    </span>
-                    <kpi.icon 
-                      className="h-4 w-4"
-                      style={{ color: 'var(--text-secondary)' }}
-                    />
-                  </div>
-                  
-                  <div className="mt-4">
-                    <div className="kpi-number">{kpi.value}</div>
-                    <div className={kpi.isPositive ? "trend-positive" : "trend-negative"}>
-                      {kpi.isPositive ? (
-                        <ArrowUp className="h-4 w-4" />
-                      ) : (
-                        <ArrowDown className="h-4 w-4" />
-                      )}
-                      {kpi.trend}
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
+            
+            {/* Header Section */}
+            <div className="flex items-center justify-between">
+              <div>
+                                 <h1 className="text-2xl font-semibold text-gray-900">Good morning, {session.user?.name?.split(' ')[0] || 'there'}</h1>
+                 <p className="text-gray-600 mt-1">Here&apos;s your financial overview for December 2024</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  December 2024
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Transaction
+                </Button>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <Card key={index} className="border-0 shadow-sm bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gray-100 rounded-lg">
+                          <stat.icon className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                </div>
+                    
+                    <div className="mt-4">
+                      <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                      <div className="flex items-center mt-2">
+                        {stat.changeType === "increase" && (
+                          <ArrowUp className="h-4 w-4 text-green-500" />
+                        )}
+                        {stat.changeType === "decrease" && (
+                          <ArrowDown className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={`text-sm font-medium ml-1 ${
+                          stat.changeType === "increase" ? "text-green-600" : 
+                          stat.changeType === "decrease" ? "text-red-600" : 
+                          "text-gray-600"
+                        }`}>
+                          {stat.change}
+                        </span>
+                        <span className="text-sm text-gray-500 ml-1">{stat.description}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
 
-            {/* Row 2: Tasks List (span 8) + Goal Progress (span 4) */}
-            <div className="col-span-8">
-              <div 
-                className="bg-white border rounded-3xl p-6"
-                style={{
-                  borderColor: 'var(--card-border)',
-                  boxShadow: 'var(--elevation-1)'
-                }}
-              >
-                <h3 
-                  className="font-semibold mb-6"
-                  style={{ 
-                    fontSize: 'var(--text-md)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  Financial Tasks
-                </h3>
-                
-                <div className="space-y-4">
-                  {tasks.map((task) => (
-                    <div key={task.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                      <div className="flex-shrink-0">
-                        {task.status === 'completed' ? (
-                          <CheckCircle2 className="h-5 w-5" style={{ color: 'var(--mint)' }} />
-                        ) : task.status === 'overdue' ? (
-                          <AlertCircle className="h-5 w-5" style={{ color: 'var(--error)' }} />
-                        ) : (
-                          <Clock className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
-                        )}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <p 
-                          className="font-medium"
-                          style={{ 
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--text-primary)'
-                          }}
-                        >
-                          {task.title}
-                        </p>
-                        <p 
-                          className="text-xs mt-1"
-                          style={{ color: 'var(--text-secondary)' }}
-                        >
-                          Priority: {task.priority} • Status: {task.status}
-                        </p>
-                      </div>
-                      
-                      <div className="flex-shrink-0">
-                        <div 
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            task.priority === 'high' 
-                              ? 'bg-red-50 text-red-700'
-                              : task.priority === 'medium'
-                              ? 'bg-yellow-50 text-yellow-700' 
-                              : 'bg-gray-50 text-gray-700'
-                          }`}
-                        >
-                          {task.priority}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Recent Transactions */}
+              <div className="lg:col-span-2">
+                <Card className="border-0 shadow-sm bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+                      <Button variant="ghost" size="sm">View all</Button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {recentTransactions.map((transaction) => (
+                        <div key={transaction.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                              transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
+                            }`}>
+                              {transaction.amount > 0 ? (
+                                <ArrowUp className="h-5 w-5 text-green-600" />
+                              ) : (
+                                <ArrowDown className="h-5 w-5 text-red-600" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{transaction.description}</p>
+                              <p className="text-sm text-gray-500">{transaction.category}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className={`font-semibold ${
+                              transaction.amount > 0 ? 'text-green-600' : 'text-gray-900'
+                            }`}>
+                              {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-500">{transaction.date}</p>
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
 
-            <div className="col-span-4">
-              <div 
-                className="bg-white border rounded-3xl p-6"
-                style={{
-                  borderColor: 'var(--card-border)',
-                  boxShadow: 'var(--elevation-1)'
-                }}
-              >
-                <h3 
-                  className="font-semibold mb-6"
-                  style={{ 
-                    fontSize: 'var(--text-md)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  Goal Progress
-                </h3>
-                
-                <div className="text-center">
-                  <div className="relative inline-flex items-center justify-center w-32 h-32 mb-4">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#E5E9F0"
-                        strokeWidth="8"
-                      />
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="var(--mint)"
-                        strokeWidth="8"
-                        strokeDasharray={`${68 * 2.51}, 251.2`}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span 
-                        className="font-bold"
-                        style={{ 
-                          fontSize: 'var(--text-lg)',
-                          color: 'var(--text-primary)'
-                        }}
-                      >
-                        68%
-                      </span>
+              {/* Category Spending */}
+              <div>
+                <Card className="border-0 shadow-sm bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900">Category Spending</h3>
+                      <Button variant="ghost" size="sm">View all</Button>
                     </div>
-                  </div>
-                  
-                  <p 
-                    className="font-medium mb-2"
-                    style={{ 
-                      fontSize: 'var(--text-base)',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    Emergency Fund
-                  </p>
-                  <p 
-                    className="text-xs"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    $3,400 of $5,000 goal
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 3: Cash-Flow Forecast (span 8) + Recurring Subscriptions (span 4) */}
-            <div className="col-span-8 mt-6">
-              <div 
-                className="bg-white border rounded-3xl p-6"
-                style={{
-                  borderColor: 'var(--card-border)',
-                  boxShadow: 'var(--elevation-1)'
-                }}
-              >
-                <h3 
-                  className="font-semibold mb-6"
-                  style={{ 
-                    fontSize: 'var(--text-md)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  Cash-Flow Forecast
-                </h3>
-                
-                <div className="h-40 flex items-end justify-between gap-2">
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, index) => {
-                    const heights = [60, 75, 45, 90, 65, 85]
-                    return (
-                      <div key={month} className="flex flex-col items-center gap-2">
-                        <div 
-                          className="w-8 rounded-t"
-                          style={{ 
-                            height: `${heights[index]}%`,
-                            backgroundColor: 'var(--mint)'
-                          }}
-                        ></div>
-                        <span 
-                          className="text-xs"
-                          style={{ color: 'var(--text-secondary)' }}
-                        >
-                          {month}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="col-span-4 mt-6">
-              <div 
-                className="bg-white border rounded-3xl p-6"
-                style={{
-                  borderColor: 'var(--card-border)',
-                  boxShadow: 'var(--elevation-1)'
-                }}
-              >
-                <h3 
-                  className="font-semibold mb-6"
-                  style={{ 
-                    fontSize: 'var(--text-md)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  Recurring Subscriptions
-                </h3>
-                
-                <div className="space-y-4">
-                  {[
-                    { name: 'Netflix', amount: '$15.99', status: 'active' },
-                    { name: 'Spotify', amount: '$9.99', status: 'active' },
-                    { name: 'Adobe CC', amount: '$52.99', status: 'cancelled' }
-                  ].map((sub, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <p 
-                          className="font-medium"
-                          style={{ 
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--text-primary)'
-                          }}
-                        >
-                          {sub.name}
-                        </p>
-                        <p 
-                          className="text-xs"
-                          style={{ color: 'var(--text-secondary)' }}
-                        >
-                          {sub.status}
-                        </p>
-                      </div>
-                      <span 
-                        className="font-semibold"
-                        style={{ 
-                          fontSize: 'var(--text-sm)',
-                          color: 'var(--text-primary)'
-                        }}
-                      >
-                        {sub.amount}
-                      </span>
+                    
+                    <div className="space-y-4">
+                      {categories.map((category, index) => {
+                        const percentage = (category.spent / category.budget) * 100
+                        return (
+                          <div key={index} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                              </div>
+                              <span className="text-sm text-gray-600">
+                                ${category.spent} / ${category.budget}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="h-2 rounded-full transition-all"
+                                style={{ 
+                                  width: `${Math.min(percentage, 100)}%`,
+                                  backgroundColor: category.color 
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                  ))}
-                </div>
+                  </CardContent>
+                </Card>
               </div>
+
             </div>
           </div>
         </main>

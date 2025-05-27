@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { 
-  DollarSign,
   BarChart3,
   Upload,
   Target,
@@ -14,21 +13,17 @@ import {
   TrendingUp,
   FileText,
   Settings,
-  Menu,
-  X
+  ChevronLeft,
+  ChevronRight,
+  Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const sidebarItems = [
   {
-    title: "Dashboard",
+    title: "Overview",
     href: "/dashboard",
     icon: BarChart3,
-  },
-  {
-    title: "Import CSV",
-    href: "/dashboard/import",
-    icon: Upload,
   },
   {
     title: "Transactions",
@@ -55,6 +50,11 @@ const sidebarItems = [
     href: "/dashboard/analytics",
     icon: TrendingUp,
   },
+  {
+    title: "Import CSV",
+    href: "/dashboard/import",
+    icon: Upload,
+  },
 ]
 
 export function Sidebar() {
@@ -64,25 +64,18 @@ export function Sidebar() {
   return (
     <div 
       className={cn(
-        "h-screen transition-all duration-300 flex flex-col",
-        collapsed ? "w-20" : "w-60"
+        "h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col",
+        collapsed ? "w-16" : "w-64"
       )}
-      style={{ 
-        backgroundColor: 'var(--deep-blue)',
-        transition: 'var(--transition-fast)'
-      }}
     >
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
         {!collapsed && (
-          <div className="flex items-center gap-3">
-            <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: 'var(--mint)' }}
-            >
-              <DollarSign className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-white" />
             </div>
-            <span className="text-white font-semibold text-lg">EasyBudget</span>
+            <span className="font-semibold text-gray-900">EasyBudget</span>
           </div>
         )}
         
@@ -90,44 +83,47 @@ export function Sidebar() {
           variant="ghost" 
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="text-white hover:bg-white/10 p-2"
+          className="h-8 w-8 p-0 text-gray-500 hover:text-gray-900"
         >
-          {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
+      {/* Quick Actions */}
+      {!collapsed && (
+        <div className="p-4 border-b border-gray-200">
+          <Button size="sm" className="w-full justify-start bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Transaction
+          </Button>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="flex-1 py-6">
-        <div className="space-y-2 px-3">
+      <nav className="flex-1 py-4">
+        <div className="space-y-1 px-2">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link key={item.href} href={item.href}>
                 <div
                   className={cn(
-                    "group relative flex items-center rounded-xl p-3 transition-all",
-                    "hover:bg-white/5",
-                    isActive && "bg-white/10"
+                    "group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                    "hover:bg-gray-100",
+                    isActive 
+                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-600" 
+                      : "text-gray-700 hover:text-gray-900"
                   )}
-                  style={{
-                    backgroundColor: isActive ? 'var(--mint)' : undefined,
-                    borderRadius: 'var(--radius-sm)'
-                  }}
                 >
                   <item.icon 
                     className={cn(
                       "h-5 w-5 flex-shrink-0",
-                      isActive ? "text-white" : "text-white/70"
+                      isActive ? "text-blue-600" : "text-gray-500"
                     )} 
                   />
                   
                   {!collapsed && (
-                    <span 
-                      className={cn(
-                        "ml-3 text-sm font-medium",
-                        isActive ? "text-white" : "text-white/80"
-                      )}
-                    >
+                    <span className="ml-3">
                       {item.title}
                     </span>
                   )}
@@ -146,16 +142,15 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-white/10">
+      <div className="p-2 border-t border-gray-200">
         <Link href="/dashboard/settings">
           <div
-            className="group relative flex items-center rounded-xl p-3 transition-all hover:bg-white/5"
-            style={{ borderRadius: 'var(--radius-sm)' }}
+            className="group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900"
           >
-            <Settings className="h-5 w-5 flex-shrink-0 text-white/70" />
+            <Settings className="h-5 w-5 flex-shrink-0 text-gray-500" />
             
             {!collapsed && (
-              <span className="ml-3 text-sm font-medium text-white/80">
+              <span className="ml-3">
                 Settings
               </span>
             )}
