@@ -12,13 +12,8 @@ import {
   Bell,
   Shield,
   CreditCard,
-  Palette,
   Download,
   Trash2,
-  Key,
-  Globe,
-  Smartphone,
-  Mail,
   ChevronRight,
   AlertTriangle
 } from "lucide-react"
