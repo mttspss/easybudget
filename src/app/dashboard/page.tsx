@@ -4,30 +4,25 @@ import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { 
   DollarSign,
   TrendingUp,
   TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
   Target,
-  Filter,
-  Search,
-  MoreVertical,
-  Calendar
+  ArrowUp,
+  ArrowDown,
+  CheckCircle2,
+  Clock,
+  AlertCircle
 } from "lucide-react"
-import { Input } from "@/components/ui/input"
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }
@@ -36,191 +31,326 @@ export default function Dashboard() {
     redirect("/")
   }
 
-  const statsCards = [
+  const kpiData = [
     {
-      title: "Total Balance",
+      title: "Balance",
       value: "$12,345",
-      change: "+5",
-      changeType: "increase",
-      period: "vs last month",
-      icon: DollarSign,
-      color: "text-blue-600"
+      trend: "+5.2%",
+      isPositive: true,
+      icon: DollarSign
     },
     {
-      title: "Monthly Income",
+      title: "Income", 
       value: "$5,420",
-      change: "+2",
-      changeType: "increase", 
-      period: "vs last month",
-      icon: TrendingUp,
-      color: "text-green-600"
+      trend: "+12.3%",
+      isPositive: true,
+      icon: TrendingUp
     },
     {
-      title: "Monthly Expenses",
-      value: "$3,210",
-      change: "+12",
-      changeType: "increase",
-      period: "vs last month", 
-      icon: TrendingDown,
-      color: "text-red-600"
+      title: "Expenses",
+      value: "$3,210", 
+      trend: "+8.1%",
+      isPositive: false,
+      icon: TrendingDown
     },
     {
-      title: "Savings Rate",
-      value: "68%",
-      change: "+15",
-      changeType: "increase",
-      period: "vs last week",
-      icon: Target,
-      color: "text-purple-600"
+      title: "Savings",
+      value: "$2,135",
+      trend: "+15.7%", 
+      isPositive: true,
+      icon: Target
     }
   ]
 
-  const todaysTasks = [
-    {
-      name: "Review Q2 expenses",
-      category: "Monthly Review",
-      due: "27 May 2024",
-      status: "pending"
-    },
-    {
-      name: "Upload bank statements",
-      category: "Data Import",
-      due: "27 May 2024", 
-      status: "pending"
-    },
-    {
-      name: "Update savings goal",
-      category: "Goal Planning",
-      due: "27 May 2024",
-      status: "pending"
-    },
-    {
-      name: "Categorize transactions",
-      category: "Data Management",
-      due: "27 May 2024",
-      status: "pending"
-    }
+  const tasks = [
+    { id: 1, title: "Review Q2 expenses", status: "pending", priority: "high" },
+    { id: 2, title: "Upload bank statements", status: "pending", priority: "medium" },
+    { id: 3, title: "Categorize transactions", status: "completed", priority: "low" },
+    { id: 4, title: "Update savings goal", status: "pending", priority: "high" },
+    { id: 5, title: "Monthly budget review", status: "overdue", priority: "high" }
   ]
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-white">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header 
-          title={`Welcome Back, ${session.user?.name?.split(' ')[0]}! 👋`}
-          subtitle={`4 Tasks Due Today, 2 Overdue Tasks, 8 Upcoming Deadlines (This Week)`}
-        />
+        <Header title="Dashboard" />
         
-        <main className="flex-1 overflow-auto p-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {statsCards.map((stat, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    {stat.title}
-                  </CardTitle>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                  <p className={`text-xs flex items-center mt-1 ${
-                    stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stat.changeType === 'increase' ? (
-                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 mr-1" />
-                    )}
-                    {stat.change} {stat.period}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Today's Tasks */}
-            <div className="lg:col-span-2">
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-xl font-bold">Today&apos;s Financial Tasks</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                      <Input placeholder="Search here..." className="pl-10 w-64" />
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filter
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {todaysTasks.map((task, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-primary rounded-full"></div>
-                          <div>
-                            <p className="font-medium text-gray-900">{task.name}</p>
-                            <div className="flex items-center gap-4 mt-1">
-                              <Badge variant="secondary" className="text-xs">
-                                {task.category}
-                              </Badge>
-                              <span className="text-xs text-gray-500 flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {task.due}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Performance Chart */}
-            <div>
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold">Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center mb-6">
-                    <div className="text-4xl font-bold text-gray-900">86%</div>
-                    <p className="text-sm text-green-600 flex items-center justify-center mt-1">
-                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                      +15% vs last Week
-                    </p>
+        <main className="flex-1 overflow-auto">
+          <div className="main-grid">
+            {/* Row 1: KPI Cards */}
+            <div className="col-span-12 grid grid-cols-4 gap-6 mb-8">
+              {kpiData.map((kpi, index) => (
+                <div key={index} className="kpi-card">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      {kpi.title}
+                    </span>
+                    <kpi.icon 
+                      className="h-4 w-4"
+                      style={{ color: 'var(--text-secondary)' }}
+                    />
                   </div>
                   
-                  {/* Simple Chart Placeholder */}
-                  <div className="space-y-2">
-                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, index) => {
-                      const heights = [60, 75, 90, 65, 85]
-                      return (
-                        <div key={day} className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 w-8">{day}</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-primary h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${heights[index]}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-xs text-gray-500 w-8">+{[82, 51, 86, 45, 82][index]}%</span>
-                        </div>
-                      )
-                    })}
+                  <div className="mt-4">
+                    <div className="kpi-number">{kpi.value}</div>
+                    <div className={kpi.isPositive ? "trend-positive" : "trend-negative"}>
+                      {kpi.isPositive ? (
+                        <ArrowUp className="h-4 w-4" />
+                      ) : (
+                        <ArrowDown className="h-4 w-4" />
+                      )}
+                      {kpi.trend}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
+            </div>
+
+            {/* Row 2: Tasks List (span 8) + Goal Progress (span 4) */}
+            <div className="col-span-8">
+              <div 
+                className="bg-white border rounded-3xl p-6"
+                style={{
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--elevation-1)'
+                }}
+              >
+                <h3 
+                  className="font-semibold mb-6"
+                  style={{ 
+                    fontSize: 'var(--text-md)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  Financial Tasks
+                </h3>
+                
+                <div className="space-y-4">
+                  {tasks.map((task) => (
+                    <div key={task.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                      <div className="flex-shrink-0">
+                        {task.status === 'completed' ? (
+                          <CheckCircle2 className="h-5 w-5" style={{ color: 'var(--mint)' }} />
+                        ) : task.status === 'overdue' ? (
+                          <AlertCircle className="h-5 w-5" style={{ color: 'var(--error)' }} />
+                        ) : (
+                          <Clock className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+                        )}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <p 
+                          className="font-medium"
+                          style={{ 
+                            fontSize: 'var(--text-sm)',
+                            color: 'var(--text-primary)'
+                          }}
+                        >
+                          {task.title}
+                        </p>
+                        <p 
+                          className="text-xs mt-1"
+                          style={{ color: 'var(--text-secondary)' }}
+                        >
+                          Priority: {task.priority} • Status: {task.status}
+                        </p>
+                      </div>
+                      
+                      <div className="flex-shrink-0">
+                        <div 
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            task.priority === 'high' 
+                              ? 'bg-red-50 text-red-700'
+                              : task.priority === 'medium'
+                              ? 'bg-yellow-50 text-yellow-700' 
+                              : 'bg-gray-50 text-gray-700'
+                          }`}
+                        >
+                          {task.priority}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-4">
+              <div 
+                className="bg-white border rounded-3xl p-6"
+                style={{
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--elevation-1)'
+                }}
+              >
+                <h3 
+                  className="font-semibold mb-6"
+                  style={{ 
+                    fontSize: 'var(--text-md)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  Goal Progress
+                </h3>
+                
+                <div className="text-center">
+                  <div className="relative inline-flex items-center justify-center w-32 h-32 mb-4">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="#E5E9F0"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="var(--mint)"
+                        strokeWidth="8"
+                        strokeDasharray={`${68 * 2.51}, 251.2`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span 
+                        className="font-bold"
+                        style={{ 
+                          fontSize: 'var(--text-lg)',
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        68%
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <p 
+                    className="font-medium mb-2"
+                    style={{ 
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--text-primary)'
+                    }}
+                  >
+                    Emergency Fund
+                  </p>
+                  <p 
+                    className="text-xs"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    $3,400 of $5,000 goal
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Cash-Flow Forecast (span 8) + Recurring Subscriptions (span 4) */}
+            <div className="col-span-8 mt-6">
+              <div 
+                className="bg-white border rounded-3xl p-6"
+                style={{
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--elevation-1)'
+                }}
+              >
+                <h3 
+                  className="font-semibold mb-6"
+                  style={{ 
+                    fontSize: 'var(--text-md)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  Cash-Flow Forecast
+                </h3>
+                
+                <div className="h-40 flex items-end justify-between gap-2">
+                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, index) => {
+                    const heights = [60, 75, 45, 90, 65, 85]
+                    return (
+                      <div key={month} className="flex flex-col items-center gap-2">
+                        <div 
+                          className="w-8 rounded-t"
+                          style={{ 
+                            height: `${heights[index]}%`,
+                            backgroundColor: 'var(--mint)'
+                          }}
+                        ></div>
+                        <span 
+                          className="text-xs"
+                          style={{ color: 'var(--text-secondary)' }}
+                        >
+                          {month}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-4 mt-6">
+              <div 
+                className="bg-white border rounded-3xl p-6"
+                style={{
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--elevation-1)'
+                }}
+              >
+                <h3 
+                  className="font-semibold mb-6"
+                  style={{ 
+                    fontSize: 'var(--text-md)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  Recurring Subscriptions
+                </h3>
+                
+                <div className="space-y-4">
+                  {[
+                    { name: 'Netflix', amount: '$15.99', status: 'active' },
+                    { name: 'Spotify', amount: '$9.99', status: 'active' },
+                    { name: 'Adobe CC', amount: '$52.99', status: 'cancelled' }
+                  ].map((sub, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div>
+                        <p 
+                          className="font-medium"
+                          style={{ 
+                            fontSize: 'var(--text-sm)',
+                            color: 'var(--text-primary)'
+                          }}
+                        >
+                          {sub.name}
+                        </p>
+                        <p 
+                          className="text-xs"
+                          style={{ color: 'var(--text-secondary)' }}
+                        >
+                          {sub.status}
+                        </p>
+                      </div>
+                      <span 
+                        className="font-semibold"
+                        style={{ 
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        {sub.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </main>

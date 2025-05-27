@@ -2,14 +2,14 @@
 
 import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { 
   Bell,
-  Download,
+  Upload,
   LogOut,
   User,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Sun
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -21,65 +21,94 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface HeaderProps {
-  title: string
-  subtitle?: string
+  title?: string
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title }: HeaderProps) {
   const { data: session } = useSession()
 
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          {subtitle && (
-            <p className="text-sm text-gray-600">{subtitle}</p>
-          )}
-        </div>
+    <header 
+      className="sticky top-0 z-40 h-16 flex items-center justify-between px-8 bg-white border-b"
+      style={{
+        borderColor: 'var(--card-border)',
+        boxShadow: 'var(--elevation-1)'
+      }}
+    >
+      <div className="flex items-center gap-6">
+        {title && (
+          <h1 
+            className="font-bold"
+            style={{ 
+              fontSize: 'var(--text-lg)',
+              color: 'var(--text-primary)'
+            }}
+          >
+            {title}
+          </h1>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Last Updated Info */}
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500">
-          <span>Last Updated 27 May 2025</span>
-          <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white"></div>
-            <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-white"></div>
-            <div className="w-6 h-6 rounded-full bg-purple-500 border-2 border-white"></div>
-          </div>
-        </div>
+        {/* Theme Toggle */}
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="h-8 w-8 p-0"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          <Sun className="h-4 w-4" />
+        </Button>
 
-        {/* Export Button */}
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
-          Export
+        {/* CSV Import */}
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="gap-2"
+          style={{
+            borderColor: 'var(--card-border)',
+            color: 'var(--text-primary)'
+          }}
+        >
+          <Upload className="h-4 w-4" />
+          Import
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="relative h-8 w-8 p-0"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <Bell className="h-4 w-4" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 p-0 text-xs">
-            3
-          </Badge>
+          <div 
+            className="absolute -top-1 -right-1 h-2 w-2 rounded-full"
+            style={{ backgroundColor: 'var(--error)' }}
+          />
         </Button>
 
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
-                  {session?.user?.name?.charAt(0) || 'U'}
-                </span>
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 h-8 px-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white"
+                style={{ backgroundColor: 'var(--mint)' }}
+              >
+                {session?.user?.name?.charAt(0) || 'U'}
               </div>
-              <span className="hidden md:block text-sm font-medium">
-                {session?.user?.name || 'User'}
+              <span className="text-sm font-medium hidden md:block">
+                {session?.user?.name?.split(' ')[0] || 'User'}
               </span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

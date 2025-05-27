@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { 
   DollarSign,
@@ -9,14 +10,14 @@ import {
   Upload,
   Target,
   CreditCard,
-  Settings,
   PieChart,
   TrendingUp,
   FileText,
-  Search
+  Settings,
+  Menu,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 const sidebarItems = [
   {
@@ -58,86 +59,113 @@ const sidebarItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <div className="flex h-full w-64 flex-col bg-gray-900 text-white">
+    <div 
+      className={cn(
+        "h-screen transition-all duration-300 flex flex-col",
+        collapsed ? "w-20" : "w-60"
+      )}
+      style={{ 
+        backgroundColor: 'var(--deep-blue)',
+        transition: 'var(--transition-fast)'
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-800">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <DollarSign className="h-5 w-5 text-white" />
-        </div>
-        <span className="text-xl font-bold">EasyBudget</span>
-      </div>
-
-      {/* Search */}
-      <div className="px-4 py-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search..."
-            className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-          />
-        </div>
+      <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+        {!collapsed && (
+          <div className="flex items-center gap-3">
+            <div 
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: 'var(--mint)' }}
+            >
+              <DollarSign className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-white font-semibold text-lg">EasyBudget</span>
+          </div>
+        )}
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-white hover:bg-white/10 p-2"
+        >
+          {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
+        </Button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 pb-4">
-        <div className="space-y-1">
+      <nav className="flex-1 py-6">
+        <div className="space-y-2 px-3">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link key={item.href} href={item.href}>
-                <Button
-                  variant="ghost"
+                <div
                   className={cn(
-                    "w-full justify-start gap-3 text-gray-300 hover:text-white hover:bg-gray-800",
-                    isActive && "bg-gray-800 text-white"
+                    "group relative flex items-center rounded-xl p-3 transition-all",
+                    "hover:bg-white/5",
+                    isActive && "bg-white/10"
                   )}
+                  style={{
+                    backgroundColor: isActive ? 'var(--mint)' : undefined,
+                    borderRadius: 'var(--radius-sm)'
+                  }}
                 >
-                  <item.icon className="h-4 w-4" />
-                  {item.title}
-                </Button>
+                  <item.icon 
+                    className={cn(
+                      "h-5 w-5 flex-shrink-0",
+                      isActive ? "text-white" : "text-white/70"
+                    )} 
+                  />
+                  
+                  {!collapsed && (
+                    <span 
+                      className={cn(
+                        "ml-3 text-sm font-medium",
+                        isActive ? "text-white" : "text-white/80"
+                      )}
+                    >
+                      {item.title}
+                    </span>
+                  )}
+                  
+                  {/* Tooltip for collapsed state */}
+                  {collapsed && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                      {item.title}
+                    </div>
+                  )}
+                </div>
               </Link>
             )
           })}
         </div>
-
-        {/* Quick Stats */}
-        <div className="mt-8 space-y-4">
-          <div className="rounded-lg bg-gray-800 p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">This Month</span>
-              <TrendingUp className="h-4 w-4 text-green-500" />
-            </div>
-            <div className="mt-2">
-              <div className="text-2xl font-bold">$2,340</div>
-              <div className="text-sm text-green-500">+12% vs last month</div>
-            </div>
-          </div>
-
-          <div className="rounded-lg bg-gray-800 p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">Savings Goal</span>
-              <Target className="h-4 w-4 text-blue-500" />
-            </div>
-            <div className="mt-2">
-              <div className="text-2xl font-bold">68%</div>
-              <div className="text-sm text-blue-500">$3,400 / $5,000</div>
-            </div>
-          </div>
-        </div>
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-gray-800 p-4">
+      <div className="p-3 border-t border-white/10">
         <Link href="/dashboard/settings">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-gray-300 hover:text-white hover:bg-gray-800"
+          <div
+            className="group relative flex items-center rounded-xl p-3 transition-all hover:bg-white/5"
+            style={{ borderRadius: 'var(--radius-sm)' }}
           >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Button>
+            <Settings className="h-5 w-5 flex-shrink-0 text-white/70" />
+            
+            {!collapsed && (
+              <span className="ml-3 text-sm font-medium text-white/80">
+                Settings
+              </span>
+            )}
+            
+            {collapsed && (
+              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                Settings
+              </div>
+            )}
+          </div>
         </Link>
       </div>
     </div>
