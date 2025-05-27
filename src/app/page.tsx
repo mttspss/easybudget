@@ -468,11 +468,11 @@ export default function Home() {
                    <li className="flex items-center">
                      <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                      <span className="text-lg">Support for all major bank formats</span>
-                   </li>
+          </li>
                    <li className="flex items-center">
                      <CheckCircle className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                      <span className="text-lg">Bulk import thousands of transactions</span>
-                   </li>
+          </li>
                  </ul>
                </div>
                
