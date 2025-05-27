@@ -1,12 +1,9 @@
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+// import { PrismaAdapter } from "@auth/prisma-adapter"
+// import { prisma } from "./prisma"
 
 export const authOptions = {
-  adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET,
+  // adapter: PrismaAdapter(prisma), // DISABILITATO PER TEST
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -31,4 +28,5 @@ export const authOptions = {
     strategy: "jwt" as const,
   },
   debug: process.env.NODE_ENV === 'development',
+  secret: process.env.NEXTAUTH_SECRET,
 } 
