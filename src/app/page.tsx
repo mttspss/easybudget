@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession, signIn } from "next-auth/react"
+import { useSession, signIn, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +20,9 @@ import {
   Lock,
   Zap,
   Plus,
-  Minus
+  Minus,
+  LogOut,
+  User
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -34,29 +36,6 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-
-  if (session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Welcome back, {session.user?.name}!
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Ready to take control of your finances today?
-            </p>
-            <Link href="/dashboard">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Go to Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
       </div>
     )
   }
@@ -104,18 +83,34 @@ export default function Home() {
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How it Works</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
-              <Button onClick={() => {
-                console.log("Sign In clicked");
-                signIn("google");
-              }} variant="outline" size="sm">
-                Sign In
-              </Button>
-              <Button onClick={() => {
-                console.log("Get Started clicked");
-                signIn("google");
-              }} size="sm" className="bg-primary hover:bg-primary/90">
-                Get Started
-              </Button>
+              
+              {session ? (
+                <div className="flex items-center space-x-4">
+                  <Link href="/dashboard">
+                    <Button variant="outline" size="sm">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm text-gray-600">{session.user?.name}</span>
+                  </div>
+                  <Button onClick={() => signOut()} variant="ghost" size="sm">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button onClick={() => signIn("google")} variant="outline" size="sm">
+                    Sign In
+                  </Button>
+                  <Button onClick={() => signIn("google")} size="sm" className="bg-primary hover:bg-primary/90">
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -139,12 +134,32 @@ export default function Home() {
                 <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
                 <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
                 <div className="flex flex-col space-y-2 pt-4">
-                  <Button onClick={() => signIn("google")} variant="outline" size="sm">
-                    Sign In
-                  </Button>
-                  <Button onClick={() => signIn("google")} size="sm" className="bg-primary hover:bg-primary/90">
-                    Get Started
-                  </Button>
+                  {session ? (
+                    <>
+                      <Link href="/dashboard">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Dashboard
+                        </Button>
+                      </Link>
+                      <div className="text-sm text-gray-600 px-2">
+                        Welcome, {session.user?.name}
+                      </div>
+                      <Button onClick={() => signOut()} variant="ghost" size="sm">
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={() => signIn("google")} variant="outline" size="sm">
+                        Sign In
+                      </Button>
+                      <Button onClick={() => signIn("google")} size="sm" className="bg-primary hover:bg-primary/90">
+                        Get Started
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -156,6 +171,23 @@ export default function Home() {
       <section className="pt-20 pb-32 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
+            {session && (
+              <div className="mb-8 p-6 bg-primary/10 rounded-lg border border-primary/20">
+                <h2 className="text-2xl font-bold text-primary mb-2">
+                  Welcome back, {session.user?.name}! 👋
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Ready to take control of your finances today?
+                </p>
+                <Link href="/dashboard">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+            
             <Badge variant="secondary" className="mb-6 bg-primary/10 text-primary border-primary/20">
               💳 Multiple Accounts, One Dashboard
             </Badge>
@@ -169,26 +201,25 @@ export default function Home() {
               Whether you have 1 account or 10+ (personal cards, business accounts, multiple banks), EasyBudget consolidates everything. Import CSV files, track expenses & income, get smart predictions, and never lose control of your money again.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button 
-                size="lg" 
-                onClick={() => {
-                  console.log("Start Your Financial Transformation clicked");
-                  signIn("google");
-                }}
-                className="bg-primary hover:bg-primary/90 text-lg px-8 py-4 h-auto"
-              >
-                Start Your Financial Transformation
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-lg px-8 py-4 h-auto"
-              >
-                Watch 2-Min Demo
-              </Button>
-            </div>
+            {!session && (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Button 
+                  size="lg" 
+                  onClick={() => signIn("google")}
+                  className="bg-primary hover:bg-primary/90 text-lg px-8 py-4 h-auto"
+                >
+                  Start Your Financial Transformation
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="text-lg px-8 py-4 h-auto"
+                >
+                  Watch 2-Min Demo
+                </Button>
+              </div>
+            )}
 
             {/* Social Proof */}
             <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
