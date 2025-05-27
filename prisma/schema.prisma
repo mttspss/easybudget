@@ -15,55 +15,43 @@ datasource db {
 
 // NextAuth.js Models
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  id                String  @id @map("_id") @default(auto()) @db.ObjectId
   userId            String  @db.ObjectId
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.String
   access_token      String? @db.String
-  expires_at        Int?
-  token_type        String?
-  scope             String?
+  expires_at        Int?    @db.Int
+  token_type        String? @db.String
+  scope             String? @db.String
   id_token          String? @db.String
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session_state     String? @db.String
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
 model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @map("_id") @default(auto()) @db.ObjectId
   sessionToken String   @unique
   userId       String   @db.ObjectId
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @id @map("_id") @default(auto()) @db.ObjectId
   name          String?
-  email         String    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts     Account[]
-  sessions     Session[]
-  categories   Category[]
-  transactions Transaction[]
-  budgets      Budget[]
 
   @@map("users")
 }
 
 model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @map("_id") @default(auto()) @db.ObjectId
   identifier String
   token      String   @unique
   expires    DateTime
@@ -72,20 +60,16 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-// Budgeting App Models
+// Budgeting App Models (senza relazioni per ora)
 model Category {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  color       String   @default("#22C55E")
-  icon        String?
-  type        String   // "income" or "expense"
-  userId      String   @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  budgets      Budget[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  color     String   @default("#22C55E")
+  icon      String?
+  type      String   // "income" or "expense"
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("categories")
 }
@@ -100,9 +84,6 @@ model Transaction {
   userId      String   @db.ObjectId
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
@@ -119,9 +100,6 @@ model Budget {
   userId     String   @db.ObjectId
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("budgets")
 }

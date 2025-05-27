@@ -1,9 +1,12 @@
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "./prisma"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -27,28 +30,5 @@ export const authOptions = {
   session: {
     strategy: "jwt" as const,
   },
-  events: {
-    signIn: async (message: any) => {
-      console.log('✅ User signed in successfully:', message);
-    },
-    error: async (message: any) => {
-      console.error('❌ Auth error occurred:', message);
-    },
-    createUser: async (message: any) => {
-      console.log('👤 New user created:', message);
-    },
-  },
-  logger: {
-    error(code: any, metadata: any) {
-      console.error('🚨 NextAuth Error:', code, metadata);
-    },
-    warn(code: any) {
-      console.warn('⚠️ NextAuth Warning:', code);
-    },
-    debug(code: any, metadata: any) {
-      console.log('🔍 NextAuth Debug:', code, metadata);
-    },
-  },
-  debug: true,
-  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 } 
