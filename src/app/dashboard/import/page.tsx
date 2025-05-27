@@ -84,7 +84,6 @@ export default function ImportPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header 
           title="Import CSV Files"
-          subtitle="Upload your bank statements to automatically categorize and track your transactions"
         />
         
         <main className="flex-1 overflow-auto p-6">
