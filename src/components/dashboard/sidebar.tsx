@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { 
   BarChart3,
-  CreditCard,
+  ArrowUpRight,
+  ArrowDownRight,
   PieChart,
   Target,
   FileText,
@@ -23,9 +24,14 @@ const sidebarItems = [
     icon: BarChart3,
   },
   {
-    title: "Transactions",
-    href: "/dashboard/transactions",
-    icon: CreditCard,
+    title: "Income",
+    href: "/dashboard/income",
+    icon: ArrowUpRight,
+  },
+  {
+    title: "Expenses",
+    href: "/dashboard/expenses",
+    icon: ArrowDownRight,
   },
   {
     title: "Categories",
