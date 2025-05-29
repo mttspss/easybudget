@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,17 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "EasyBudget - Personal Finance & Budgeting App",
-  description: "Take control of your finances with EasyBudget. Track expenses, manage budgets, and achieve your financial goals.",
-  keywords: ["budgeting", "finance", "expense tracking", "personal finance", "money management"],
-  authors: [{ name: "EasyBudget Team" }],
-  creator: "EasyBudget",
-  publisher: "EasyBudget",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  title: "EasyBudget - Personal Finance Management",
+  description: "Track your expenses, manage budgets, and achieve your financial goals with EasyBudget.",
 };
 
 export default function RootLayout({
@@ -28,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Providers>
+        <AuthProvider>
           {children}
-        </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

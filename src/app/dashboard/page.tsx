@@ -1,6 +1,7 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/lib/auth-context"
+import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
@@ -29,25 +30,120 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("month")
 
   useEffect(() => {
-    if (session) {
+    if (user) {
       fetchDashboardStats()
     }
-  }, [session, selectedPeriod])
+  }, [user, selectedPeriod])
 
   const fetchDashboardStats = async () => {
+    if (!user) return
+    
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/dashboard/stats?period=${selectedPeriod}`)
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data)
+      
+      // Calculate date ranges
+      const now = new Date()
+      let startDate: Date
+      const endDate = now
+
+      switch (selectedPeriod) {
+        case 'week':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
+          break
+        case 'year':
+          startDate = new Date(now.getFullYear(), 0, 1)
+          break
+        default: // month
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1)
       }
+
+      // Get transactions for the period
+      const { data: periodTransactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('date', startDate.toISOString().split('T')[0])
+        .lte('date', endDate.toISOString().split('T')[0])
+
+      // Get all transactions for total balance
+      const { data: allTransactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+
+      // Get recent transactions (last 5)
+      const { data: recentTransactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(5)
+
+      // Get categories
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', user.id)
+
+      // Calculate stats
+      const periodIncome = (periodTransactions || [])
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      const periodExpenses = (periodTransactions || [])
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      const totalIncome = (allTransactions || [])
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      const totalExpenses = (allTransactions || [])
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      // Category spending with budgets
+      const categorySpending = await Promise.all(
+        (categories || []).map(async (category) => {
+          const categoryTransactions = (periodTransactions || []).filter(t => t.category_id === category.id)
+          const spent = categoryTransactions.reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          // Get budget for this category
+          const { data: budgets } = await supabase
+            .from('budgets')
+            .select('*')
+            .eq('category_id', category.id)
+            .eq('user_id', user.id)
+            .lte('start_date', endDate.toISOString().split('T')[0])
+            .gte('end_date', startDate.toISOString().split('T')[0])
+            .limit(1)
+
+          const budget = budgets?.[0]
+
+          return {
+            category: category.name,
+            color: category.color,
+            spent,
+            budget: budget?.amount || 0,
+            percentage: budget?.amount ? (spent / budget.amount) * 100 : 0
+          }
+        })
+      )
+
+      setStats({
+        totalBalance: totalIncome - totalExpenses,
+        income: periodIncome,
+        expenses: periodExpenses,
+        balance: periodIncome - periodExpenses,
+        recentTransactions: recentTransactions || [],
+        categorySpending: categorySpending.filter(c => c.spent > 0)
+      })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
     } finally {
@@ -55,7 +151,7 @@ export default function Dashboard() {
     }
   }
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -63,7 +159,7 @@ export default function Dashboard() {
     )
   }
 
-  if (!session) {
+  if (!user) {
     redirect("/")
   }
 
@@ -103,13 +199,13 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* Header */}
-                  <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Welcome back, {session.user?.name?.split(' ')[0] || 'there'}
+                  Welcome back, {user.user_metadata?.name?.split(' ')[0] || 'there'}
                 </h1>
                 <p className="text-gray-600 mt-1">Here&apos;s your financial overview</p>
-                  </div>
+              </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center bg-white border border-gray-200 rounded-xl p-1">
                   {["week", "month", "year"].map((period) => (
@@ -199,7 +295,7 @@ export default function Dashboard() {
                         <p className="text-2xl font-bold text-gray-900">
                           {formatCurrency(stats?.expenses || 0)}
                         </p>
-                    </div>
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -209,8 +305,8 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="p-2 bg-purple-50 rounded-lg">
                           <TrendingUp className="h-5 w-5 text-purple-600" />
-                </div>
-              </div>
+                        </div>
+                      </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-1">Net Income</p>
                         <p className={`text-2xl font-bold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -305,40 +401,40 @@ export default function Dashboard() {
                           <div className="flex justify-between mb-2">
                             <div className="h-4 bg-gray-200 rounded w-1/3"></div>
                             <div className="h-4 bg-gray-200 rounded w-16"></div>
-                </div>
+                          </div>
                           <div className="h-2 bg-gray-200 rounded"></div>
-              </div>
+                        </div>
                       ))}
-            </div>
+                    </div>
                   ) : stats?.categorySpending && stats.categorySpending.length > 0 ? (
                     <div className="space-y-4">
                       {stats.categorySpending.map((category, index) => (
                         <div key={index}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                        <div 
+                              <div 
                                 className="w-3 h-3 rounded-full" 
                                 style={{ backgroundColor: category.color }}
-                        ></div>
+                              ></div>
                               <span className="font-medium text-gray-900">{category.category}</span>
                             </div>
                             <span className="text-sm font-semibold text-gray-600">
                               {formatCurrency(category.spent)}
-                        </span>
-                      </div>
+                            </span>
+                          </div>
                           {category.budget > 0 && (
                             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+                              <div 
                                 className={`h-2 rounded-full ${
                                   category.percentage > 100 ? 'bg-red-500' : 'bg-blue-500'
                                 }`}
                                 style={{ width: `${Math.min(category.percentage, 100)}%` }}
                               ></div>
-                      </div>
+                            </div>
                           )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
                   ) : (
                     <div className="text-center py-8">
                       <DollarSign className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -348,7 +444,7 @@ export default function Dashboard() {
                         <Plus className="h-4 w-4 mr-2" />
                         Add Category
                       </Button>
-              </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>
