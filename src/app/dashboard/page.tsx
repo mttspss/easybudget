@@ -18,7 +18,7 @@ import {
   PiggyBank,
   Clock
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 interface DashboardStats {
   totalBalance: number
@@ -35,13 +35,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("month")
 
-  useEffect(() => {
-    if (user) {
-      fetchDashboardStats()
-    }
-  }, [user, selectedPeriod])
-
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
     if (!user) return
     
     try {
@@ -149,7 +143,13 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user, selectedPeriod])
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardStats()
+    }
+  }, [user, fetchDashboardStats])
 
   if (loading) {
     return (
