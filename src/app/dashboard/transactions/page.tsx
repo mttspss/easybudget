@@ -1,34 +1,37 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/lib/auth-context"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 import { 
   Plus,
   Filter,
   Search,
-  Download,
-  ArrowUp,
-  ArrowDown,
-  MoreHorizontal,
-  Calendar
+  ArrowUpRight,
+  ArrowDownRight,
+  Calendar,
+  DollarSign,
+  MoreHorizontal
 } from "lucide-react"
 
 export default function TransactionsPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
-  if (!session) {
+  if (!user) {
     redirect("/")
   }
 
@@ -169,7 +172,7 @@ export default function TransactionsPage() {
                   Filter
                 </Button>
                 <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
+                  <DollarSign className="h-4 w-4 mr-2" />
                   Export
                 </Button>
                 <Button size="sm">
@@ -228,9 +231,9 @@ export default function TransactionsPage() {
                                 transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                               }`}>
                                 {transaction.amount > 0 ? (
-                                  <ArrowUp className="h-4 w-4 text-green-600" />
+                                  <ArrowUpRight className="h-4 w-4 text-green-600" />
                                 ) : (
-                                  <ArrowDown className="h-4 w-4 text-red-600" />
+                                  <ArrowDownRight className="h-4 w-4 text-red-600" />
                                 )}
                               </div>
                               <div>
