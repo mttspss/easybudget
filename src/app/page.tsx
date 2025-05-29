@@ -23,13 +23,20 @@ import {
   Database,
   Brain,
   Lock,
-  Activity
+  Activity,
+  User,
+  Settings,
+  HelpCircle,
+  LogOut,
+  TrendingUp,
+  Home
 } from "lucide-react"
 
 export default function LandingPage() {
   const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const [email, setEmail] = useState("")
   const router = useRouter()
 
@@ -63,6 +70,49 @@ export default function LandingPage() {
       icon: Lock,
       title: "Bank-Level Security You Can Trust",
       desc: "Your data is protected with the same security standards used by major banks. SOC 2 certified with 256-bit encryption."
+    }
+  ]
+
+  const journeyTypes = [
+    {
+      icon: User,
+      title: "For Individuals",
+      desc: "Perfect for students, young professionals, and anyone starting their financial journey.",
+      color: "bg-blue-50 border-blue-200",
+      iconColor: "bg-blue-100 text-blue-600",
+      features: [
+        "Single dashboard for all personal accounts",
+        "Easy CSV import from any bank",
+        "Personal goals & emergency fund tracking",
+        "Subscription management"
+      ]
+    },
+    {
+      icon: TrendingUp,
+      title: "For Entrepreneurs",
+      desc: "Manage multiple businesses and personal finances without the complexity.",
+      color: "bg-white border-2 border-slate-900 shadow-lg",
+      iconColor: "bg-slate-100 text-slate-700",
+      features: [
+        "Multiple account dashboards (4+ credit cards, 2+ businesses)",
+        "Separate business & personal tracking",
+        "Advanced reporting & analytics",
+        "Cash flow predictions for each business"
+      ],
+      highlighted: true
+    },
+    {
+      icon: Home,
+      title: "For Families",
+      desc: "Coordinate household finances and teach kids about money management.",
+      color: "bg-purple-50 border-purple-200",
+      iconColor: "bg-purple-100 text-purple-600",
+      features: [
+        "Shared family dashboard access",
+        "Multiple savings goals (vacation, education, etc.)",
+        "Household expense categorization",
+        "Family budget planning & tracking"
+      ]
     }
   ]
 
@@ -164,6 +214,15 @@ export default function LandingPage() {
     router.push(`/auth/register?email=${encodeURIComponent(email)}`)
   }
 
+  const handleUserDropdown = () => {
+    setUserDropdownOpen(!userDropdownOpen)
+  }
+
+  const handleSignOut = () => {
+    signOut()
+    setUserDropdownOpen(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
@@ -179,6 +238,7 @@ export default function LandingPage() {
 
             <div className="hidden md:flex items-center space-x-8">
               <a href="#benefits" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Features</a>
+              <a href="#journey" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Solutions</a>
               <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">How it Works</a>
               <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Pricing</a>
               <a href="#faq" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">FAQ</a>
@@ -190,9 +250,45 @@ export default function LandingPage() {
                   <Button variant="ghost" onClick={() => router.push('/dashboard')} className="text-slate-600 hover:text-slate-900">
                     Dashboard
                   </Button>
-                  <Button variant="outline" onClick={() => signOut()} className="border-slate-300 text-slate-700 hover:bg-slate-50">
-                    Sign Out
-                  </Button>
+                  <div className="relative">
+                    <button
+                      onClick={handleUserDropdown}
+                      className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center text-white font-medium text-sm hover:bg-slate-800 transition-colors"
+                    >
+                      {user.email?.[0]?.toUpperCase() || 'U'}
+                    </button>
+                    {userDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <div className="font-medium text-slate-900">{user.email}</div>
+                          <div className="text-sm text-slate-500">Free Plan</div>
+                        </div>
+                        <div className="py-1">
+                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                            <User className="w-4 h-4 mr-3" />
+                            Profile Settings
+                          </button>
+                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                            <Settings className="w-4 h-4 mr-3" />
+                            Preferences
+                          </button>
+                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                            <HelpCircle className="w-4 h-4 mr-3" />
+                            Help & Support
+                          </button>
+                          <div className="border-t border-gray-100 mt-1 pt-1">
+                            <button 
+                              onClick={handleSignOut}
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                            >
+                              <LogOut className="w-4 h-4 mr-3" />
+                              Sign out
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </>
               ) : (
                 <>
@@ -220,6 +316,7 @@ export default function LandingPage() {
             <div className="md:hidden py-4 border-t border-gray-200 bg-white">
               <div className="flex flex-col space-y-4">
                 <a href="#benefits" className="text-slate-600 hover:text-slate-900 px-2 py-1">Features</a>
+                <a href="#journey" className="text-slate-600 hover:text-slate-900 px-2 py-1">Solutions</a>
                 <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 px-2 py-1">How it Works</a>
                 <a href="#pricing" className="text-slate-600 hover:text-slate-900 px-2 py-1">Pricing</a>
                 <a href="#faq" className="text-slate-600 hover:text-slate-900 px-2 py-1">FAQ</a>
@@ -248,6 +345,12 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div className="space-y-4">
+                {/* Badge */}
+                <div className="inline-flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-slate-700 text-sm font-medium">
+                  <Database className="w-4 h-4 mr-2" />
+                  Multiple Accounts, One Dashboard
+                </div>
+                
                 <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
                   <span className="text-slate-600"> Spreadsheets</span>
@@ -399,8 +502,41 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Built for Every Financial Journey */}
+      <section id="journey" className="py-12 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Built for Every Financial Journey
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              From students tracking their first budget to entrepreneurs managing multiple businesses
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-3 gap-6">
+            {journeyTypes.map((type, index) => (
+              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg`}>
+                <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mb-6`}>
+                  <type.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
+                <p className="text-slate-600 mb-6 leading-relaxed">{type.desc}</p>
+                <ul className="space-y-3">
+                  {type.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start">
+                      <Check className="w-4 h-4 text-green-600 mr-3 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 text-sm leading-relaxed">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section id="how-it-works" className="py-12 bg-gray-50">
+      <section id="how-it-works" className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
@@ -434,7 +570,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-12 bg-white">
+      <section id="pricing" className="py-12 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
@@ -487,7 +623,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-12 bg-gray-50">
+      <section id="faq" className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
