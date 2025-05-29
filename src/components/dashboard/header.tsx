@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { useAuth } from "@/lib/auth-context"
 import { Button } from "@/components/ui/button"
 import { 
   Bell,
@@ -22,7 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function Header() {
-  const { data: session } = useSession()
+  const { user, signOut } = useAuth()
 
   return (
     <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
@@ -71,14 +71,14 @@ export function Header() {
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
                     <div className="text-sm font-semibold text-gray-900">
-                      {session?.user?.name?.split(' ')[0] || 'User'}
+                      {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
                     </div>
                     <div className="text-xs text-gray-500">Free Plan</div>
                   </div>
                   <Avatar className="h-8 w-8 ring-2 ring-gray-200">
-                    <AvatarImage src={session?.user?.image || ""} alt="Profile" />
+                    <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt="Profile" />
                     <AvatarFallback className="text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-                      {session?.user?.name?.charAt(0) || "U"}
+                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </div>
@@ -87,8 +87,8 @@ export function Header() {
             <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-lg">
               <DropdownMenuLabel className="text-sm">
                 <div className="space-y-1">
-                  <p className="font-semibold text-gray-900">{session?.user?.name}</p>
-                  <p className="text-gray-500 text-xs">{session?.user?.email}</p>
+                  <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || user?.email}</p>
+                  <p className="text-gray-500 text-xs">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-100" />
