@@ -205,7 +205,7 @@ export default function Dashboard() {
                   Welcome back, {user.user_metadata?.name?.split(' ')[0] || 'there'}
                 </h1>
                 <p className="text-gray-600 mt-1">Here&apos;s your financial overview</p>
-              </div>
+                  </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center bg-white border border-gray-200 rounded-xl p-1">
                   {["week", "month", "year"].map((period) => (
@@ -412,7 +412,7 @@ export default function Dashboard() {
                         <div key={index}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <div 
+                        <div 
                                 className="w-3 h-3 rounded-full" 
                                 style={{ backgroundColor: category.color }}
                         ></div>
@@ -424,7 +424,7 @@ export default function Dashboard() {
                       </div>
                           {category.budget > 0 && (
                             <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
+              <div 
                                 className={`h-2 rounded-full ${
                                   category.percentage > 100 ? 'bg-red-500' : 'bg-blue-500'
                                 }`}
