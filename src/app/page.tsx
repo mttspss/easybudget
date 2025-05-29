@@ -515,12 +515,14 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
             {journeyTypes.map((type, index) => (
-              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg`}>
-                <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mb-6`}>
-                  <type.icon className="w-6 h-6" />
+              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg shadow-md`}>
+                <div className="text-center mb-6">
+                  <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                    <type.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
+                  <p className="text-slate-600 leading-relaxed">{type.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">{type.desc}</p>
                 <ul className="space-y-3">
                   {type.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
