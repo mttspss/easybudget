@@ -199,7 +199,7 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
                   Welcome back, {user.user_metadata?.name?.split(' ')[0] || 'there'}
@@ -295,7 +295,7 @@ export default function Dashboard() {
                         <p className="text-2xl font-bold text-gray-900">
                           {formatCurrency(stats?.expenses || 0)}
                         </p>
-                      </div>
+                    </div>
                     </CardContent>
                   </Card>
 
@@ -305,8 +305,8 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="p-2 bg-purple-50 rounded-lg">
                           <TrendingUp className="h-5 w-5 text-purple-600" />
-                        </div>
-                      </div>
+                </div>
+              </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-1">Net Income</p>
                         <p className={`text-2xl font-bold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -401,11 +401,11 @@ export default function Dashboard() {
                           <div className="flex justify-between mb-2">
                             <div className="h-4 bg-gray-200 rounded w-1/3"></div>
                             <div className="h-4 bg-gray-200 rounded w-16"></div>
-                          </div>
+                </div>
                           <div className="h-2 bg-gray-200 rounded"></div>
-                        </div>
+              </div>
                       ))}
-                    </div>
+            </div>
                   ) : stats?.categorySpending && stats.categorySpending.length > 0 ? (
                     <div className="space-y-4">
                       {stats.categorySpending.map((category, index) => (
@@ -415,13 +415,13 @@ export default function Dashboard() {
                               <div 
                                 className="w-3 h-3 rounded-full" 
                                 style={{ backgroundColor: category.color }}
-                              ></div>
+                        ></div>
                               <span className="font-medium text-gray-900">{category.category}</span>
                             </div>
                             <span className="text-sm font-semibold text-gray-600">
                               {formatCurrency(category.spent)}
-                            </span>
-                          </div>
+                        </span>
+                      </div>
                           {category.budget > 0 && (
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div 
@@ -430,11 +430,11 @@ export default function Dashboard() {
                                 }`}
                                 style={{ width: `${Math.min(category.percentage, 100)}%` }}
                               ></div>
-                            </div>
+                      </div>
                           )}
-                        </div>
-                      ))}
                     </div>
+                  ))}
+                </div>
                   ) : (
                     <div className="text-center py-8">
                       <DollarSign className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -444,7 +444,7 @@ export default function Dashboard() {
                         <Plus className="h-4 w-4 mr-2" />
                         Add Category
                       </Button>
-                    </div>
+              </div>
                   )}
                 </CardContent>
               </Card>

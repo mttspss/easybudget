@@ -4,25 +4,20 @@ import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { 
-  Eye, 
-  EyeOff, 
-  Mail, 
-  Lock, 
   ArrowRight, 
   Check, 
   TrendingUp, 
   Shield, 
-  Zap,
-  BarChart3,
+  Clock,
   Target,
   Users,
   ChevronDown,
   Menu,
   X,
   Upload,
-  PieChart,
+  Search,
+  Bell,
   DollarSign,
   Facebook,
   Twitter,
@@ -30,52 +25,14 @@ import {
   Linkedin,
   Play,
   Star,
-  Search,
-  Bell
+  Zap
 } from "lucide-react"
 
 export default function LandingPage() {
-  const { user, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } = useAuth()
-  const [isSignUp, setIsSignUp] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [authLoading, setAuthLoading] = useState(false)
+  const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const router = useRouter()
-
-  if (user) {
-    window.location.href = "/dashboard"
-    return null
-  }
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAuthLoading(true)
-    try {
-      if (isSignUp) {
-        await signUpWithEmail(email, password)
-      } else {
-        await signInWithEmail(email, password)
-      }
-    } catch (error) {
-      console.error('Auth error:', error)
-    } finally {
-      setAuthLoading(false)
-    }
-  }
-
-  const handleGoogleAuth = async () => {
-    setAuthLoading(true)
-    try {
-      await signInWithGoogle()
-    } catch (error) {
-      console.error('Google auth error:', error)
-    } finally {
-      setAuthLoading(false)
-    }
-  }
 
   const benefits = [
     { 
