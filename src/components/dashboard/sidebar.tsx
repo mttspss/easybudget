@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 import { 
   BarChart3,
   ArrowUpRight,
@@ -13,7 +14,6 @@ import {
   TrendingUp,
   Upload,
   Settings,
-  Wallet,
   Layers
 } from "lucide-react"
 
@@ -73,14 +73,11 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl">
-              <Wallet className="h-6 w-6 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
+          <div className="w-10 h-10 rounded-lg overflow-hidden">
+            <Image src="/mainlogo.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
           </div>
           <div>
-            <span className="text-xl font-bold text-gray-900">EasyBudget</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
             <div className="text-xs text-gray-500">Financial Dashboard</div>
           </div>
         </div>
