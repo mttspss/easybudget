@@ -150,7 +150,7 @@ export default function LandingPage() {
         "Goal tracking and forecasting",
         "Email support"
       ],
-      cta: "Start Professional Trial"
+      cta: "Get Professional"
     },
     {
       name: "Business", 
@@ -166,7 +166,7 @@ export default function LandingPage() {
         "Priority support",
         "Custom categorization rules"
       ],
-      cta: "Start Business Trial"
+      cta: "Get Business"
     },
     {
       name: "Enterprise", 
@@ -192,6 +192,10 @@ export default function LandingPage() {
       a: "We use bank-level security with 256-bit SSL encryption and SOC 2 Type II compliance. Your banking credentials are never stored on our servers, and all data is encrypted both in transit and at rest." 
     },
     { 
+      q: "How quickly can I get started?", 
+      a: "You can be up and running in under 5 minutes. Simply create an account, connect your bank accounts or upload a CSV file, and start tracking your finances immediately." 
+    },
+    { 
       q: "How accurate is the automated categorization?", 
       a: "Our machine learning algorithms achieve 99.2% accuracy in transaction categorization. The system continuously improves as it learns from your specific spending patterns." 
     },
@@ -200,12 +204,16 @@ export default function LandingPage() {
       a: "Yes, we offer RESTful APIs for seamless integration with accounting software, CRM systems, and business intelligence tools. Enterprise plans include custom integration support." 
     },
     { 
-      q: "What happens to my data if I cancel?", 
-      a: "You can export all your data in standard formats (CSV, Excel, PDF) before cancellation. We provide a 30-day grace period for data retrieval." 
+      q: "What happens to my data if I decide to leave?", 
+      a: "You can export all your data in standard formats (CSV, Excel, PDF) at any time. We provide a 30-day grace period for data retrieval after cancellation, and your data is permanently deleted thereafter." 
     },
     { 
-      q: "Do you offer on-premise deployment?", 
-      a: "Yes, Enterprise plans include on-premise deployment options for organizations with strict data residency requirements." 
+      q: "Do you offer customer support?", 
+      a: "Yes! Professional plans include email support with 24-hour response time. Business plans get priority support, and Enterprise customers have access to a dedicated account manager." 
+    },
+    { 
+      q: "Can I cancel my subscription anytime?", 
+      a: "Absolutely. You can cancel your subscription at any time with no cancellation fees. Your service continues until the end of your current billing period." 
     }
   ]
 
@@ -366,15 +374,16 @@ export default function LandingPage() {
                   onClick={() => router.push('/auth/register')} 
                   className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-3"
                 >
-                  Start 14-Day Trial
+                  Get Started Now
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button 
                   variant="outline" 
                   className="border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 font-medium"
+                  onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  View Demo
+                  Watch Tutorial
                 </Button>
               </div>
 
@@ -391,6 +400,25 @@ export default function LandingPage() {
                   <Database className="w-4 h-4 text-purple-600" />
                   <span className="text-sm text-slate-600 font-medium">10K+ Banks</span>
                 </div>
+              </div>
+
+              {/* Social Proof */}
+              <div className="flex items-center space-x-3 pt-4">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">JD</div>
+                  <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">SM</div>
+                  <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">AL</div>
+                  <div className="w-8 h-8 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">MR</div>
+                  <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">TB</div>
+                </div>
+                <div className="flex items-center space-x-1">
+                  {[1,2,3,4,5].map((star) => (
+                    <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                    </svg>
+                  ))}
+                </div>
+                <span className="text-sm text-slate-600 font-medium">2,847+ finance professionals manage their money smarter</span>
               </div>
             </div>
 
@@ -672,7 +700,7 @@ export default function LandingPage() {
               onClick={() => router.push('/auth/register')} 
               className="bg-white text-slate-900 hover:bg-gray-100 font-medium px-8 py-3 text-lg"
             >
-              Start Your 14-Day Trial
+              Get Started Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -687,15 +715,15 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-6 space-y-3 sm:space-y-0 text-sm text-slate-400">
             <div className="flex items-center">
               <Check className="w-4 h-4 text-green-500 mr-2" />
-              <span>14-day trial</span>
-            </div>
-            <div className="flex items-center">
-              <Check className="w-4 h-4 text-green-500 mr-2" />
-              <span>No credit card required</span>
+              <span>No setup fees</span>
             </div>
             <div className="flex items-center">
               <Check className="w-4 h-4 text-green-500 mr-2" />
               <span>Cancel anytime</span>
+            </div>
+            <div className="flex items-center">
+              <Check className="w-4 h-4 text-green-500 mr-2" />
+              <span>24/7 support</span>
             </div>
           </div>
         </div>
@@ -762,7 +790,7 @@ export default function LandingPage() {
                     type="submit"
                     className="w-full bg-white text-slate-900 hover:bg-gray-100 font-medium text-sm py-2"
                   >
-                    Start Trial
+                    Get Started
                   </Button>
                 </form>
                 <div className="pt-3 border-t border-slate-800">
