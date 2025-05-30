@@ -54,7 +54,7 @@ export default function SignInPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <div className="w-10 h-10 rounded-lg overflow-hidden">
-              <Image src="/mainlogo.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
+              <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
             </div>
             <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
           </div>
