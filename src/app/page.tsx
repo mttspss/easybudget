@@ -238,10 +238,10 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg overflow-hidden">
-                <Image src="/logo.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+              <div className="w-10 h-10 rounded-lg overflow-hidden">
+                <Image src="/mainlogo.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
               </div>
-              <span className="text-xl font-semibold text-slate-900">EasyBudget</span>
+              <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
@@ -808,31 +808,29 @@ export default function LandingPage() {
           
           <div className="border-t border-slate-800 mt-8 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-lg overflow-hidden">
+                  <Image src="/mainlogo.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+                </div>
+                <span className="font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
+              </div>
+              <p className="text-slate-400 text-sm">
+                © 2024 EasyBudget. All rights reserved.
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-7 h-7 rounded-lg overflow-hidden">
-                    <Image src="/logo.png" alt="EasyBudget Logo" width={28} height={28} className="w-full h-full object-contain" />
-                  </div>
-                  <span className="font-semibold">EasyBudget</span>
-                </div>
-                <p className="text-slate-400 text-sm">
-                  © 2024 EasyBudget. All rights reserved.
-                </p>
+                <a href="#" className="text-slate-400 hover:text-white transition-colors">
+                  <Linkedin className="w-4 h-4" />
+                </a>
+                <a href="#" className="text-slate-400 hover:text-white transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
               </div>
-              
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-4">
-                  <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                  <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                    <Twitter className="w-4 h-4" />
-                  </a>
-                </div>
-                <p className="text-slate-500 text-sm">
-                  hello@easybudget.ing
-                </p>
-              </div>
+              <p className="text-slate-500 text-sm">
+                hello@easybudget.ing
+              </p>
             </div>
           </div>
         </div>

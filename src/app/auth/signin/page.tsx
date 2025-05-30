@@ -53,10 +53,10 @@ export default function SignInPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <Image src="/logo.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+            <div className="w-10 h-10 rounded-lg overflow-hidden">
+              <Image src="/mainlogo.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-semibold text-slate-900">EasyBudget</span>
+            <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your account</p>
