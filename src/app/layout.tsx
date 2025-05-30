@@ -16,13 +16,7 @@ export const metadata: Metadata = {
       { url: '/icon.svg', type: 'image/svg+xml' },
       { url: '/icon.png', type: 'image/png', sizes: '32x32' },
     ],
-    apple: '/apple-icon.png',
-    other: [
-      { rel: 'icon', url: '/web-app-manifest-192x192.png', sizes: '192x192', type: 'image/png' },
-      { rel: 'icon', url: '/web-app-manifest-512x512.png', sizes: '512x512', type: 'image/png' },
-    ],
   },
-  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
