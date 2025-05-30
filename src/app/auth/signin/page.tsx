@@ -27,7 +27,7 @@ export default function SignInPage() {
     setAuthLoading(true)
     try {
       await signInWithEmail(email, password)
-      router.push('/dashboard')
+      router.push('/')
     } catch (error) {
       console.error('Error signing in:', error)
     } finally {
@@ -39,7 +39,7 @@ export default function SignInPage() {
     setAuthLoading(true)
     try {
       await signInWithGoogle()
-      router.push('/dashboard')
+      router.push('/')
     } catch (error) {
       console.error('Error signing in with Google:', error)
     } finally {
@@ -56,7 +56,10 @@ export default function SignInPage() {
             <div className="w-10 h-10 rounded-lg overflow-hidden">
               <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
             </div>
-            <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
+            <span className="text-2xl font-semibold">
+              <span className="text-black">easybudget</span>
+              <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+            </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your account</p>

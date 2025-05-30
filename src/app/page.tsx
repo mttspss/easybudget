@@ -241,7 +241,10 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-lg overflow-hidden">
                 <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
               </div>
-              <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
+              <span className="text-2xl font-semibold">
+                <span className="text-black">easybudget</span>
+                <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+              </span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
@@ -812,7 +815,10 @@ export default function LandingPage() {
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
                   <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
+                <span className="font-semibold">
+                  <span className="text-black">easybudget</span>
+                  <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+                </span>
               </div>
               <p className="text-slate-400 text-sm">
                 © 2024 EasyBudget. All rights reserved.

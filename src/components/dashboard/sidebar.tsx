@@ -77,7 +77,10 @@ export function Sidebar() {
             <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
           </div>
           <div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">easybudget</span>
+            <span className="text-xl font-bold">
+              <span className="text-black">easybudget</span>
+              <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+            </span>
             <div className="text-xs text-gray-500">Financial Dashboard</div>
           </div>
         </div>
