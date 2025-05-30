@@ -3,14 +3,14 @@
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
   Mail, 
   Lock, 
   Eye, 
-  EyeOff,
-  DollarSign
+  EyeOff
 } from "lucide-react"
 import Link from "next/link"
 
@@ -52,11 +52,11 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <Image src="/logo.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-bold text-gray-900">EasyBudget</span>
+            <span className="text-xl font-semibold text-slate-900">EasyBudget</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your account</p>

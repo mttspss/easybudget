@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -14,7 +15,6 @@ import {
   Menu,
   X,
   Upload,
-  DollarSign,
   Twitter,
   Linkedin,
   Play,
@@ -238,8 +238,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
+                <Image src="/logo.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
               </div>
               <span className="text-xl font-semibold text-slate-900">EasyBudget</span>
             </div>
@@ -810,8 +810,8 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
-                    <DollarSign className="w-4 h-4 text-slate-900" />
+                  <div className="w-7 h-7 rounded-lg overflow-hidden">
+                    <Image src="/logo.png" alt="EasyBudget Logo" width={28} height={28} className="w-full h-full object-contain" />
                   </div>
                   <span className="font-semibold">EasyBudget</span>
                 </div>
