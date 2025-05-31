@@ -50,13 +50,13 @@ export default function SignInPage() {
         <div className="w-full max-w-xs">
           {/* Logo */}
           <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/80 backdrop-blur-sm border border-[#7aff01]/30 shadow-lg flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Image 
                 src="/mainlogo.svg" 
                 alt="EasyBudget Logo" 
-                width={32} 
-                height={32} 
-                className="w-8 h-8 object-contain" 
+                width={64} 
+                height={64} 
+                className="w-16 h-16 object-contain" 
               />
             </div>
             
