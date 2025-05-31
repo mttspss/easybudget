@@ -47,38 +47,37 @@ export default function RegisterPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
       
       <div className="relative min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-xs">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/80 backdrop-blur-sm border border-[#7aff01]/30 shadow-lg flex items-center justify-center">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/80 backdrop-blur-sm border border-[#7aff01]/30 shadow-lg flex items-center justify-center">
               <Image 
                 src="/mainlogo.svg" 
                 alt="EasyBudget Logo" 
-                width={48} 
-                height={48} 
-                className="w-12 h-12 object-contain" 
+                width={32} 
+                height={32} 
+                className="w-8 h-8 object-contain" 
               />
             </div>
             
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
               Welcome to{" "}
               <span className="text-gray-900">easybudget</span>
               <span className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent">.ing</span>
             </h1>
-            <p className="text-gray-600">Create your account to get started</p>
+            <p className="text-gray-600 text-sm">Create your account to get started</p>
           </div>
 
           {/* Form */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Google Button */}
             <Button 
               type="button" 
-              variant="outline" 
               onClick={handleGoogleAuth} 
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 border-blue-600 text-white font-medium shadow-md" 
+              className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md border-0" 
               disabled={authLoading}
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -98,14 +97,14 @@ export default function RegisterPage() {
             </div>
 
             {/* Email Form */}
-            <form onSubmit={handleAuth} className="space-y-4">
+            <form onSubmit={handleAuth} className="space-y-3">
               <div>
                 <Input 
                   type="email" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                   placeholder="Email" 
-                  className="h-12 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm" 
                   required 
                 />
               </div>
@@ -116,14 +115,14 @@ export default function RegisterPage() {
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
                   placeholder="Password" 
-                  className="h-12 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm" 
                   required 
                 />
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium shadow-md" 
+                className="w-full h-10 bg-gray-900 hover:bg-gray-800 text-white font-medium shadow-md text-sm" 
                 disabled={authLoading}
               >
                 {authLoading ? "Creating Account..." : "Continue"}
@@ -131,7 +130,7 @@ export default function RegisterPage() {
             </form>
 
             {/* Footer Links */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-3">
               <p className="text-gray-600 text-sm">
                 Already have an account?{" "}
                 <Link href="/auth/signin" className="text-[#7aff01] hover:text-[#9eff31] font-medium">
@@ -152,7 +151,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Back to home */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <Link href="/" className="text-gray-500 hover:text-gray-700 text-sm">
               ← Back to Home
             </Link>
