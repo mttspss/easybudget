@@ -712,94 +712,110 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900"></div>
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-            Ready to Take Control of Your Finances?
-            </h2>
-          <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of professionals who have streamlined their financial management with EasyBudget.
-            </p>
+      <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-gray-50 border-t border-gray-100">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="max-w-3xl mx-auto space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+                Start Your Financial 
+                <span className="block bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent">
+                  Transformation Today
+                </span>
+              </h2>
+              <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+                Join 2,847+ professionals who have simplified their financial management. 
+                Get complete visibility and control over your money in minutes.
+              </p>
+            </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-              onClick={() => router.push('/auth/register')} 
-              className="bg-white text-slate-900 hover:bg-gray-100 font-medium px-8 py-3 text-lg"
+                onClick={() => router.push('/auth/register')} 
+                className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-              Get Started Now
+                Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            <Button 
-              variant="outline" 
-              className="border-slate-600 text-white hover:bg-slate-800 px-8 py-3 text-lg"
-              onClick={() => window.open('mailto:sales@easybudget.ing')}
-            >
-              Talk to Sales
-            </Button>
+              <Button 
+                variant="outline" 
+                className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 py-4 text-lg rounded-xl shadow-sm hover:shadow-md transition-all"
+                onClick={() => window.open('mailto:sales@easybudget.ing')}
+              >
+                Talk to Sales
+              </Button>
             </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-6 space-y-3 sm:space-y-0 text-sm text-slate-400">
-            <div className="flex items-center">
-              <Check className="w-4 h-4 text-green-500 mr-2" />
-              <span>No setup fees</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <Check className="w-6 h-6 text-green-600" />
+                </div>
+                <span className="font-semibold text-slate-900">No Setup Fees</span>
+                <span className="text-sm text-slate-600">Start immediately</span>
               </div>
-            <div className="flex items-center">
-              <Check className="w-4 h-4 text-green-500 mr-2" />
-                <span>Cancel anytime</span>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="font-semibold text-slate-900">Bank-Level Security</span>
+                <span className="text-sm text-slate-600">SOC 2 certified</span>
               </div>
-            <div className="flex items-center">
-              <Check className="w-4 h-4 text-green-500 mr-2" />
-              <span>24/7 support</span>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Target className="w-6 h-6 text-purple-600" />
+                </div>
+                <span className="font-semibold text-slate-900">Cancel Anytime</span>
+                <span className="text-sm text-slate-600">No long-term commitment</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-950 text-white py-12">
+      <footer className="bg-white border-t border-gray-200 py-16">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid lg:grid-cols-4 gap-8 mb-12">
             {/* Product */}
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-3 text-slate-400 text-sm">
-                <li><a href="#benefits" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
+              <h4 className="font-bold text-slate-900 mb-6">Product</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="#benefits" className="hover:text-slate-900 transition-colors">Features</a></li>
+                <li><a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Integrations</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">API Documentation</a></li>
               </ul>
             </div>
 
             {/* Company */}
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-3 text-slate-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <h4 className="font-bold text-slate-900 mb-6">Company</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Contact</a></li>
               </ul>
             </div>
 
             {/* Legal */}
             <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-3 text-slate-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Compliance</a></li>
+              <h4 className="font-bold text-slate-900 mb-6">Legal</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
               </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 className="font-semibold mb-4">Get Started</h4>
+              <h4 className="font-bold text-slate-900 mb-6">Get Started</h4>
               <div className="space-y-4">
-                <p className="text-slate-400 text-sm">
-                  Ready to streamline your financial operations?
+                <p className="text-slate-600">
+                  Ready to take control of your finances?
                 </p>
                 <form onSubmit={handleEmailSignup} className="space-y-3">
                   <div className="relative">
@@ -809,22 +825,22 @@ export default function LandingPage() {
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)} 
                       placeholder="Enter your email" 
-                      className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-slate-400 focus:border-slate-500 text-sm"
+                      className="pl-10 bg-white border-gray-300 text-slate-900 placeholder-slate-400 focus:border-[#7aff01] focus:ring-[#7aff01]/20"
                       required 
                     />
                   </div>
                   <Button 
                     type="submit"
-                    className="w-full bg-white text-slate-900 hover:bg-gray-100 font-medium text-sm py-2"
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium"
                   >
                     Get Started
                   </Button>
                 </form>
-                <div className="pt-3 border-t border-slate-800">
+                <div className="pt-3 border-t border-gray-200">
                   <Button 
                     variant="ghost" 
                     onClick={() => router.push('/auth/signin')} 
-                    className="w-full text-slate-400 hover:text-white hover:bg-slate-800 text-sm py-2"
+                    className="w-full text-slate-600 hover:text-slate-900 hover:bg-gray-50"
                   >
                     Already have an account? Sign in
                   </Button>
@@ -833,33 +849,36 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 mt-8 pt-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
                   <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold">
-                  <span className="text-black">easybudget</span>
-                  <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+                <span className="text-xl font-bold">
+                  <span className="text-slate-900">easybudget</span>
+                  <span style={{ color: '#01ff76' }}>.ing</span>
                 </span>
               </div>
-              <p className="text-slate-400 text-sm">
-              © 2024 EasyBudget. All rights reserved.
-            </p>
+              
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-4">
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    <Twitter className="w-5 h-5" />
+                  </a>
+                </div>
+                <span className="text-slate-600">
+                  hello@easybudget.ing
+                </span>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-4">
-                <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                  <Linkedin className="w-4 h-4" />
-                </a>
-                <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                  <Twitter className="w-4 h-4" />
-                </a>
-              </div>
-              <p className="text-slate-500 text-sm">
-                hello@easybudget.ing
+            <div className="text-center mt-8">
+              <p className="text-slate-500">
+                © 2024 EasyBudget. All rights reserved.
               </p>
             </div>
           </div>
