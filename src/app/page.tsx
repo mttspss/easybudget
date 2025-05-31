@@ -375,85 +375,93 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="py-16 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="py-20 bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
+        {/* Subtle patterns */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(122,255,1,0.1),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
+        
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <div className="space-y-4">
+            <div className="space-y-8">
+              <div className="space-y-6">
                 {/* Badge */}
-                <div className="inline-flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-slate-700 text-sm font-medium">
-                  <Database className="w-4 h-4 mr-2" />
+                <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-slate-700 text-sm font-medium shadow-sm">
+                  <Database className="w-4 h-4 mr-2 text-[#7aff01]" />
                   Multiple Accounts, One Dashboard
-              </div>
+                </div>
                 
-                <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+                <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
-                  <span className="text-slate-600"> Spreadsheets</span>
-            </h1>
+                  <span className="block bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent"> 
+                    Spreadsheets
+                  </span>
+                </h1>
             
-                <p className="text-lg text-slate-600 leading-relaxed">
-                  Get a complete view of your finances in one place. Track expenses, predict cash flow, and generate reports automatically - no more manual work or scattered data.
-            </p>
+                <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
+                  Get a complete view of your finances in one place. Track expenses, predict cash flow, and generate reports automatically.
+                </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   onClick={() => router.push('/auth/register')} 
-                  className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-3"
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
                 >
                   Get Started Now
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   variant="outline"
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 font-medium"
+                  className="border-2 border-slate-300 text-slate-700 hover:bg-white/50 backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-xl shadow-sm hover:shadow-md transition-all"
                   onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
                 >
-                  <Play className="mr-2 h-4 w-4" />
+                  <Play className="mr-2 h-5 w-5" />
                   Watch Tutorial
                 </Button>
               </div>
 
-              <div className="flex items-center space-x-6 pt-2">
-              <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-slate-600 font-medium">SOC 2 Certified</span>
+              <div className="grid grid-cols-3 gap-4 pt-4">
+                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+                  <Shield className="w-6 h-6 text-green-600" />
+                  <span className="text-sm font-semibold text-slate-900">SOC 2 Certified</span>
+                </div>
+                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+                  <Lock className="w-6 h-6 text-blue-600" />
+                  <span className="text-sm font-semibold text-slate-900">Bank-Level Security</span>
+                </div>
+                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+                  <Database className="w-6 h-6 text-purple-600" />
+                  <span className="text-sm font-semibold text-slate-900">10K+ Banks</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-slate-600 font-medium">Bank-Level Security</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                  <Database className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm text-slate-600 font-medium">10K+ Banks</span>
+
+              {/* Social Proof */}
+              <div className="flex items-center space-x-4 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+                <div className="flex -space-x-2">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">JD</div>
+                  <div className="w-10 h-10 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">SM</div>
+                  <div className="w-10 h-10 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">AL</div>
+                  <div className="w-10 h-10 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">MR</div>
+                  <div className="w-10 h-10 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">TB</div>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-1 mb-1">
+                    {[1,2,3,4,5].map((star) => (
+                      <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">2,847+ finance professionals trust easybudget</span>
+                </div>
               </div>
             </div>
 
-              {/* Social Proof */}
-              <div className="flex items-center space-x-3 pt-4">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">JD</div>
-                  <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">SM</div>
-                  <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">AL</div>
-                  <div className="w-8 h-8 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">MR</div>
-                  <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">TB</div>
-          </div>
-                <div className="flex items-center space-x-1">
-                  {[1,2,3,4,5].map((star) => (
-                    <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-sm text-slate-600 font-medium">2,847+ finance professionals manage their money smarter</span>
-                </div>
-                </div>
-
             {/* Professional Dashboard Mock-up */}
             <div className="relative">
-              <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
                 {/* Browser Chrome */}
-                <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center space-x-2 px-4 py-3 bg-white/90 backdrop-blur-sm border-b border-gray-200">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
@@ -461,76 +469,76 @@ export default function LandingPage() {
                 </div>
                 
                 {/* Dashboard Content */}
-                <div className="p-4 space-y-4">
+                <div className="p-6 space-y-6">
                   {/* Header */}
                   <div className="flex justify-between items-center">
-                    <h3 className="text-base font-semibold text-slate-900">Financial Overview</h3>
-                    <div className="text-xs text-slate-500">Last updated: 2 mins ago</div>
-                </div>
+                    <h3 className="text-lg font-bold text-slate-900">Financial Overview</h3>
+                    <div className="text-xs text-slate-500 bg-gray-100 px-2 py-1 rounded-md">Live</div>
+                  </div>
                   
                   {/* KPI Cards */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-slate-50 rounded-lg p-3">
-                      <div className="text-xs text-slate-600 mb-1">Total Assets</div>
-                      <div className="text-lg font-bold text-slate-900">$127,340</div>
-                      <div className="text-xs text-green-600">+12.4%</div>
-                </div>
-                    <div className="bg-slate-50 rounded-lg p-3">
-                      <div className="text-xs text-slate-600 mb-1">Monthly Spend</div>
-                      <div className="text-lg font-bold text-slate-900">$4,890</div>
-                      <div className="text-xs text-red-600">+3.2%</div>
-          </div>
-                    <div className="bg-slate-50 rounded-lg p-3">
-                      <div className="text-xs text-slate-600 mb-1">Savings Rate</div>
-                      <div className="text-lg font-bold text-slate-900">28.5%</div>
-                      <div className="text-xs text-green-600">+2.1%</div>
-        </div>
-           </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-gradient-to-br from-[#7aff01]/10 to-[#9eff31]/5 rounded-xl p-4 border border-[#7aff01]/20">
+                      <div className="text-xs text-slate-600 mb-1 font-medium">Total Assets</div>
+                      <div className="text-2xl font-bold text-slate-900">$127,340</div>
+                      <div className="text-xs text-green-600 font-semibold">+12.4%</div>
+                    </div>
+                    <div className="bg-slate-50 rounded-xl p-4 border border-gray-200">
+                      <div className="text-xs text-slate-600 mb-1 font-medium">Monthly Spend</div>
+                      <div className="text-2xl font-bold text-slate-900">$4,890</div>
+                      <div className="text-xs text-red-600 font-semibold">+3.2%</div>
+                    </div>
+                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                      <div className="text-xs text-slate-600 mb-1 font-medium">Savings Rate</div>
+                      <div className="text-2xl font-bold text-slate-900">28.5%</div>
+                      <div className="text-xs text-green-600 font-semibold">+2.1%</div>
+                    </div>
+                  </div>
 
                   {/* Chart Area */}
-                  <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-4 h-24 flex items-center justify-center">
-                    <div className="space-y-1 w-full">
-                      <div className="flex justify-between text-xs text-slate-500">
+                  <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 h-28 flex items-center justify-center border border-gray-200">
+                    <div className="space-y-2 w-full">
+                      <div className="flex justify-between text-xs text-slate-500 font-medium">
                         <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                 </div>
-                      <div className="h-12 bg-gradient-to-t from-slate-200 to-slate-100 rounded flex items-end justify-around px-1">
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '60%'}}></div>
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '80%'}}></div>
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '45%'}}></div>
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '90%'}}></div>
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '70%'}}></div>
-                        <div className="w-6 bg-slate-600 rounded-t" style={{height: '85%'}}></div>
-               </div>
-                 </div>
-               </div>
+                      </div>
+                      <div className="h-16 bg-gradient-to-t from-slate-200 to-slate-100 rounded-lg flex items-end justify-around px-2">
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '60%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '80%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '45%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '90%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '70%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '85%'}}></div>
+                      </div>
+                    </div>
+                  </div>
                   
                   {/* Transaction List */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-slate-900">Recent Transactions</div>
-                    <div className="space-y-2">
+                  <div className="space-y-3">
+                    <div className="text-sm font-bold text-slate-900">Recent Transactions</div>
+                    <div className="space-y-3">
                       {[
-                        { desc: "Salary Deposit", amount: "+$5,200", cat: "Income" },
-                        { desc: "Rent Payment", amount: "-$1,800", cat: "Housing" },
-                        { desc: "Grocery Store", amount: "-$156", cat: "Food" }
+                        { desc: "Salary Deposit", amount: "+$5,200", cat: "Income", color: "bg-green-50 border-green-200" },
+                        { desc: "Rent Payment", amount: "-$1,800", cat: "Housing", color: "bg-red-50 border-red-200" },
+                        { desc: "Grocery Store", amount: "-$156", cat: "Food", color: "bg-orange-50 border-orange-200" }
                       ].map((tx, i) => (
-                        <div key={i} className="flex justify-between items-center text-sm">
+                        <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${tx.color}`}>
                           <div>
-                            <div className="font-medium text-slate-900">{tx.desc}</div>
+                            <div className="font-semibold text-slate-900 text-sm">{tx.desc}</div>
                             <div className="text-xs text-slate-500">{tx.cat}</div>
-                 </div>
-                          <div className={`font-semibold text-sm ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-slate-900'}`}>
+                          </div>
+                          <div className={`font-bold text-sm ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-slate-900'}`}>
                             {tx.amount}
-               </div>
-           </div>
+                          </div>
+                        </div>
                       ))}
-         </div>
-               </div>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
-       </section>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Benefits/Features */}
       <section id="benefits" className="py-12 bg-white">
