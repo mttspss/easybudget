@@ -264,14 +264,22 @@ export default function LandingPage() {
                   <div className="relative">
                     <button
                       onClick={handleUserDropdown}
-                      className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center text-white font-medium text-sm hover:bg-slate-800 transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
                     >
-                      {user.email?.[0]?.toUpperCase() || 'U'}
+                      <div className="text-right hidden sm:block">
+                        <div className="text-sm font-semibold text-slate-900">
+                          {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
+                        </div>
+                        <div className="text-xs text-slate-500">Free Plan</div>
+                      </div>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm bg-gradient-to-br from-blue-500 to-blue-600">
+                        {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                      </div>
                     </button>
                     {userDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
                         <div className="px-4 py-3 border-b border-gray-100">
-                          <div className="font-medium text-slate-900">{user.email}</div>
+                          <div className="font-medium text-slate-900">{user?.user_metadata?.full_name || user?.email}</div>
                           <div className="text-sm text-slate-500">Free Plan</div>
                   </div>
                         <div className="py-1">
@@ -316,7 +324,7 @@ export default function LandingPage() {
                     onClick={() => router.push('/auth/register')} 
                     className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-2"
                   >
-                    Get Started
+                    Sign Up
                   </Button>
                 </>
               )}
@@ -346,7 +354,7 @@ export default function LandingPage() {
                   ) : (
                     <>
                       <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
-                      <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Get Started</Button>
+                      <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
                     </>
                   )}
                 </div>
