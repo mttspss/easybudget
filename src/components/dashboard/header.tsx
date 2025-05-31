@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { 
   Bell,
@@ -23,6 +24,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function Header() {
   const { user, signOut } = useAuth()
+  const router = useRouter()
+
+  const handleProfileSettings = () => {
+    router.push('/dashboard/profile')
+  }
+
+  const handlePreferences = () => {
+    router.push('/dashboard/preferences')
+  }
 
   return (
     <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
@@ -92,11 +102,17 @@ export function Header() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-100" />
-              <DropdownMenuItem className="text-sm py-2 focus:bg-gray-50">
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handleProfileSettings}
+              >
                 <User className="mr-3 h-4 w-4 text-gray-500" />
                 Profile Settings
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 focus:bg-gray-50">
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handlePreferences}
+              >
                 <Settings className="mr-3 h-4 w-4 text-gray-500" />
                 Preferences
               </DropdownMenuItem>

@@ -187,7 +187,7 @@ export default function LandingPage() {
   ]
 
   const faqs = [
-    { 
+    {
       q: "How secure is my financial data?", 
       a: "We use bank-level security with 256-bit SSL encryption and SOC 2 Type II compliance. Your banking credentials are never stored on our servers, and all data is encrypted both in transit and at rest." 
     },
@@ -259,8 +259,8 @@ export default function LandingPage() {
               {user ? (
                 <>
                   <Button variant="ghost" onClick={() => router.push('/dashboard')} className="text-slate-600 hover:text-slate-900">
-                    Dashboard
-                  </Button>
+                      Dashboard
+                    </Button>
                   <div className="relative">
                     <button
                       onClick={handleUserDropdown}
@@ -273,13 +273,19 @@ export default function LandingPage() {
                         <div className="px-4 py-3 border-b border-gray-100">
                           <div className="font-medium text-slate-900">{user.email}</div>
                           <div className="text-sm text-slate-500">Free Plan</div>
-                        </div>
+                  </div>
                         <div className="py-1">
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                          <button 
+                            className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
+                            onClick={() => router.push('/dashboard/profile')}
+                          >
                             <User className="w-4 h-4 mr-3" />
                             Profile Settings
                           </button>
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                          <button 
+                            className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
+                            onClick={() => router.push('/dashboard/preferences')}
+                          >
                             <Settings className="w-4 h-4 mr-3" />
                             Preferences
                           </button>
@@ -295,7 +301,7 @@ export default function LandingPage() {
                               <LogOut className="w-4 h-4 mr-3" />
                               Sign out
                             </button>
-                          </div>
+                </div>
                         </div>
                       </div>
                     )}
@@ -360,16 +366,16 @@ export default function LandingPage() {
                 <div className="inline-flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-slate-700 text-sm font-medium">
                   <Database className="w-4 h-4 mr-2" />
                   Multiple Accounts, One Dashboard
-                </div>
+              </div>
                 
                 <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
                   <span className="text-slate-600"> Spreadsheets</span>
-                </h1>
-                
+            </h1>
+            
                 <p className="text-lg text-slate-600 leading-relaxed">
                   Get a complete view of your finances in one place. Track expenses, predict cash flow, and generate reports automatically - no more manual work or scattered data.
-                </p>
+            </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -381,7 +387,7 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant="outline"
                   className="border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 font-medium"
                   onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
                 >
@@ -391,19 +397,19 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center space-x-6 pt-2">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                   <Shield className="w-4 h-4 text-green-600" />
                   <span className="text-sm text-slate-600 font-medium">SOC 2 Certified</span>
-                </div>
-                <div className="flex items-center space-x-2">
+              </div>
+              <div className="flex items-center space-x-2">
                   <Lock className="w-4 h-4 text-blue-600" />
                   <span className="text-sm text-slate-600 font-medium">Bank-Level Security</span>
-                </div>
-                <div className="flex items-center space-x-2">
+              </div>
+              <div className="flex items-center space-x-2">
                   <Database className="w-4 h-4 text-purple-600" />
                   <span className="text-sm text-slate-600 font-medium">10K+ Banks</span>
-                </div>
               </div>
+            </div>
 
               {/* Social Proof */}
               <div className="flex items-center space-x-3 pt-4">
@@ -413,7 +419,7 @@ export default function LandingPage() {
                   <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">AL</div>
                   <div className="w-8 h-8 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">MR</div>
                   <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold">TB</div>
-                </div>
+          </div>
                 <div className="flex items-center space-x-1">
                   {[1,2,3,4,5].map((star) => (
                     <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -422,8 +428,8 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <span className="text-sm text-slate-600 font-medium">2,847+ finance professionals manage their money smarter</span>
-              </div>
-            </div>
+                </div>
+                </div>
 
             {/* Professional Dashboard Mock-up */}
             <div className="relative">
@@ -442,7 +448,7 @@ export default function LandingPage() {
                   <div className="flex justify-between items-center">
                     <h3 className="text-base font-semibold text-slate-900">Financial Overview</h3>
                     <div className="text-xs text-slate-500">Last updated: 2 mins ago</div>
-                  </div>
+                </div>
                   
                   {/* KPI Cards */}
                   <div className="grid grid-cols-3 gap-3">
@@ -450,25 +456,25 @@ export default function LandingPage() {
                       <div className="text-xs text-slate-600 mb-1">Total Assets</div>
                       <div className="text-lg font-bold text-slate-900">$127,340</div>
                       <div className="text-xs text-green-600">+12.4%</div>
-                    </div>
+                </div>
                     <div className="bg-slate-50 rounded-lg p-3">
                       <div className="text-xs text-slate-600 mb-1">Monthly Spend</div>
                       <div className="text-lg font-bold text-slate-900">$4,890</div>
                       <div className="text-xs text-red-600">+3.2%</div>
-                    </div>
+          </div>
                     <div className="bg-slate-50 rounded-lg p-3">
                       <div className="text-xs text-slate-600 mb-1">Savings Rate</div>
                       <div className="text-lg font-bold text-slate-900">28.5%</div>
                       <div className="text-xs text-green-600">+2.1%</div>
-                    </div>
-                  </div>
-                  
+        </div>
+           </div>
+
                   {/* Chart Area */}
                   <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-4 h-24 flex items-center justify-center">
                     <div className="space-y-1 w-full">
                       <div className="flex justify-between text-xs text-slate-500">
                         <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                      </div>
+                 </div>
                       <div className="h-12 bg-gradient-to-t from-slate-200 to-slate-100 rounded flex items-end justify-around px-1">
                         <div className="w-6 bg-slate-600 rounded-t" style={{height: '60%'}}></div>
                         <div className="w-6 bg-slate-600 rounded-t" style={{height: '80%'}}></div>
@@ -476,9 +482,9 @@ export default function LandingPage() {
                         <div className="w-6 bg-slate-600 rounded-t" style={{height: '90%'}}></div>
                         <div className="w-6 bg-slate-600 rounded-t" style={{height: '70%'}}></div>
                         <div className="w-6 bg-slate-600 rounded-t" style={{height: '85%'}}></div>
-                      </div>
-                    </div>
-                  </div>
+               </div>
+                 </div>
+               </div>
                   
                   {/* Transaction List */}
                   <div className="space-y-2">
@@ -493,20 +499,20 @@ export default function LandingPage() {
                           <div>
                             <div className="font-medium text-slate-900">{tx.desc}</div>
                             <div className="text-xs text-slate-500">{tx.cat}</div>
-                          </div>
+                 </div>
                           <div className={`font-semibold text-sm ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-slate-900'}`}>
                             {tx.amount}
-                          </div>
-                        </div>
+               </div>
+           </div>
                       ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+         </div>
+               </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </section>
 
       {/* Benefits/Features */}
       <section id="benefits" className="py-12 bg-white">
@@ -524,10 +530,10 @@ export default function LandingPage() {
               <div key={index} className="p-6 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
                 <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
                   <benefit.icon className="w-5 h-5 text-slate-600" />
-                </div>
+              </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">{benefit.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{benefit.desc}</p>
-              </div>
+            </div>
             ))}
           </div>
         </div>
@@ -550,7 +556,7 @@ export default function LandingPage() {
                 <div className="text-center mb-6">
                   <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
                     <type.icon className="w-6 h-6" />
-                  </div>
+                </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
                   <p className="text-slate-600 leading-relaxed">{type.desc}</p>
                 </div>
@@ -562,10 +568,10 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-              </div>
+                </div>
             ))}
-          </div>
-        </div>
+                </div>
+                </div>
       </section>
 
       {/* How It Works */}
@@ -578,14 +584,14 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Get up and running in minutes with our simple 3-step process
             </p>
-          </div>
+              </div>
           <div className="grid lg:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="text-center">
                 <div className="relative mb-6">
                   <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-lg font-bold text-white">{index + 1}</span>
-                  </div>
+                </div>
                   {index < 2 && (
                     <div className="hidden lg:block absolute top-6 left-full w-full h-px bg-slate-200"></div>
                   )}
@@ -596,10 +602,10 @@ export default function LandingPage() {
                   <p className="text-slate-600 leading-relaxed">{step.desc}</p>
                   <p className="text-sm text-slate-500 font-medium">{step.detail}</p>
                 </div>
-              </div>
+                </div>
             ))}
-          </div>
-        </div>
+                </div>
+                </div>
       </section>
 
       {/* Pricing */}
@@ -612,7 +618,7 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
-          </div>
+                </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
               <div key={index} className={`rounded-xl p-6 border transition-all hover:shadow-lg ${plan.popular ? 'border-slate-900 shadow-md scale-105 bg-white ring-2 ring-slate-900' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
@@ -621,17 +627,17 @@ export default function LandingPage() {
                     <span className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Most Popular
                     </span>
-                  </div>
+                </div>
                 )}
                 <div className="text-center mb-6">
                   <div className="text-sm text-slate-600 font-medium mb-2">
                     {plan.highlight}
-                  </div>
+                </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{plan.name}</h3>
                   <div className="mb-3">
                     <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
                     {plan.price !== "Custom" && <span className="text-slate-600">/month</span>}
-                  </div>
+                </div>
                   <p className="text-slate-600">{plan.desc}</p>
                 </div>
                 <ul className="space-y-3 mb-6">
@@ -649,7 +655,7 @@ export default function LandingPage() {
                 >
                   {plan.cta}
                 </Button>
-              </div>
+          </div>
             ))}
           </div>
         </div>
@@ -693,19 +699,19 @@ export default function LandingPage() {
         <div className="relative max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Ready to Take Control of Your Finances?
-          </h2>
+            </h2>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
             Join thousands of professionals who have streamlined their financial management with EasyBudget.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button 
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <Button 
               onClick={() => router.push('/auth/register')} 
               className="bg-white text-slate-900 hover:bg-gray-100 font-medium px-8 py-3 text-lg"
-            >
+              >
               Get Started Now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             <Button 
               variant="outline" 
               className="border-slate-600 text-white hover:bg-slate-800 px-8 py-3 text-lg"
@@ -713,17 +719,17 @@ export default function LandingPage() {
             >
               Talk to Sales
             </Button>
-          </div>
+            </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-6 space-y-3 sm:space-y-0 text-sm text-slate-400">
             <div className="flex items-center">
               <Check className="w-4 h-4 text-green-500 mr-2" />
               <span>No setup fees</span>
-            </div>
+              </div>
             <div className="flex items-center">
               <Check className="w-4 h-4 text-green-500 mr-2" />
-              <span>Cancel anytime</span>
-            </div>
+                <span>Cancel anytime</span>
+              </div>
             <div className="flex items-center">
               <Check className="w-4 h-4 text-green-500 mr-2" />
               <span>24/7 support</span>
@@ -747,7 +753,7 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
               </ul>
             </div>
-            
+
             {/* Company */}
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
@@ -758,7 +764,7 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
-            
+
             {/* Legal */}
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
@@ -808,7 +814,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="border-t border-slate-800 mt-8 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-3">
@@ -821,8 +827,8 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-slate-400 text-sm">
-                © 2024 EasyBudget. All rights reserved.
-              </p>
+              © 2024 EasyBudget. All rights reserved.
+            </p>
             </div>
             
             <div className="flex items-center space-x-6">

@@ -35,6 +35,50 @@ export type Database = {
           updated_at?: string
         }
       }
+      user_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          currency: string
+          date_format: string
+          timezone: string
+          theme: string
+          email_notifications: boolean
+          push_notifications: boolean
+          weekly_reports: boolean
+          budget_alerts: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          currency?: string
+          date_format?: string
+          timezone?: string
+          theme?: string
+          email_notifications?: boolean
+          push_notifications?: boolean
+          weekly_reports?: boolean
+          budget_alerts?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          currency?: string
+          date_format?: string
+          timezone?: string
+          theme?: string
+          email_notifications?: boolean
+          push_notifications?: boolean
+          weekly_reports?: boolean
+          budget_alerts?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       categories: {
         Row: {
           id: string
