@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 
 export default function SignInPage() {
@@ -15,6 +16,9 @@ export default function SignInPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+  const [showResetForm, setShowResetForm] = useState(false)
+  const [resetEmail, setResetEmail] = useState("")
   const router = useRouter()
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -25,6 +29,7 @@ export default function SignInPage() {
       router.push('/')
     } catch (error) {
       console.error('Error signing in:', error)
+      alert('Invalid email or password. Please try again.')
     } finally {
       setAuthLoading(false)
     }
@@ -40,6 +45,90 @@ export default function SignInPage() {
     } finally {
       setAuthLoading(false)
     }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!resetEmail) {
+      alert('Please enter your email address.')
+      return
+    }
+    
+    setResetLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth/reset-password`
+      })
+      
+      if (error) throw error
+      
+      alert('Password reset email sent! Check your inbox.')
+      setShowResetForm(false)
+      setResetEmail("")
+    } catch (error) {
+      console.error('Error sending reset email:', error)
+      alert('Error sending reset email. Please try again.')
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
+  if (showResetForm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(122,255,1,0.1),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
+        
+        <div className="relative min-h-screen flex items-center justify-center p-6">
+          <div className="w-full max-w-xs">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Image 
+                  src="/mainlogo.svg" 
+                  alt="EasyBudget Logo" 
+                  width={64} 
+                  height={64} 
+                  className="w-16 h-16 object-contain" 
+                />
+              </div>
+              
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Reset Password</h1>
+              <p className="text-gray-600 text-sm">Enter your email to receive a reset link</p>
+            </div>
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div>
+                <Input 
+                  type="email" 
+                  value={resetEmail} 
+                  onChange={(e) => setResetEmail(e.target.value)} 
+                  placeholder="Email" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm" 
+                  required 
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-10 bg-gray-900 hover:bg-gray-800 text-white font-medium shadow-md text-sm" 
+                disabled={resetLoading}
+              >
+                {resetLoading ? "Sending..." : "Send Reset Email"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setShowResetForm(false)}
+                className="text-gray-500 hover:text-gray-700 text-sm"
+              >
+                ← Back to Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -137,6 +226,16 @@ export default function SignInPage() {
                 {authLoading ? "Signing In..." : "Continue"}
               </Button>
             </form>
+
+            {/* Forgot Password Link */}
+            <div className="text-center">
+              <button
+                onClick={() => setShowResetForm(true)}
+                className="text-[#7aff01] hover:text-[#9eff31] text-sm font-medium"
+              >
+                Forgot your password?
+              </button>
+            </div>
 
             {/* Footer Links */}
             <div className="text-center space-y-3">

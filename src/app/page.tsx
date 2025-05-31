@@ -234,133 +234,143 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
-              </div>
-              <span className="text-2xl font-semibold">
-                <span className="text-black">easybudget</span>
-                <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
-              </span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#benefits" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Features</a>
-              <a href="#journey" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Solutions</a>
-              <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">How it Works</a>
-              <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Pricing</a>
-              <a href="#faq" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">FAQ</a>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-4">
-              {user ? (
-                <>
-                  <Button variant="ghost" onClick={() => router.push('/dashboard')} className="text-slate-600 hover:text-slate-900">
-                      Dashboard
-                    </Button>
-                  <div className="relative">
-                    <button
-                      onClick={handleUserDropdown}
-                      className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
-                    >
-                      <div className="text-right hidden sm:block">
-                        <div className="text-sm font-semibold text-slate-900">
-                          {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
-                        </div>
-                        <div className="text-xs text-slate-500">Free Plan</div>
-                      </div>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm bg-gradient-to-br from-blue-500 to-blue-600">
-                        {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
-                      </div>
-                    </button>
-                    {userDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                        <div className="px-4 py-3 border-b border-gray-100">
-                          <div className="font-medium text-slate-900">{user?.user_metadata?.full_name || user?.email}</div>
-                          <div className="text-sm text-slate-500">Free Plan</div>
-                  </div>
-                        <div className="py-1">
-                          <button 
-                            className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
-                            onClick={() => router.push('/dashboard/profile')}
-                          >
-                            <User className="w-4 h-4 mr-3" />
-                            Profile Settings
-                          </button>
-                          <button 
-                            className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
-                            onClick={() => router.push('/dashboard/preferences')}
-                          >
-                            <Settings className="w-4 h-4 mr-3" />
-                            Preferences
-                          </button>
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
-                            <HelpCircle className="w-4 h-4 mr-3" />
-                            Help & Support
-                          </button>
-                          <div className="border-t border-gray-100 mt-1 pt-1">
-                            <button 
-                              onClick={handleSignOut}
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                            >
-                              <LogOut className="w-4 h-4 mr-3" />
-                              Sign out
-                            </button>
+      <nav className="sticky top-0 z-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-lg px-6 py-3">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-lg overflow-hidden">
+                  <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
                 </div>
+                <span className="text-2xl font-semibold">
+                  <span className="text-black">easybudget</span>
+                  <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+                </span>
+              </div>
+
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#benefits" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Features</a>
+                <a href="#journey" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Solutions</a>
+                <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">How it Works</a>
+                <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Pricing</a>
+                <a href="#faq" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">FAQ</a>
+              </div>
+
+              <div className="hidden md:flex items-center space-x-4">
+                {user ? (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => router.push('/dashboard')} 
+                      className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] hover:from-[#6aef00] hover:to-[#8aef21] text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
+                    >
+                        Dashboard
+                      </Button>
+                    <div className="relative">
+                      <button
+                        onClick={handleUserDropdown}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <div className="text-right hidden sm:block">
+                          <div className="text-sm font-semibold text-slate-900">
+                            {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
+                          </div>
+                          <div className="text-xs text-slate-500">Free Plan</div>
                         </div>
-                      </div>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm bg-gradient-to-br from-blue-500 to-blue-600">
+                          {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                        </div>
+                      </button>
+                      {userDropdownOpen && (
+                        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                          <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="font-medium text-slate-900">{user?.user_metadata?.full_name || user?.email}</div>
+                            <div className="text-sm text-slate-500">Free Plan</div>
+                    </div>
+                          <div className="py-1">
+                            <button 
+                              className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
+                              onClick={() => router.push('/dashboard/profile')}
+                            >
+                              <User className="w-4 h-4 mr-3" />
+                              Profile Settings
+                            </button>
+                            <button 
+                              className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
+                              onClick={() => router.push('/dashboard/preferences')}
+                            >
+                              <Settings className="w-4 h-4 mr-3" />
+                              Preferences
+                            </button>
+                            <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
+                              <HelpCircle className="w-4 h-4 mr-3" />
+                              Help & Support
+                            </button>
+                            <div className="border-t border-gray-100 mt-1 pt-1">
+                              <button 
+                                onClick={handleSignOut}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                              >
+                                <LogOut className="w-4 h-4 mr-3" />
+                                Sign out
+                              </button>
+                  </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => router.push('/auth/signin')} 
+                      className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] hover:from-[#6aef00] hover:to-[#8aef21] text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      onClick={() => router.push('/auth/register')} 
+                      className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-2 rounded-lg"
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              <div className="md:hidden">
+                <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+              </div>
+            </div>
+
+            {mobileMenuOpen && (
+              <div className="md:hidden pt-4 border-t border-gray-200 mt-3">
+                <div className="flex flex-col space-y-4">
+                  <a href="#benefits" className="text-slate-600 hover:text-slate-900 px-2 py-1">Features</a>
+                  <a href="#journey" className="text-slate-600 hover:text-slate-900 px-2 py-1">Solutions</a>
+                  <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 px-2 py-1">How it Works</a>
+                  <a href="#pricing" className="text-slate-600 hover:text-slate-900 px-2 py-1">Pricing</a>
+                  <a href="#faq" className="text-slate-600 hover:text-slate-900 px-2 py-1">FAQ</a>
+                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                    {user ? (
+                      <>
+                        <Button variant="ghost" onClick={() => router.push('/dashboard')}>Dashboard</Button>
+                        <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
+                        <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
+                      </>
                     )}
                   </div>
-                </>
-              ) : (
-                <>
-                  <Button variant="ghost" onClick={() => router.push('/auth/signin')} className="text-slate-600 hover:text-slate-900 font-medium">
-                    Sign In
-                  </Button>
-                  <Button 
-                    onClick={() => router.push('/auth/register')} 
-                    className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-2"
-                  >
-                    Sign Up
-                  </Button>
-                </>
-              )}
-            </div>
-
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
-          </div>
-
-          {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200 bg-white">
-              <div className="flex flex-col space-y-4">
-                <a href="#benefits" className="text-slate-600 hover:text-slate-900 px-2 py-1">Features</a>
-                <a href="#journey" className="text-slate-600 hover:text-slate-900 px-2 py-1">Solutions</a>
-                <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 px-2 py-1">How it Works</a>
-                <a href="#pricing" className="text-slate-600 hover:text-slate-900 px-2 py-1">Pricing</a>
-                <a href="#faq" className="text-slate-600 hover:text-slate-900 px-2 py-1">FAQ</a>
-                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                  {user ? (
-                    <>
-                      <Button variant="ghost" onClick={() => router.push('/dashboard')}>Dashboard</Button>
-                      <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
-                      <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
-                    </>
-                  )}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </nav>
 
