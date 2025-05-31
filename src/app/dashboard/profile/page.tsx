@@ -24,7 +24,6 @@ import {
 export default function ProfilePage() {
   const { user, loading } = useAuth()
   const [isUpdating, setIsUpdating] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   
   // Profile form state
