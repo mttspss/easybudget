@@ -232,11 +232,15 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
+      {/* Subtle patterns for entire page */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(122,255,1,0.1),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
+      
       {/* Navbar */}
       <nav className="sticky top-0 z-50 p-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-lg px-6 py-3">
+          <div className="bg-white/70 backdrop-blur-md border border-gray-200/50 rounded-2xl shadow-lg px-6 py-3">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden">
@@ -264,8 +268,8 @@ export default function LandingPage() {
                       onClick={() => router.push('/dashboard')} 
                       className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] hover:from-[#6aef00] hover:to-[#8aef21] text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
                     >
-                        Dashboard
-                      </Button>
+                      Dashboard
+                    </Button>
                     <div className="relative">
                       <button
                         onClick={handleUserDropdown}
@@ -375,24 +379,20 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="py-20 bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
-        {/* Subtle patterns */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(122,255,1,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
-        
+      <section className="py-16 relative">        
         <div className="relative max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
                 {/* Badge */}
                 <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-slate-700 text-sm font-medium shadow-sm">
-                  <Database className="w-4 h-4 mr-2 text-[#7aff01]" />
+                  <Database className="w-4 h-4 mr-2 text-[#6fb01a]" />
                   Multiple Accounts, One Dashboard
                 </div>
                 
                 <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
-                  <span className="block bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent"> 
+                  <span className="block bg-gradient-to-r from-[#6fb01a] to-[#85c926] bg-clip-text text-transparent"> 
                     Spreadsheets
                   </span>
                 </h1>
@@ -420,18 +420,18 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-4">
-                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
-                  <Shield className="w-6 h-6 text-green-600" />
-                  <span className="text-sm font-semibold text-slate-900">SOC 2 Certified</span>
+              <div className="flex items-center space-x-6 pt-4">
+                <div className="flex items-center space-x-2">
+                  <Shield className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-slate-600 font-medium">SOC 2 Certified</span>
                 </div>
-                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
-                  <Lock className="w-6 h-6 text-blue-600" />
-                  <span className="text-sm font-semibold text-slate-900">Bank-Level Security</span>
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm text-slate-600 font-medium">Bank-Level Security</span>
                 </div>
-                <div className="flex flex-col items-center space-y-2 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
-                  <Database className="w-6 h-6 text-purple-600" />
-                  <span className="text-sm font-semibold text-slate-900">10K+ Banks</span>
+                <div className="flex items-center space-x-2">
+                  <Database className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm text-slate-600 font-medium">10K+ Banks</span>
                 </div>
               </div>
 
@@ -478,7 +478,7 @@ export default function LandingPage() {
                   
                   {/* KPI Cards */}
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-[#7aff01]/10 to-[#9eff31]/5 rounded-xl p-4 border border-[#7aff01]/20">
+                    <div className="bg-gradient-to-br from-[#6fb01a]/10 to-[#85c926]/5 rounded-xl p-4 border border-[#6fb01a]/20">
                       <div className="text-xs text-slate-600 mb-1 font-medium">Total Assets</div>
                       <div className="text-2xl font-bold text-slate-900">$127,340</div>
                       <div className="text-xs text-green-600 font-semibold">+12.4%</div>
@@ -502,12 +502,12 @@ export default function LandingPage() {
                         <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
                       </div>
                       <div className="h-16 bg-gradient-to-t from-slate-200 to-slate-100 rounded-lg flex items-end justify-around px-2">
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '60%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '80%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '45%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '90%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '70%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#7aff01] to-[#9eff31] rounded-t-md" style={{height: '85%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '60%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '80%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '45%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '90%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '70%'}}></div>
+                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '85%'}}></div>
                       </div>
                     </div>
                   </div>
@@ -541,8 +541,8 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits/Features */}
-      <section id="benefits" className="py-12 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="benefits" className="py-12 relative">
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Everything You Need to Take Control of Your Finances
@@ -553,21 +553,21 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
-              <div key={index} className="p-6 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
+              <div key={index} className="p-6 rounded-lg bg-white/60 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
                 <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
                   <benefit.icon className="w-5 h-5 text-slate-600" />
-              </div>
+                </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">{benefit.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{benefit.desc}</p>
-            </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Built for Every Financial Journey */}
-      <section id="journey" className="py-12 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="journey" className="py-12 relative">
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Built for Every Financial Journey
@@ -578,7 +578,7 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
             {journeyTypes.map((type, index) => (
-              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg shadow-md`}>
+              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg shadow-md bg-white/70 backdrop-blur-sm border border-gray-200`}>
                 <div className="text-center mb-6">
                   <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
                     <type.icon className="w-6 h-6" />
@@ -601,8 +601,8 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-12 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="how-it-works" className="py-12 relative">
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               How It Works
@@ -635,8 +635,8 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-12 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="pricing" className="py-12 relative">
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Choose Your Plan
@@ -647,7 +647,7 @@ export default function LandingPage() {
                 </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
-              <div key={index} className={`rounded-xl p-6 border transition-all hover:shadow-lg ${plan.popular ? 'border-slate-900 shadow-md scale-105 bg-white ring-2 ring-slate-900' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+              <div key={index} className={`rounded-xl p-6 border transition-all hover:shadow-lg bg-white/70 backdrop-blur-sm ${plan.popular ? 'border-slate-900 shadow-md scale-105 ring-2 ring-slate-900' : 'border-gray-200 hover:border-gray-300'}`}>
                 {plan.popular && (
                   <div className="text-center mb-4">
                     <span className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -688,8 +688,8 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
+      <section id="faq" className="py-12 relative">
+        <div className="relative max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Frequently Asked Questions
@@ -700,9 +700,9 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {faqs.map((faq, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden bg-white/70 backdrop-blur-sm">
                 <button 
-                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-gray-50 transition-colors" 
+                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-gray-50/50 transition-colors" 
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
                 >
                   <span className="font-semibold text-slate-900 pr-4">{faq.q}</span>
@@ -720,13 +720,13 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-gray-50 border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 text-center">
+      <section className="py-20 relative border-t border-gray-100">
+        <div className="relative max-w-5xl mx-auto px-6 text-center">
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 Start Your Financial 
-                <span className="block bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-[#6fb01a] to-[#85c926] bg-clip-text text-transparent">
                   Transformation Today
                 </span>
               </h2>
@@ -781,8 +781,8 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-16">
-        <div className="max-w-6xl mx-auto px-6">
+      <footer className="relative border-t border-gray-200 py-16">
+        <div className="relative max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-4 gap-8 mb-12">
             {/* Product */}
             <div>
@@ -833,7 +833,7 @@ export default function LandingPage() {
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)} 
                       placeholder="Enter your email" 
-                      className="pl-10 bg-white border-gray-300 text-slate-900 placeholder-slate-400 focus:border-[#7aff01] focus:ring-[#7aff01]/20"
+                      className="pl-10 bg-white/80 border-gray-300 text-slate-900 placeholder-slate-400 focus:border-[#6fb01a] focus:ring-[#6fb01a]/20 backdrop-blur-sm"
                       required 
                     />
                   </div>
@@ -848,7 +848,7 @@ export default function LandingPage() {
                   <Button 
                     variant="ghost" 
                     onClick={() => router.push('/auth/signin')} 
-                    className="w-full text-slate-600 hover:text-slate-900 hover:bg-gray-50"
+                    className="w-full text-slate-600 hover:text-slate-900 hover:bg-gray-50/50"
                   >
                     Already have an account? Sign in
                   </Button>
