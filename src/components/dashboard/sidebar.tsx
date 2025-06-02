@@ -103,7 +103,7 @@ export function Sidebar() {
           <div>
             <span className="text-lg font-bold">
               <span className="text-black">easybudget</span>
-              <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+              <span className="text-green-400">.ing</span>
             </span>
           </div>
         </div>

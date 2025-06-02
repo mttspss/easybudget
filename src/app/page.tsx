@@ -248,7 +248,7 @@ export default function LandingPage() {
               </div>
                 <span className="text-2xl font-semibold">
                   <span className="text-black">easybudget</span>
-                  <span className="bg-gradient-to-r from-[#cbff49] to-[#a9ff68] bg-clip-text text-transparent">.ing</span>
+                  <span className="text-green-400">.ing</span>
                 </span>
             </div>
 
@@ -392,7 +392,7 @@ export default function LandingPage() {
                 
                 <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
-                  <span className="block bg-gradient-to-r from-[#6fb01a] to-[#85c926] bg-clip-text text-transparent"> 
+                  <span className="block text-green-400"> 
                     Spreadsheets
                   </span>
             </h1>
@@ -726,7 +726,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 Start Your Financial 
-                <span className="block bg-gradient-to-r from-[#6fb01a] to-[#85c926] bg-clip-text text-transparent">
+                <span className="block text-green-400">
                   Transformation Today
                 </span>
             </h2>
@@ -865,7 +865,7 @@ export default function LandingPage() {
                 </div>
                 <span className="text-xl font-bold">
                   <span className="text-slate-900">easybudget</span>
-                  <span style={{ color: '#01ff76' }}>.ing</span>
+                  <span className="text-green-400">.ing</span>
                 </span>
               </div>
               

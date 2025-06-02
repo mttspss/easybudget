@@ -65,7 +65,7 @@ export default function RegisterPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
               Welcome to{" "}
               <span className="text-gray-900">easybudget</span>
-              <span className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] bg-clip-text text-transparent">.ing</span>
+              <span className="text-green-400">.ing</span>
             </h1>
             <p className="text-gray-600 text-sm">Create your account to get started</p>
           </div>
