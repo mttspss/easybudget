@@ -19,7 +19,8 @@ import {
   Layers,
   User,
   LogOut,
-  HelpCircle
+  HelpCircle,
+  MoreHorizontal
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -94,19 +95,21 @@ export function Sidebar() {
 
   return (
     <div className="w-64 flex flex-col">
-      {/* Logo */}
+      {/* Logo - Now clickable */}
       <div className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg overflow-hidden">
-            <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+        <Link href="/" className="block">
+          <div className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <span className="text-lg font-bold">
+                <span className="text-black">easybudget</span>
+                <span className="text-green-400">.ing</span>
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-lg font-bold">
-              <span className="text-black">easybudget</span>
-              <span className="text-green-400">.ing</span>
-            </span>
-          </div>
-        </div>
+        </Link>
       </div>
 
       {/* Navigation */}
@@ -167,62 +170,67 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* User Profile */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start p-3 h-auto hover:bg-gray-50">
-              <div className="flex items-center gap-3 w-full">
-                <Avatar className="h-8 w-8 ring-2 ring-gray-200">
-                  <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt="Profile" />
-                  <AvatarFallback className="text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-left flex-1">
-                  <div className="text-sm font-semibold text-gray-900 truncate">
-                    {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
-                  </div>
-                  <div className="text-xs text-gray-500">Free Plan</div>
+        {/* User Profile - Enhanced with 3-dot menu */}
+        <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+          <Avatar className="h-8 w-8 ring-2 ring-gray-200">
+            <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt="Profile" />
+            <AvatarFallback className="text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+              {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-left flex-1 min-w-0">
+            <div className="text-sm font-semibold text-gray-900 truncate">
+              {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
+            </div>
+            <div className="text-xs text-gray-500">Free Plan</div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-opacity"
+              >
+                <MoreHorizontal className="h-4 w-4 text-gray-500" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-lg">
+              <DropdownMenuLabel className="text-sm">
+                <div className="space-y-1">
+                  <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || user?.email}</p>
+                  <p className="text-gray-500 text-xs">{user?.email}</p>
                 </div>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-lg">
-            <DropdownMenuLabel className="text-sm">
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || user?.email}</p>
-                <p className="text-gray-500 text-xs">{user?.email}</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-gray-100" />
-            <DropdownMenuItem 
-              className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
-              onClick={handleProfileSettings}
-            >
-              <User className="mr-3 h-4 w-4 text-gray-500" />
-              Profile Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
-              onClick={handlePreferences}
-            >
-              <Settings className="mr-3 h-4 w-4 text-gray-500" />
-              Preferences
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-sm py-2 focus:bg-gray-50">
-              <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
-              Help & Support
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-gray-100" />
-            <DropdownMenuItem 
-              className="text-sm py-2 text-red-600 focus:text-red-600 focus:bg-red-50"
-              onClick={() => signOut()}
-            >
-              <LogOut className="mr-3 h-4 w-4" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-100" />
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handleProfileSettings}
+              >
+                <User className="mr-3 h-4 w-4 text-gray-500" />
+                Profile Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handlePreferences}
+              >
+                <Settings className="mr-3 h-4 w-4 text-gray-500" />
+                Preferences
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-sm py-2 focus:bg-gray-50">
+                <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
+                Help & Support
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-gray-100" />
+              <DropdownMenuItem 
+                className="text-sm py-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+                onClick={() => signOut()}
+              >
+                <LogOut className="mr-3 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   )

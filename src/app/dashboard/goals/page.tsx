@@ -335,14 +335,14 @@ export default function GoalsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                 {/* Main stats - larger cards */}
                 <Card className="lg:col-span-2 bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm">
-                  <CardContent className="p-3">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Total Goals</p>
                         <div className="text-3xl font-medium text-gray-900">{totalGoals}</div>
                         <p className="text-xs text-gray-500 mt-1">Active financial targets</p>
                       </div>
-                      <div className="p-3 bg-blue-100 rounded-full">
+                      <div className="p-2 bg-blue-100 rounded-full">
                         <Target className="h-6 w-6 text-blue-600" />
                       </div>
                     </div>
@@ -350,7 +350,7 @@ export default function GoalsPage() {
                 </Card>
 
                 <Card className="lg:col-span-2 bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
-                  <CardContent className="p-3">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Overall Progress</p>
@@ -364,7 +364,7 @@ export default function GoalsPage() {
                           />
                         </div>
                       </div>
-                      <div className="p-3 bg-purple-100 rounded-full">
+                      <div className="p-2 bg-purple-100 rounded-full">
                         <TrendingUp className="h-6 w-6 text-purple-600" />
                       </div>
                     </div>
