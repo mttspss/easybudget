@@ -13,7 +13,10 @@ import {
   Plus,
   Filter,
   Download,
-  Clock
+  Clock,
+  TrendingDown,
+  BarChart3,
+  Activity
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -111,98 +114,33 @@ export default function Dashboard() {
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
-      // Generate data for charts based on selected period
-      const chartData = []
-      let periods = 6
-      
-      if (selectedPeriod === 'week') {
-        // Show last 7 weeks
-        periods = 7
-        for (let i = periods - 1; i >= 0; i--) {
-          const date = new Date()
-          date.setDate(date.getDate() - (i * 7))
-          const weekStart = new Date(date)
-          const weekEnd = new Date(date)
-          weekEnd.setDate(weekEnd.getDate() + 6)
-          
-          const weekTransactions = (allTransactions || []).filter(t => {
-            const tDate = new Date(t.date)
-            return tDate >= weekStart && tDate <= weekEnd
-          })
-          
-          const weekIncome = weekTransactions
-            .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          const weekExpenses = weekTransactions
-            .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          chartData.push({
-            month: `W${Math.ceil(date.getDate() / 7)}`,
-            income: weekIncome,
-            expenses: weekExpenses,
-            balance: weekIncome - weekExpenses
-          })
-        }
-      } else if (selectedPeriod === 'year') {
-        // Show last 5 years
-        periods = 5
-        for (let i = periods - 1; i >= 0; i--) {
-          const date = new Date()
-          date.setFullYear(date.getFullYear() - i)
-          const yearStart = new Date(date.getFullYear(), 0, 1)
-          const yearEnd = new Date(date.getFullYear(), 11, 31)
-          
-          const yearTransactions = (allTransactions || []).filter(t => {
-            const tDate = new Date(t.date)
-            return tDate >= yearStart && tDate <= yearEnd
-          })
-          
-          const yearIncome = yearTransactions
-            .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          const yearExpenses = yearTransactions
-            .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          chartData.push({
-            month: date.getFullYear().toString(),
-            income: yearIncome,
-            expenses: yearExpenses,
-            balance: yearIncome - yearExpenses
-          })
-        }
-      } else {
-        // Default: Show last 6 months
-        periods = 6
-        for (let i = periods - 1; i >= 0; i--) {
-          const date = new Date()
-          date.setMonth(date.getMonth() - i)
-          const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
-          const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-          
-          const monthTransactions = (allTransactions || []).filter(t => {
-            const tDate = new Date(t.date)
-            return tDate >= monthStart && tDate <= monthEnd
-          })
-          
-          const monthIncome = monthTransactions
-            .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          const monthExpenses = monthTransactions
-            .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          chartData.push({
-            month: date.toLocaleDateString('en-US', { month: 'short' }),
-            income: monthIncome,
-            expenses: monthExpenses,
-            balance: monthIncome - monthExpenses
-          })
-        }
+      // Generate monthly data for charts
+      const monthlyData = []
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+        
+        const monthTransactions = (allTransactions || []).filter(t => {
+          const tDate = new Date(t.date)
+          return tDate >= monthStart && tDate <= monthEnd
+        })
+        
+        const monthIncome = monthTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        const monthExpenses = monthTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        monthlyData.push({
+          month: date.toLocaleDateString('en-US', { month: 'short' }),
+          income: monthIncome,
+          expenses: monthExpenses,
+          balance: monthIncome - monthExpenses
+        })
       }
 
       // Category spending with budgets
@@ -240,7 +178,7 @@ export default function Dashboard() {
         balance: periodIncome - periodExpenses,
         recentTransactions: recentTransactions || [],
         categorySpending: categorySpending.filter(c => c.spent > 0),
-        monthlyData: chartData
+        monthlyData: monthlyData
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
@@ -366,7 +304,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Main Stats Cards - Better Proportions */}
+              {/* Main Stats Cards - Reduced Height */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {isLoading ? (
                   <>
@@ -378,65 +316,65 @@ export default function Dashboard() {
                   <>
                     {/* Net Income - Blue Theme */}
                     <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
+                      <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600 mb-3">Net Income</p>
+                            <p className="text-sm font-medium text-gray-600 mb-2">Net Income</p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-2xl font-semibold text-blue-600">
+                              <span className="text-xl font-semibold text-blue-600">
                                 $
                               </span>
-                              <span className="text-3xl font-semibold text-gray-900">
+                              <span className="text-2xl font-semibold text-gray-900">
                                 {Math.abs(stats?.balance || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className="p-3 bg-blue-100 rounded-full">
-                            <TrendingUp className="h-6 w-6 text-blue-600" />
+                          <div className="p-2 bg-blue-100 rounded-full">
+                            <TrendingUp className="h-5 w-5 text-blue-600" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    {/* Income */}
+                    {/* Income - Salesync Style Icon */}
                     <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
+                      <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600 mb-3">
+                            <p className="text-sm font-medium text-gray-600 mb-2">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Income
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-2xl font-semibold text-green-600">$</span>
-                              <span className="text-3xl font-semibold text-gray-900">
+                              <span className="text-xl font-semibold text-green-600">$</span>
+                              <span className="text-2xl font-semibold text-gray-900">
                                 {(stats?.income || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className="p-3 bg-green-100 rounded-full">
-                            <ArrowUpRight className="h-6 w-6 text-green-600" />
+                          <div className="p-2 bg-green-100 rounded-full">
+                            <TrendingUp className="h-5 w-5 text-green-600" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    {/* Expenses */}
+                    {/* Expenses - Salesync Style Icon */}
                     <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
+                      <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600 mb-3">
+                            <p className="text-sm font-medium text-gray-600 mb-2">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Expenses
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-2xl font-semibold text-red-600">$</span>
-                              <span className="text-3xl font-semibold text-gray-900">
+                              <span className="text-xl font-semibold text-red-600">$</span>
+                              <span className="text-2xl font-semibold text-gray-900">
                                 {(stats?.expenses || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className="p-3 bg-red-100 rounded-full">
-                            <ArrowDownRight className="h-6 w-6 text-red-600" />
+                          <div className="p-2 bg-red-100 rounded-full">
+                            <TrendingDown className="h-5 w-5 text-red-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -445,13 +383,16 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Charts Section - Better Alignment */}
+              {/* Charts Section - With Icons */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Financial Trend - Aligned with bar chart */}
+                {/* Financial Trend - With Icon */}
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-medium text-gray-900">Financial Trend</CardTitle>
-                    <p className="text-sm text-gray-600">Income, expenses and balance over time</p>
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                      <CardTitle className="text-lg font-medium text-gray-900">Financial Trend</CardTitle>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">Income, expenses and balance over time</p>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {isLoading ? (
@@ -519,12 +460,15 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* Monthly Comparison - Keep this one as user likes it */}
+                {/* Monthly Comparison - Less Bold + Icon */}
                 <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40 shadow-lg">
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-lg font-bold text-gray-900">Monthly Comparison</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-purple-600" />
+                          <CardTitle className="text-lg font-medium text-gray-900">Monthly Comparison</CardTitle>
+                        </div>
                         <p className="text-sm text-gray-600 mt-1">Income vs Expenses</p>
                       </div>
                     </div>
@@ -595,13 +539,16 @@ export default function Dashboard() {
                 </Card>
               </div>
 
-              {/* Recent Transactions */}
+              {/* Recent Transactions - With Icon and Better Font */}
               <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-base font-semibold text-gray-900">Recent Transactions</CardTitle>
-                      <p className="text-xs text-gray-600 mt-1">Your latest financial activity</p>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-gray-600" />
+                        <CardTitle className="text-lg font-medium text-gray-900">Recent Transactions</CardTitle>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Your latest financial activity</p>
                     </div>
                     <Button variant="outline" size="sm" className="h-7 text-xs hover:bg-gray-50">
                       View All
