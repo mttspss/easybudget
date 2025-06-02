@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
+import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker"
 import { 
   TrendingUp,
   ArrowUpRight,
@@ -53,6 +54,7 @@ interface DashboardStats {
   recentTransactions: any[]
   categorySpending: any[]
   monthlyData: any[]
+  currentPeriod?: string
 }
 
 interface Transaction {
@@ -74,6 +76,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("month")
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined)
 
   // Transaction columns for data table
   const transactionColumns: ColumnDef<Transaction>[] = useMemo(() => [
@@ -177,17 +180,30 @@ export default function Dashboard() {
       // Calculate date ranges
       const now = new Date()
       let startDate: Date
-      const endDate = now
+      let endDate: Date
+      let periodLabel: string
 
-      switch (selectedPeriod) {
-        case 'week':
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
-          break
-        case 'year':
-          startDate = new Date(now.getFullYear(), 0, 1)
-          break
-        default: // month
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      if (customDateRange?.from && customDateRange?.to) {
+        // Custom date range
+        startDate = customDateRange.from
+        endDate = customDateRange.to
+        periodLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+      } else {
+        // Preset periods
+        endDate = now
+        switch (selectedPeriod) {
+          case 'week':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
+            periodLabel = 'Weekly'
+            break
+          case 'year':
+            startDate = new Date(now.getFullYear(), 0, 1)
+            periodLabel = 'Yearly'
+            break
+          default: // month
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+            periodLabel = 'Monthly'
+        }
       }
 
       // Get transactions for the period
@@ -305,14 +321,15 @@ export default function Dashboard() {
         balance: periodIncome - periodExpenses,
         recentTransactions: recentTransactions || [],
         categorySpending: categorySpending.filter(c => c.spent > 0),
-        monthlyData: monthlyData
+        monthlyData: monthlyData,
+        currentPeriod: periodLabel
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
     } finally {
       setIsLoading(false)
     }
-  }, [user, selectedPeriod])
+  }, [user, selectedPeriod, customDateRange])
 
   useEffect(() => {
     if (user) {
@@ -402,24 +419,44 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Financial Overview</h2>
-                  <p className="text-gray-600 text-sm mt-1">Track your income and expenses</p>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {stats?.currentPeriod ? `${stats.currentPeriod} overview` : 'Track your income and expenses'}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {/* Quick Period Buttons */}
                   <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
                     {["week", "month", "year"].map((period) => (
                       <Button
                         key={period}
-                        variant={selectedPeriod === period ? "default" : "ghost"}
+                        variant={selectedPeriod === period && !customDateRange ? "default" : "ghost"}
                         size="sm"
                         className={`h-8 px-3 text-xs transition-all ${
-                          selectedPeriod === period ? "bg-blue-600 text-white shadow-sm" : ""
+                          selectedPeriod === period && !customDateRange ? "bg-blue-600 text-white shadow-sm" : ""
                         }`}
-                        onClick={() => setSelectedPeriod(period)}
+                        onClick={() => {
+                          setSelectedPeriod(period)
+                          setCustomDateRange(undefined)
+                        }}
                       >
                         {period.charAt(0).toUpperCase() + period.slice(1)}
                       </Button>
                     ))}
                   </div>
+                  
+                  {/* Custom Date Range Picker */}
+                  <DateRangePicker
+                    value={customDateRange}
+                    onValueChange={(range) => {
+                      setCustomDateRange(range)
+                      if (range?.from && range?.to) {
+                        setSelectedPeriod("") // Clear preset selection when custom range is used
+                      }
+                    }}
+                    className="h-8 text-xs"
+                    placeholder="Custom range"
+                  />
+                  
                   <Button variant="outline" size="sm" className="h-8 text-xs">
                     <Filter className="h-3 w-3 mr-2" />
                     Filter
@@ -469,7 +506,7 @@ export default function Dashboard() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
-                              {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Income
+                              {stats?.currentPeriod ? `${stats.currentPeriod} Income` : 'Income'}
                             </p>
                             <div className="flex items-baseline gap-1">
                               <span className="text-xl font-semibold text-green-600">$</span>
@@ -492,7 +529,7 @@ export default function Dashboard() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
-                              {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Expenses
+                              {stats?.currentPeriod ? `${stats.currentPeriod} Expenses` : 'Expenses'}
                             </p>
                             <div className="flex items-baseline gap-1">
                               <span className="text-xl font-semibold text-red-600">$</span>
