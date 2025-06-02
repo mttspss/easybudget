@@ -34,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { toast } from "sonner"
 
 interface Transaction {
   id: string
@@ -70,9 +71,7 @@ export default function IncomePage() {
     amount: "",
     description: "",
     date: new Date().toISOString().split('T')[0],
-    category_id: "",
-    icon: "",
-    image: ""
+    category_id: ""
   })
 
   const fetchData = useCallback(async () => {
@@ -134,7 +133,7 @@ export default function IncomePage() {
     e.preventDefault()
     
     if (!formData.amount || !formData.description || !formData.category_id) {
-      alert('Please fill in all fields')
+      toast.error('Please fill in all required fields')
       return
     }
 
@@ -148,13 +147,16 @@ export default function IncomePage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
-            icon: formData.icon || null,
-            image: formData.image || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingTransaction.id)
 
-        if (error) throw error
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
+        
+        toast.success('Income updated successfully!')
       } else {
         // Create new transaction
         const { error } = await supabase
@@ -165,12 +167,15 @@ export default function IncomePage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
-            type: 'income',
-            icon: formData.icon || null,
-            image: formData.image || null
+            type: 'income'
           })
 
-        if (error) throw error
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
+        
+        toast.success('Income added successfully!')
       }
 
       // Reset form and close dialog
@@ -178,18 +183,16 @@ export default function IncomePage() {
         amount: "",
         description: "",
         date: new Date().toISOString().split('T')[0],
-        category_id: "",
-        icon: "",
-        image: ""
+        category_id: ""
       })
       setEditingTransaction(null)
       setIsDialogOpen(false)
       
       // Refresh data
       fetchData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving transaction:', error)
-      alert('Error saving transaction. Please try again.')
+      toast.error(`Error saving transaction: ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -199,9 +202,7 @@ export default function IncomePage() {
       amount: transaction.amount.toString(),
       description: transaction.description,
       date: transaction.date,
-      category_id: transaction.category_id,
-      icon: transaction.icon || "",
-      image: transaction.image || ""
+      category_id: transaction.category_id
     })
     setIsDialogOpen(true)
   }
@@ -217,10 +218,11 @@ export default function IncomePage() {
 
       if (error) throw error
       
+      toast.success('Income deleted successfully!')
       fetchData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting transaction:', error)
-      alert('Error deleting transaction. Please try again.')
+      toast.error(`Error deleting transaction: ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -331,29 +333,6 @@ export default function IncomePage() {
                           />
                         </div>
 
-                        <div>
-                          <Label htmlFor="icon">Icon (optional)</Label>
-                          <Input
-                            id="icon"
-                            value={formData.icon}
-                            onChange={(e) => setFormData({...formData, icon: e.target.value})}
-                            placeholder="e.g., 💰, 💼, 💻, 📈"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">You can use any emoji as an icon</p>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="image">Image URL (optional)</Label>
-                          <Input
-                            id="image"
-                            type="url"
-                            value={formData.image}
-                            onChange={(e) => setFormData({...formData, image: e.target.value})}
-                            placeholder="https://example.com/image.jpg"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">Add a receipt or related image</p>
-                        </div>
-
                         <DialogFooter>
                           <Button type="button" variant="outline" onClick={() => {
                             setIsDialogOpen(false)
@@ -362,9 +341,7 @@ export default function IncomePage() {
                               amount: "",
                               description: "",
                               date: new Date().toISOString().split('T')[0],
-                              category_id: "",
-                              icon: "",
-                              image: ""
+                              category_id: ""
                             })
                           }}>
                             Cancel

@@ -40,6 +40,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { toast } from "sonner"
 
 interface Category {
   id: string
@@ -128,7 +129,7 @@ export default function CategoriesPage() {
     e.preventDefault()
     
     if (!formData.name || !formData.color) {
-      alert('Please fill in all required fields')
+      toast.error('Please fill in all required fields')
       return
     }
 
@@ -147,6 +148,7 @@ export default function CategoriesPage() {
           .eq('id', editingCategory.id)
 
         if (error) throw error
+        toast.success('Category updated successfully!')
       } else {
         // Create new category
         const { error } = await supabase
@@ -160,6 +162,7 @@ export default function CategoriesPage() {
           })
 
         if (error) throw error
+        toast.success('Category created successfully!')
       }
 
       // Reset form and close dialog
@@ -174,9 +177,9 @@ export default function CategoriesPage() {
       
       // Refresh data
       fetchCategories()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving category:', error)
-      alert('Error saving category. Please try again.')
+      toast.error(`Error saving category: ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -195,7 +198,7 @@ export default function CategoriesPage() {
     // Check if category has transactions
     const category = categories.find(c => c.id === id)
     if (category && category.transaction_count! > 0) {
-      alert(`Cannot delete category "${category.name}" because it has ${category.transaction_count} transactions. Please move or delete the transactions first.`)
+      toast.error(`Cannot delete category "${category.name}" because it has ${category.transaction_count} transactions. Please move or delete the transactions first.`)
       return
     }
 
@@ -209,10 +212,11 @@ export default function CategoriesPage() {
 
       if (error) throw error
       
+      toast.success('Category deleted successfully!')
       fetchCategories()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting category:', error)
-      alert('Error deleting category. Please try again.')
+      toast.error(`Error deleting category: ${error.message || 'Please try again.'}`)
     }
   }
 

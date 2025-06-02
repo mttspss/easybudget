@@ -30,6 +30,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { toast } from "sonner"
 
 interface Goal {
   id: string
@@ -100,7 +101,7 @@ export default function GoalsPage() {
     e.preventDefault()
     
     if (!formData.name || !formData.target_amount) {
-      alert('Please fill in required fields')
+      toast.error('Please fill in required fields')
       return
     }
 
@@ -120,6 +121,7 @@ export default function GoalsPage() {
           .eq('id', editingGoal.id)
 
         if (error) throw error
+        toast.success('Goal updated successfully!')
       } else {
         // Create new goal
         const { error } = await supabase
@@ -134,6 +136,7 @@ export default function GoalsPage() {
           })
 
         if (error) throw error
+        toast.success('Goal created successfully!')
       }
 
       // Reset form and close dialog
@@ -149,9 +152,9 @@ export default function GoalsPage() {
       
       // Refresh data
       fetchGoals()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving goal:', error)
-      alert('Error saving goal. Please try again.')
+      toast.error(`Error saving goal: ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -178,10 +181,11 @@ export default function GoalsPage() {
 
       if (error) throw error
       
+      toast.success('Goal deleted successfully!')
       fetchGoals()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting goal:', error)
-      alert('Error deleting goal. Please try again.')
+      toast.error(`Error deleting goal: ${error.message || 'Please try again.'}`)
     }
   }
 
