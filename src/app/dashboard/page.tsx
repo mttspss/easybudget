@@ -162,7 +162,7 @@ export default function Dashboard() {
   }
 
   const LoadingCard = () => (
-    <Card className="bg-gradient-to-br from-gray-50 via-white to-gray-50/30 border border-gray-100 shadow-sm">
+    <Card className="bg-gradient-to-br from-gray-50/50 via-white to-white border border-gray-200/30 shadow-sm">
       <CardContent className="p-4">
         <div className="animate-pulse space-y-3">
           <div className="h-3 bg-gray-200 rounded w-1/3"></div>
@@ -180,13 +180,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-200">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-4">
           {/* White Container for Dashboard Content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6 min-h-full">
             <div className="max-w-7xl mx-auto space-y-6">
               
               {/* Greeting Component - Aligned with sidebar */}
@@ -240,7 +240,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Main Stats Cards - Gradient Design */}
+              {/* Main Stats Cards - Subtle Design */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {isLoading ? (
                   <>
@@ -251,7 +251,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     {/* Net Income */}
-                    <Card className="bg-gradient-to-br from-green-50 via-white to-green-50/30 border border-green-100 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -273,7 +273,7 @@ export default function Dashboard() {
                     </Card>
 
                     {/* Income */}
-                    <Card className="bg-gradient-to-br from-green-50 via-white to-green-50/30 border border-green-100 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -295,7 +295,7 @@ export default function Dashboard() {
                     </Card>
 
                     {/* Expenses */}
-                    <Card className="bg-gradient-to-br from-red-50 via-white to-red-50/30 border border-red-100 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
