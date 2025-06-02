@@ -17,7 +17,6 @@ import {
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -26,7 +25,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Legend
+  Area,
+  AreaChart
 } from 'recharts'
 
 interface DashboardStats {
@@ -236,7 +236,27 @@ export default function Dashboard() {
                 <span className="text-2xl">👋</span>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    Hello, {user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || 'there'}
+                    Hello, {(() => {
+                      // Try to get full name from user metadata
+                      if (user.user_metadata?.full_name) {
+                        return user.user_metadata.full_name.split(' ')[0]
+                      }
+                      // Try to get first name from user metadata
+                      if (user.user_metadata?.first_name) {
+                        return user.user_metadata.first_name
+                      }
+                      // Try to get name from user metadata
+                      if (user.user_metadata?.name) {
+                        return user.user_metadata.name.split(' ')[0]
+                      }
+                      // Fallback to email username but make it prettier
+                      if (user.email) {
+                        const emailName = user.email.split('@')[0]
+                        // Convert "mttspss" to "Mttspss" 
+                        return emailName.charAt(0).toUpperCase() + emailName.slice(1)
+                      }
+                      return 'there'
+                    })()}
                   </h1>
                   <p className="text-gray-600 text-sm mt-1">
                     It&apos;s {new Date().toLocaleDateString('en-US', { 
@@ -363,65 +383,90 @@ export default function Dashboard() {
 
               {/* Charts Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Budget, Income & Expenses Chart */}
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-gray-900">Financial Trend</CardTitle>
-                    <p className="text-xs text-gray-600">Budget vs Income vs Expenses</p>
+                {/* Total Revenue Style Chart - Like Salesync */}
+                <Card className="bg-gradient-to-br from-blue-50/30 via-white to-white border border-blue-200/40 shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg font-bold text-gray-900">Total Balance</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-2xl font-bold text-gray-900">
+                            ${(stats?.totalBalance || 0).toLocaleString()}
+                          </span>
+                          <span className="text-sm font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                            +{(stats?.monthlyData && stats.monthlyData.length > 1) ? 
+                              ((((stats.monthlyData[stats.monthlyData.length - 1]?.balance || 0) - 
+                                 (stats.monthlyData[stats.monthlyData.length - 2]?.balance || 0)) / 
+                                Math.abs(stats.monthlyData[stats.monthlyData.length - 2]?.balance || 1)) * 100).toFixed(1) : '0'
+                            }%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="h-48 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg animate-pulse"></div>
+                      <div className="h-64 bg-gradient-to-br from-blue-50 to-emerald-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48">
+                      <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={stats?.monthlyData || []}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <AreaChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                              </linearGradient>
+                              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.6}/>
+                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 12 }}
-                              stroke="#666"
+                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              axisLine={false}
+                              tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12 }}
-                              stroke="#666"
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
-                              formatter={(value: any) => [`$${Number(value).toFixed(2)}`, '']}
-                              labelStyle={{ color: '#666' }}
+                              formatter={(value: any, name: string) => [
+                                `$${Number(value).toLocaleString()}`, 
+                                name === 'balance' ? 'Net Balance' : 
+                                name === 'income' ? 'Income' : 'Expenses'
+                              ]}
+                              labelStyle={{ color: '#1e293b', fontWeight: '600' }}
                               contentStyle={{
-                                backgroundColor: '#fff',
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '8px',
-                                fontSize: '12px'
+                                backgroundColor: 'white',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                               }}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="balance" 
+                              stroke="#3b82f6" 
+                              strokeWidth={3}
+                              fill="url(#balanceGradient)"
+                              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                              activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
                             />
                             <Line 
                               type="monotone" 
                               dataKey="income" 
                               stroke="#22c55e" 
                               strokeWidth={2}
-                              dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
-                              name="Income"
+                              dot={{ fill: '#22c55e', strokeWidth: 2, r: 3 }}
+                              strokeDasharray="5 5"
                             />
-                            <Line 
-                              type="monotone" 
-                              dataKey="expenses" 
-                              stroke="#ef4444" 
-                              strokeWidth={2}
-                              dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
-                              name="Expenses"
-                            />
-                            <Line 
-                              type="monotone" 
-                              dataKey="balance" 
-                              stroke="#3b82f6" 
-                              strokeWidth={2}
-                              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                              name="Net Balance"
-                            />
-                          </LineChart>
+                          </AreaChart>
                         </ResponsiveContainer>
                       </div>
                     )}
@@ -429,51 +474,72 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Income vs Expenses Chart */}
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-gray-900">Monthly Comparison</CardTitle>
-                    <p className="text-xs text-gray-600">Income vs Expenses</p>
+                <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40 shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg font-bold text-gray-900">Monthly Comparison</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Income vs Expenses</p>
+                      </div>
+                    </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="h-48 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg animate-pulse"></div>
+                      <div className="h-64 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48">
+                      <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyData || []}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <BarChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="incomeBar" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#22c55e"/>
+                                <stop offset="100%" stopColor="#16a34a"/>
+                              </linearGradient>
+                              <linearGradient id="expenseBar" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#ef4444"/>
+                                <stop offset="100%" stopColor="#dc2626"/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 12 }}
-                              stroke="#666"
+                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              axisLine={false}
+                              tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12 }}
-                              stroke="#666"
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
-                              formatter={(value: any) => [`$${Number(value).toFixed(2)}`, '']}
-                              labelStyle={{ color: '#666' }}
+                              formatter={(value: any, name: string) => [
+                                `$${Number(value).toLocaleString()}`, 
+                                name === 'income' ? 'Income' : 'Expenses'
+                              ]}
+                              labelStyle={{ color: '#1e293b', fontWeight: '600' }}
                               contentStyle={{
-                                backgroundColor: '#fff',
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '8px',
-                                fontSize: '12px'
+                                backgroundColor: 'white',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                               }}
                             />
-                            <Legend />
                             <Bar 
                               dataKey="income" 
-                              fill="#22c55e" 
+                              fill="url(#incomeBar)"
                               name="Income"
                               radius={[4, 4, 0, 0]}
+                              maxBarSize={40}
                             />
                             <Bar 
                               dataKey="expenses" 
-                              fill="#ef4444" 
+                              fill="url(#expenseBar)"
                               name="Expenses"
                               radius={[4, 4, 0, 0]}
+                              maxBarSize={40}
                             />
                           </BarChart>
                         </ResponsiveContainer>
