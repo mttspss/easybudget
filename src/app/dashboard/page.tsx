@@ -13,10 +13,21 @@ import {
   Plus,
   Filter,
   Download,
-  Clock,
-  BarChart3
+  Clock
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Legend
+} from 'recharts'
 
 interface DashboardStats {
   totalBalance: number
@@ -25,6 +36,7 @@ interface DashboardStats {
   balance: number
   recentTransactions: any[]
   categorySpending: any[]
+  monthlyData: any[]
 }
 
 export default function Dashboard() {
@@ -100,6 +112,35 @@ export default function Dashboard() {
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
+      // Generate monthly data for charts
+      const monthlyData = []
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+        
+        const monthTransactions = (allTransactions || []).filter(t => {
+          const tDate = new Date(t.date)
+          return tDate >= monthStart && tDate <= monthEnd
+        })
+        
+        const monthIncome = monthTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        const monthExpenses = monthTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        monthlyData.push({
+          month: date.toLocaleDateString('en-US', { month: 'short' }),
+          income: monthIncome,
+          expenses: monthExpenses,
+          balance: monthIncome - monthExpenses
+        })
+      }
+
       // Category spending with budgets
       const categorySpending = await Promise.all(
         (categories || []).map(async (category) => {
@@ -134,7 +175,8 @@ export default function Dashboard() {
         expenses: periodExpenses,
         balance: periodIncome - periodExpenses,
         recentTransactions: recentTransactions || [],
-        categorySpending: categorySpending.filter(c => c.spent > 0)
+        categorySpending: categorySpending.filter(c => c.spent > 0),
+        monthlyData: monthlyData
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
@@ -331,12 +373,56 @@ export default function Dashboard() {
                     {isLoading ? (
                       <div className="h-48 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-                        <div className="text-center">
-                          <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Chart Coming Soon</h3>
-                          <p className="text-xs text-gray-500">Financial trend visualization will appear here</p>
-                        </div>
+                      <div className="h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={stats?.monthlyData || []}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="month" 
+                              tick={{ fontSize: 12 }}
+                              stroke="#666"
+                            />
+                            <YAxis 
+                              tick={{ fontSize: 12 }}
+                              stroke="#666"
+                              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+                            />
+                            <Tooltip 
+                              formatter={(value: any) => [`$${Number(value).toFixed(2)}`, '']}
+                              labelStyle={{ color: '#666' }}
+                              contentStyle={{
+                                backgroundColor: '#fff',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '8px',
+                                fontSize: '12px'
+                              }}
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="income" 
+                              stroke="#22c55e" 
+                              strokeWidth={2}
+                              dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
+                              name="Income"
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="expenses" 
+                              stroke="#ef4444" 
+                              strokeWidth={2}
+                              dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+                              name="Expenses"
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="balance" 
+                              stroke="#3b82f6" 
+                              strokeWidth={2}
+                              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                              name="Net Balance"
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
                       </div>
                     )}
                   </CardContent>
@@ -352,12 +438,45 @@ export default function Dashboard() {
                     {isLoading ? (
                       <div className="h-48 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                        <div className="text-center">
-                          <BarChart3 className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Chart Coming Soon</h3>
-                          <p className="text-xs text-gray-500">Income vs Expenses comparison will appear here</p>
-                        </div>
+                      <div className="h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={stats?.monthlyData || []}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="month" 
+                              tick={{ fontSize: 12 }}
+                              stroke="#666"
+                            />
+                            <YAxis 
+                              tick={{ fontSize: 12 }}
+                              stroke="#666"
+                              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+                            />
+                            <Tooltip 
+                              formatter={(value: any) => [`$${Number(value).toFixed(2)}`, '']}
+                              labelStyle={{ color: '#666' }}
+                              contentStyle={{
+                                backgroundColor: '#fff',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '8px',
+                                fontSize: '12px'
+                              }}
+                            />
+                            <Legend />
+                            <Bar 
+                              dataKey="income" 
+                              fill="#22c55e" 
+                              name="Income"
+                              radius={[4, 4, 0, 0]}
+                            />
+                            <Bar 
+                              dataKey="expenses" 
+                              fill="#ef4444" 
+                              name="Expenses"
+                              radius={[4, 4, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
                       </div>
                     )}
                   </CardContent>
