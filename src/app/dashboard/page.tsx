@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/ui/data-table"
 import { 
   TrendingUp,
   ArrowUpRight,
@@ -16,9 +17,21 @@ import {
   Clock,
   BarChart3,
   Activity,
-  Wallet
+  Wallet,
+  MoreHorizontal,
+  Edit,
+  Trash2
 } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import { ColumnDef } from "@tanstack/react-table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Line,
   XAxis,
@@ -41,11 +54,118 @@ interface DashboardStats {
   monthlyData: any[]
 }
 
+interface Transaction {
+  id: string
+  amount: number
+  description: string
+  date: string
+  type: 'income' | 'expense'
+  categories?: {
+    name: string
+    color: string
+  } | null
+}
+
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("month")
+
+  // Transaction columns for data table
+  const transactionColumns: ColumnDef<Transaction>[] = useMemo(() => [
+    {
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => {
+        const transaction = row.original
+        return (
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${
+              transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
+            }`}>
+              {transaction.type === 'income' ? (
+                <ArrowUpRight className="h-4 w-4 text-green-600" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4 text-red-600" />
+              )}
+            </div>
+            <div>
+              <div className="font-medium text-gray-900 text-sm">{transaction.description}</div>
+              <div className="text-xs text-gray-500">{formatDate(transaction.date)}</div>
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => {
+        const category = row.original.categories
+        return (
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-2.5 h-2.5 rounded-full" 
+              style={{ backgroundColor: category?.color || '#gray' }}
+            />
+            <span className="text-sm text-gray-600">
+              {category?.name || 'Uncategorized'}
+            </span>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "amount",
+      header: () => <div className="text-right">Amount</div>,
+      cell: ({ row }) => {
+        const transaction = row.original
+        const amount = parseFloat(transaction.amount.toString())
+        return (
+          <div className="text-right">
+            <div className="flex items-baseline gap-1 justify-end">
+              <span className={`text-sm font-medium ${
+                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {transaction.type === 'income' ? '+$' : '-$'}
+              </span>
+              <span className="text-sm font-medium text-gray-900">
+                {Math.abs(amount).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      id: "actions",
+      cell: () => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ], [])
 
   const fetchDashboardStats = useCallback(async () => {
     if (!user) return
@@ -83,10 +203,16 @@ export default function Dashboard() {
         .select('*')
         .eq('user_id', user.id)
 
-      // Get recent transactions (last 5)
+      // Get recent transactions (last 5) with categories
       const { data: recentTransactions } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          *,
+          categories (
+            name,
+            color
+          )
+        `)
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(5)
@@ -316,7 +442,7 @@ export default function Dashboard() {
                   <>
                     {/* Net Income - Blue Theme */}
                     <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-3">
+                      <CardContent className="p-2">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">Net Income</p>
@@ -338,7 +464,7 @@ export default function Dashboard() {
 
                     {/* Income - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-3">
+                      <CardContent className="p-2">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
@@ -361,7 +487,7 @@ export default function Dashboard() {
 
                     {/* Expenses - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-3">
+                      <CardContent className="p-2">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
@@ -559,50 +685,21 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                    <div className="space-y-3">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-3 p-3">
-                          <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                          <div className="flex-1">
-                            <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                          </div>
-                          <div className="h-3 bg-gray-200 rounded w-16"></div>
-                        </div>
-                      ))}
+                    <div className="animate-pulse">
+                      <div className="h-8 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                     </div>
                   ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
-                    <div className="space-y-2">
-                      {stats.recentTransactions.map((transaction, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                          <div className={`p-2 rounded-full ${
-                            transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-                          }`}>
-                            {transaction.type === 'income' ? (
-                              <ArrowUpRight className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <ArrowDownRight className="h-4 w-4 text-red-600" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 text-sm">{transaction.description}</div>
-                            <div className="text-xs text-gray-500">{formatDate(transaction.date)}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-baseline gap-1">
-                              <span className={`text-sm font-medium ${
-                                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                                {transaction.type === 'income' ? '+$' : '-$'}
-                              </span>
-                              <span className="text-sm font-medium text-gray-900">
-                                {Math.abs(transaction.amount).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <DataTable 
+                      columns={transactionColumns} 
+                      data={stats.recentTransactions} 
+                      searchKey="description"
+                      searchPlaceholder="Search transactions..."
+                      showPagination={false}
+                      showColumnToggle={false}
+                      showSearch={false}
+                    />
                   ) : (
                     <div className="text-center py-8">
                       <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
