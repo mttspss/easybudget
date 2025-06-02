@@ -25,8 +25,7 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Area,
-  AreaChart
+  LineChart
 } from 'recharts'
 
 interface DashboardStats {
@@ -319,10 +318,10 @@ export default function Dashboard() {
                           <div>
                             <p className="text-xs font-medium text-gray-600 mb-2">Net Income</p>
                             <div className="flex items-baseline gap-1">
-                              <span className={`text-lg font-bold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-lg font-semibold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 $
                               </span>
-                              <span className={`text-xl font-bold text-gray-900`}>
+                              <span className={`text-xl font-semibold text-gray-900`}>
                                 {Math.abs(stats?.balance || 0).toFixed(2)}
                               </span>
                             </div>
@@ -343,8 +342,8 @@ export default function Dashboard() {
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Income
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-bold text-green-600">$</span>
-                              <span className="text-xl font-bold text-gray-900">
+                              <span className="text-lg font-semibold text-green-600">$</span>
+                              <span className="text-xl font-semibold text-gray-900">
                                 {(stats?.income || 0).toFixed(2)}
                               </span>
                             </div>
@@ -365,8 +364,8 @@ export default function Dashboard() {
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Expenses
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-bold text-red-600">$</span>
-                              <span className="text-xl font-bold text-gray-900">
+                              <span className="text-lg font-semibold text-red-600">$</span>
+                              <span className="text-xl font-semibold text-gray-900">
                                 {(stats?.expenses || 0).toFixed(2)}
                               </span>
                             </div>
@@ -383,56 +382,30 @@ export default function Dashboard() {
 
               {/* Charts Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Total Revenue Style Chart - Like Salesync */}
-                <Card className="bg-gradient-to-br from-blue-50/30 via-white to-white border border-blue-200/40 shadow-lg">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg font-bold text-gray-900">Total Balance</CardTitle>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-2xl font-bold text-gray-900">
-                            ${(stats?.totalBalance || 0).toLocaleString()}
-                          </span>
-                          <span className="text-sm font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                            +{(stats?.monthlyData && stats.monthlyData.length > 1) ? 
-                              ((((stats.monthlyData[stats.monthlyData.length - 1]?.balance || 0) - 
-                                 (stats.monthlyData[stats.monthlyData.length - 2]?.balance || 0)) / 
-                                Math.abs(stats.monthlyData[stats.monthlyData.length - 2]?.balance || 1)) * 100).toFixed(1) : '0'
-                            }%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                {/* Financial Trend - Back to Clean Line Chart */}
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-medium text-gray-900">Financial Trend</CardTitle>
+                    <p className="text-sm text-gray-600">Income, expenses and balance over time</p>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent>
                     {isLoading ? (
-                      <div className="h-64 bg-gradient-to-br from-blue-50 to-emerald-50 rounded-lg animate-pulse"></div>
+                      <div className="h-48 bg-gray-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-64">
+                      <div className="h-48">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                            <defs>
-                              <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                              </linearGradient>
-                              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.6}/>
-                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1}/>
-                              </linearGradient>
-                            </defs>
+                          <LineChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
                               formatter={(value: any, name: string) => [
@@ -440,40 +413,47 @@ export default function Dashboard() {
                                 name === 'balance' ? 'Net Balance' : 
                                 name === 'income' ? 'Income' : 'Expenses'
                               ]}
-                              labelStyle={{ color: '#1e293b', fontWeight: '600' }}
+                              labelStyle={{ color: '#374151', fontWeight: 'normal' }}
                               contentStyle={{
                                 backgroundColor: 'white',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '12px',
-                                fontSize: '13px',
-                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                               }}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="balance" 
-                              stroke="#3b82f6" 
-                              strokeWidth={3}
-                              fill="url(#balanceGradient)"
-                              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                              activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
                             />
                             <Line 
                               type="monotone" 
                               dataKey="income" 
-                              stroke="#22c55e" 
+                              stroke="#10b981" 
                               strokeWidth={2}
-                              dot={{ fill: '#22c55e', strokeWidth: 2, r: 3 }}
-                              strokeDasharray="5 5"
+                              dot={{ fill: '#10b981', strokeWidth: 0, r: 3 }}
+                              activeDot={{ r: 4, stroke: '#10b981', strokeWidth: 1 }}
                             />
-                          </AreaChart>
+                            <Line 
+                              type="monotone" 
+                              dataKey="expenses" 
+                              stroke="#ef4444" 
+                              strokeWidth={2}
+                              dot={{ fill: '#ef4444', strokeWidth: 0, r: 3 }}
+                              activeDot={{ r: 4, stroke: '#ef4444', strokeWidth: 1 }}
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="balance" 
+                              stroke="#3b82f6" 
+                              strokeWidth={2.5}
+                              dot={{ fill: '#3b82f6', strokeWidth: 0, r: 3 }}
+                              activeDot={{ r: 4, stroke: '#3b82f6', strokeWidth: 1 }}
+                            />
+                          </LineChart>
                         </ResponsiveContainer>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
-                {/* Income vs Expenses Chart */}
+                {/* Monthly Comparison - Keep this one as user likes it */}
                 <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40 shadow-lg">
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
@@ -595,12 +575,12 @@ export default function Dashboard() {
                           </div>
                           <div className="text-right">
                             <div className="flex items-baseline gap-1">
-                              <span className={`text-sm font-bold ${
+                              <span className={`text-sm font-medium ${
                                 transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                               }`}>
                                 {transaction.type === 'income' ? '+$' : '-$'}
                               </span>
-                              <span className="text-sm font-bold text-gray-900">
+                              <span className="text-sm font-medium text-gray-900">
                                 {Math.abs(transaction.amount).toFixed(2)}
                               </span>
                             </div>
