@@ -184,13 +184,13 @@ export default function Dashboard() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4">
           {/* White Container for Dashboard Content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-full">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
             <div className="max-w-7xl mx-auto space-y-6">
               
-              {/* Greeting Component */}
-              <div className="flex items-center gap-3 mb-6">
+              {/* Greeting Component - Aligned with sidebar */}
+              <div className="flex items-center gap-3">
                 <span className="text-2xl">👋</span>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
@@ -208,7 +208,7 @@ export default function Dashboard() {
               </div>
 
               {/* Period Selection */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Financial Overview</h2>
                   <p className="text-gray-600 text-sm mt-1">Track your income and expenses</p>
@@ -241,7 +241,7 @@ export default function Dashboard() {
               </div>
 
               {/* Main Stats Cards - Gradient Design */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {isLoading ? (
                   <>
                     <LoadingCard />
@@ -320,7 +320,7 @@ export default function Dashboard() {
               </div>
 
               {/* Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Budget, Income & Expenses Chart */}
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardHeader className="pb-3">
