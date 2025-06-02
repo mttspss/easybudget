@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -339,16 +339,16 @@ export default function IncomePage() {
                 </div>
               </div>
 
-              {/* Stats */}
+              {/* Stats - Less Bold */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Total Income</p>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Total Income</p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold text-green-600">$</span>
-                          <span className="text-xl font-bold text-gray-900">
+                          <span className="text-xl font-medium text-green-600">$</span>
+                          <span className="text-2xl font-medium text-gray-900">
                             {totalIncome.toFixed(2)}
                           </span>
                         </div>
@@ -364,8 +364,8 @@ export default function IncomePage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Transactions</p>
-                        <div className="text-xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-600 mb-2">Transactions</p>
+                        <div className="text-2xl font-medium text-gray-900">
                           {filteredTransactions.length}
                         </div>
                       </div>
@@ -380,10 +380,10 @@ export default function IncomePage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Avg per Transaction</p>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Avg per Transaction</p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold text-green-600">$</span>
-                          <span className="text-xl font-bold text-gray-900">
+                          <span className="text-xl font-medium text-green-600">$</span>
+                          <span className="text-2xl font-medium text-gray-900">
                             {filteredTransactions.length > 0 ? (totalIncome / filteredTransactions.length).toFixed(2) : '0.00'}
                           </span>
                         </div>
@@ -429,88 +429,122 @@ export default function IncomePage() {
                 </Select>
               </div>
 
-              {/* Transactions List */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-semibold text-gray-900">Income Transactions</CardTitle>
-                </CardHeader>
-                <CardContent>
+              {/* Notion-Style Transactions List */}
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                {/* Table Header */}
+                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-3">
+                  <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="col-span-4">Description</div>
+                    <div className="col-span-2">Category</div>
+                    <div className="col-span-2">Date</div>
+                    <div className="col-span-2">Amount</div>
+                    <div className="col-span-2">Actions</div>
+                  </div>
+                </div>
+
+                {/* Table Body */}
+                <div className="divide-y divide-gray-100">
                   {isLoading ? (
-                    <div className="space-y-3">
+                    <div className="space-y-0">
                       {[...Array(5)].map((_, i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-3 p-3">
-                          <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
-                          <div className="flex-1">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        <div key={i} className="px-6 py-4">
+                          <div className="grid grid-cols-12 gap-4 items-center">
+                            <div className="col-span-4">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="col-span-2">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="col-span-2">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="col-span-2">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="col-span-2">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
                           </div>
-                          <div className="h-4 bg-gray-200 rounded w-20"></div>
                         </div>
                       ))}
                     </div>
                   ) : filteredTransactions.length > 0 ? (
-                    <div className="space-y-2">
+                    <>
                       {filteredTransactions.map((transaction) => (
-                        <div key={transaction.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-                          <div 
-                            className="p-2 rounded-full bg-green-100"
-                          >
-                            <ArrowUpRight className="h-4 w-4 text-green-600" />
-                          </div>
-                          
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 text-sm">{transaction.description}</div>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>{new Date(transaction.date).toLocaleDateString()}</span>
-                              <span>•</span>
-                              <div className="flex items-center gap-1">
-                                <div 
-                                  className="w-2 h-2 rounded-full" 
-                                  style={{ backgroundColor: transaction.category?.color }}
-                                />
-                                <span>{transaction.category?.name}</span>
+                        <div key={transaction.id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors group">
+                          <div className="grid grid-cols-12 gap-4 items-center">
+                            {/* Description */}
+                            <div className="col-span-4">
+                              <div className="font-medium text-gray-900 text-sm">
+                                {transaction.description}
                               </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="text-right">
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-bold text-green-600">+$</span>
-                                <span className="text-sm font-bold text-gray-900">
-                                  {transaction.amount.toFixed(2)}
+
+                            {/* Category */}
+                            <div className="col-span-2">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-2.5 h-2.5 rounded-full" 
+                                  style={{ backgroundColor: transaction.category?.color }}
+                                />
+                                <span className="text-sm text-gray-600">
+                                  {transaction.category?.name}
                                 </span>
                               </div>
                             </div>
-                            
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0"
-                                onClick={() => handleEdit(transaction)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                                onClick={() => handleDelete(transaction.id)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+
+                            {/* Date */}
+                            <div className="col-span-2">
+                              <span className="text-sm text-gray-600">
+                                {new Date(transaction.date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+
+                            {/* Amount */}
+                            <div className="col-span-2">
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-sm font-medium text-green-600">+$</span>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {transaction.amount.toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="col-span-2">
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0 hover:bg-gray-100"
+                                  onClick={() => handleEdit(transaction)}
+                                >
+                                  <Edit className="h-3.5 w-3.5 text-gray-500" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0 hover:bg-red-50"
+                                  onClick={() => handleDelete(transaction.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 text-gray-500 hover:text-red-600" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       ))}
-                    </div>
+                    </>
                   ) : (
-                    <div className="text-center py-12">
+                    <div className="px-6 py-16 text-center">
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <ArrowUpRight className="h-8 w-8 text-green-600" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No income transactions yet</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No income transactions yet</h3>
                       <p className="text-gray-600 mb-6 max-w-sm mx-auto">Start tracking your income by adding your first transaction.</p>
                       <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
                         <Plus className="h-4 w-4 mr-2" />
@@ -518,8 +552,8 @@ export default function IncomePage() {
                       </Button>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
             </div>
           </div>

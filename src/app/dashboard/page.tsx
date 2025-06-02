@@ -111,33 +111,98 @@ export default function Dashboard() {
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
-      // Generate monthly data for charts
-      const monthlyData = []
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date()
-        date.setMonth(date.getMonth() - i)
-        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
-        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-        
-        const monthTransactions = (allTransactions || []).filter(t => {
-          const tDate = new Date(t.date)
-          return tDate >= monthStart && tDate <= monthEnd
-        })
-        
-        const monthIncome = monthTransactions
-          .filter(t => t.type === 'income')
-          .reduce((sum, t) => sum + Number(t.amount), 0)
-        
-        const monthExpenses = monthTransactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + Number(t.amount), 0)
-        
-        monthlyData.push({
-          month: date.toLocaleDateString('en-US', { month: 'short' }),
-          income: monthIncome,
-          expenses: monthExpenses,
-          balance: monthIncome - monthExpenses
-        })
+      // Generate data for charts based on selected period
+      const chartData = []
+      let periods = 6
+      
+      if (selectedPeriod === 'week') {
+        // Show last 7 weeks
+        periods = 7
+        for (let i = periods - 1; i >= 0; i--) {
+          const date = new Date()
+          date.setDate(date.getDate() - (i * 7))
+          const weekStart = new Date(date)
+          const weekEnd = new Date(date)
+          weekEnd.setDate(weekEnd.getDate() + 6)
+          
+          const weekTransactions = (allTransactions || []).filter(t => {
+            const tDate = new Date(t.date)
+            return tDate >= weekStart && tDate <= weekEnd
+          })
+          
+          const weekIncome = weekTransactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          const weekExpenses = weekTransactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          chartData.push({
+            month: `W${Math.ceil(date.getDate() / 7)}`,
+            income: weekIncome,
+            expenses: weekExpenses,
+            balance: weekIncome - weekExpenses
+          })
+        }
+      } else if (selectedPeriod === 'year') {
+        // Show last 5 years
+        periods = 5
+        for (let i = periods - 1; i >= 0; i--) {
+          const date = new Date()
+          date.setFullYear(date.getFullYear() - i)
+          const yearStart = new Date(date.getFullYear(), 0, 1)
+          const yearEnd = new Date(date.getFullYear(), 11, 31)
+          
+          const yearTransactions = (allTransactions || []).filter(t => {
+            const tDate = new Date(t.date)
+            return tDate >= yearStart && tDate <= yearEnd
+          })
+          
+          const yearIncome = yearTransactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          const yearExpenses = yearTransactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          chartData.push({
+            month: date.getFullYear().toString(),
+            income: yearIncome,
+            expenses: yearExpenses,
+            balance: yearIncome - yearExpenses
+          })
+        }
+      } else {
+        // Default: Show last 6 months
+        periods = 6
+        for (let i = periods - 1; i >= 0; i--) {
+          const date = new Date()
+          date.setMonth(date.getMonth() - i)
+          const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+          const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+          
+          const monthTransactions = (allTransactions || []).filter(t => {
+            const tDate = new Date(t.date)
+            return tDate >= monthStart && tDate <= monthEnd
+          })
+          
+          const monthIncome = monthTransactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          const monthExpenses = monthTransactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+          
+          chartData.push({
+            month: date.toLocaleDateString('en-US', { month: 'short' }),
+            income: monthIncome,
+            expenses: monthExpenses,
+            balance: monthIncome - monthExpenses
+          })
+        }
       }
 
       // Category spending with budgets
@@ -175,7 +240,7 @@ export default function Dashboard() {
         balance: periodIncome - periodExpenses,
         recentTransactions: recentTransactions || [],
         categorySpending: categorySpending.filter(c => c.spent > 0),
-        monthlyData: monthlyData
+        monthlyData: chartData
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
@@ -301,8 +366,8 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Main Stats Cards - Subtle Design */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Main Stats Cards - Better Proportions */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {isLoading ? (
                   <>
                     <LoadingCard />
@@ -311,23 +376,23 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    {/* Net Income */}
-                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                    {/* Net Income - Blue Theme */}
+                    <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-2">Net Income</p>
+                            <p className="text-sm font-medium text-gray-600 mb-3">Net Income</p>
                             <div className="flex items-baseline gap-1">
-                              <span className={`text-lg font-semibold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className="text-2xl font-semibold text-blue-600">
                                 $
                               </span>
-                              <span className={`text-xl font-semibold text-gray-900`}>
+                              <span className="text-3xl font-semibold text-gray-900">
                                 {Math.abs(stats?.balance || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className={`p-2 rounded-full ${(stats?.balance || 0) >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-                            <TrendingUp className={`h-5 w-5 ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+                          <div className="p-3 bg-blue-100 rounded-full">
+                            <TrendingUp className="h-6 w-6 text-blue-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -335,21 +400,21 @@ export default function Dashboard() {
 
                     {/* Income */}
                     <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-2">
+                            <p className="text-sm font-medium text-gray-600 mb-3">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Income
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-semibold text-green-600">$</span>
-                              <span className="text-xl font-semibold text-gray-900">
+                              <span className="text-2xl font-semibold text-green-600">$</span>
+                              <span className="text-3xl font-semibold text-gray-900">
                                 {(stats?.income || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className="p-2 bg-green-100 rounded-full">
-                            <ArrowUpRight className="h-5 w-5 text-green-600" />
+                          <div className="p-3 bg-green-100 rounded-full">
+                            <ArrowUpRight className="h-6 w-6 text-green-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -357,21 +422,21 @@ export default function Dashboard() {
 
                     {/* Expenses */}
                     <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-2">
+                            <p className="text-sm font-medium text-gray-600 mb-3">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Expenses
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-semibold text-red-600">$</span>
-                              <span className="text-xl font-semibold text-gray-900">
+                              <span className="text-2xl font-semibold text-red-600">$</span>
+                              <span className="text-3xl font-semibold text-gray-900">
                                 {(stats?.expenses || 0).toFixed(2)}
                               </span>
                             </div>
                           </div>
-                          <div className="p-2 bg-red-100 rounded-full">
-                            <ArrowDownRight className="h-5 w-5 text-red-600" />
+                          <div className="p-3 bg-red-100 rounded-full">
+                            <ArrowDownRight className="h-6 w-6 text-red-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -380,32 +445,33 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Charts Section */}
+              {/* Charts Section - Better Alignment */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Financial Trend - Back to Clean Line Chart */}
+                {/* Financial Trend - Aligned with bar chart */}
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-medium text-gray-900">Financial Trend</CardTitle>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-medium text-gray-900">Financial Trend</CardTitle>
                     <p className="text-sm text-gray-600">Income, expenses and balance over time</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="h-48 bg-gray-50 rounded-lg animate-pulse"></div>
+                      <div className="h-64 bg-gray-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48">
+                      <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 11, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 11, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
+                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
                               formatter={(value: any, name: string) => [
@@ -417,9 +483,9 @@ export default function Dashboard() {
                               contentStyle={{
                                 backgroundColor: 'white',
                                 border: '1px solid #e5e7eb',
-                                borderRadius: '8px',
-                                fontSize: '12px',
-                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                               }}
                             />
                             <Line 
