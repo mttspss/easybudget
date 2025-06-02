@@ -180,13 +180,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-[#F4F4F4]">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-4">
           {/* White Container for Dashboard Content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6 min-h-full">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
             <div className="max-w-7xl mx-auto space-y-6">
               
               {/* Greeting Component - Aligned with sidebar */}
