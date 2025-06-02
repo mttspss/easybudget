@@ -377,7 +377,7 @@ export default function ExpensesPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border border-gray-200 shadow-sm">
+                <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm">
                   <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
@@ -393,7 +393,7 @@ export default function ExpensesPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border border-gray-200 shadow-sm">
+                <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30 shadow-sm">
                   <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>

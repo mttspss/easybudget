@@ -12,12 +12,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { 
   Plus,
   Search,
-  Target,
+  Download,
   Edit,
   Trash2,
-  DollarSign,
+  Target,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  CheckCircle,
+  Clock
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -330,64 +332,67 @@ export default function GoalsPage() {
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardContent className="p-2">
+              {/* Stats - Goals-specific design with mixed layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                {/* Main stats - larger cards */}
+                <Card className="lg:col-span-2 bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm">
+                  <CardContent className="p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Total Goals</p>
-                        <div className="text-2xl font-medium text-gray-900">{totalGoals}</div>
+                        <div className="text-3xl font-medium text-gray-900">{totalGoals}</div>
+                        <p className="text-xs text-gray-500 mt-1">Active financial targets</p>
                       </div>
-                      <div className="p-2 bg-blue-100 rounded-full">
-                        <Target className="h-5 w-5 text-blue-600" />
+                      <div className="p-3 bg-blue-100 rounded-full">
+                        <Target className="h-6 w-6 text-blue-600" />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
-                  <CardContent className="p-2">
+                <Card className="lg:col-span-2 bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
+                  <CardContent className="p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Completed</p>
-                        <div className="text-2xl font-medium text-gray-900">{completedGoals}</div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Overall Progress</p>
+                        <div className="text-3xl font-medium text-purple-600">
+                          {totalTargetAmount > 0 ? Math.round((totalCurrentAmount / totalTargetAmount) * 100) : 0}%
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-purple-600 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${totalTargetAmount > 0 ? Math.min(Math.round((totalCurrentAmount / totalTargetAmount) * 100), 100) : 0}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="p-2 bg-green-100 rounded-full">
-                        <TrendingUp className="h-5 w-5 text-green-600" />
+                      <div className="p-3 bg-purple-100 rounded-full">
+                        <TrendingUp className="h-6 w-6 text-purple-600" />
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Secondary stats - smaller cards */}
+                <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="p-2 bg-green-100 rounded-full mb-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div className="text-xl font-medium text-gray-900">{completedGoals}</div>
+                      <p className="text-xs text-gray-600">Completed</p>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30 shadow-sm">
                   <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">In Progress</p>
-                        <div className="text-2xl font-medium text-gray-900">{inProgressGoals}</div>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="p-2 bg-orange-100 rounded-full mb-2">
+                        <Clock className="h-4 w-4 text-orange-600" />
                       </div>
-                      <div className="p-2 bg-orange-100 rounded-full">
-                        <Calendar className="h-5 w-5 text-orange-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Progress</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-medium text-purple-600">
-                            {totalTargetAmount > 0 ? Math.round((totalCurrentAmount / totalTargetAmount) * 100) : 0}%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 bg-purple-100 rounded-full">
-                        <DollarSign className="h-5 w-5 text-purple-600" />
-                      </div>
+                      <div className="text-xl font-medium text-gray-900">{inProgressGoals}</div>
+                      <p className="text-xs text-gray-600">In Progress</p>
                     </div>
                   </CardContent>
                 </Card>

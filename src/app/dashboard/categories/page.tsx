@@ -15,7 +15,9 @@ import {
   Edit,
   Trash2,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  FolderOpen,
+  Palette
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -340,9 +342,9 @@ export default function CategoriesPage() {
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-white border border-gray-200 shadow-sm">
+              {/* Stats - Categories-specific design */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="bg-gradient-to-br from-indigo-50/50 via-white to-white border border-indigo-200/30 shadow-sm">
                   <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
@@ -351,8 +353,8 @@ export default function CategoriesPage() {
                           {filteredCategories.length}
                         </div>
                       </div>
-                      <div className="p-2 bg-blue-100 rounded-full">
-                        <PieChart className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-indigo-100 rounded-full">
+                        <FolderOpen className="h-5 w-5 text-indigo-600" />
                       </div>
                     </div>
                   </CardContent>
@@ -364,7 +366,7 @@ export default function CategoriesPage() {
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Income Categories</p>
                         <div className="text-2xl font-medium text-gray-900">
-                          {incomeCategories.length}
+                          {filteredCategories.filter(c => c.type === 'income').length}
                         </div>
                       </div>
                       <div className="p-2 bg-green-100 rounded-full">
@@ -380,11 +382,27 @@ export default function CategoriesPage() {
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Expense Categories</p>
                         <div className="text-2xl font-medium text-gray-900">
-                          {expenseCategories.length}
+                          {filteredCategories.filter(c => c.type === 'expense').length}
                         </div>
                       </div>
                       <div className="p-2 bg-red-100 rounded-full">
                         <ArrowDownRight className="h-5 w-5 text-red-600" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
+                  <CardContent className="p-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Colors Used</p>
+                        <div className="text-2xl font-medium text-gray-900">
+                          {new Set(filteredCategories.map(c => c.color)).size}
+                        </div>
+                      </div>
+                      <div className="p-2 bg-purple-100 rounded-full">
+                        <Palette className="h-5 w-5 text-purple-600" />
                       </div>
                     </div>
                   </CardContent>
