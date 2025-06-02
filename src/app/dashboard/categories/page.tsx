@@ -339,11 +339,11 @@ export default function CategoriesPage() {
               {/* Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Total Categories</p>
-                        <div className="text-xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-600 mb-2">Total Categories</p>
+                        <div className="text-2xl font-medium text-gray-900">
                           {filteredCategories.length}
                         </div>
                       </div>
@@ -355,11 +355,11 @@ export default function CategoriesPage() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Income Categories</p>
-                        <div className="text-xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-600 mb-2">Income Categories</p>
+                        <div className="text-2xl font-medium text-gray-900">
                           {incomeCategories.length}
                         </div>
                       </div>
@@ -371,11 +371,11 @@ export default function CategoriesPage() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Expense Categories</p>
-                        <div className="text-xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-600 mb-2">Expense Categories</p>
+                        <div className="text-2xl font-medium text-gray-900">
                           {expenseCategories.length}
                         </div>
                       </div>

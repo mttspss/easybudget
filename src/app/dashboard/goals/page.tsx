@@ -329,11 +329,11 @@ export default function GoalsPage() {
               {/* Stats */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Total Goals</p>
-                        <div className="text-xl font-bold text-gray-900">{totalGoals}</div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Total Goals</p>
+                        <div className="text-2xl font-medium text-gray-900">{totalGoals}</div>
                       </div>
                       <div className="p-2 bg-blue-100 rounded-full">
                         <Target className="h-5 w-5 text-blue-600" />
@@ -343,11 +343,11 @@ export default function GoalsPage() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Completed</p>
-                        <div className="text-xl font-bold text-gray-900">{completedGoals}</div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Completed</p>
+                        <div className="text-2xl font-medium text-gray-900">{completedGoals}</div>
                       </div>
                       <div className="p-2 bg-green-100 rounded-full">
                         <TrendingUp className="h-5 w-5 text-green-600" />
@@ -357,11 +357,11 @@ export default function GoalsPage() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">In Progress</p>
-                        <div className="text-xl font-bold text-gray-900">{inProgressGoals}</div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">In Progress</p>
+                        <div className="text-2xl font-medium text-gray-900">{inProgressGoals}</div>
                       </div>
                       <div className="p-2 bg-orange-100 rounded-full">
                         <Calendar className="h-5 w-5 text-orange-600" />
@@ -371,12 +371,12 @@ export default function GoalsPage() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-2">Progress</p>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Progress</p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold text-purple-600">
+                          <span className="text-2xl font-medium text-purple-600">
                             {totalTargetAmount > 0 ? Math.round((totalCurrentAmount / totalTargetAmount) * 100) : 0}%
                           </span>
                         </div>

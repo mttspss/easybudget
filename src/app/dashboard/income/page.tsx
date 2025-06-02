@@ -382,7 +382,7 @@ export default function IncomePage() {
               {/* Stats - Less Bold */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Total Income</p>
@@ -401,7 +401,7 @@ export default function IncomePage() {
                 </Card>
 
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Transactions</p>
@@ -417,7 +417,7 @@ export default function IncomePage() {
                 </Card>
 
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Avg per Transaction</p>
