@@ -243,7 +243,10 @@ export default function CategoriesPage() {
                 <div className="flex items-center gap-3">
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700">
+                      <Button 
+                        size="sm" 
+                        className="h-8 text-sm text-white bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-lg shadow-blue-500/50 font-medium rounded-lg px-5 py-2.5 border-0"
+                      >
                         <Plus className="h-3 w-3 mr-2" />
                         Add Category
                       </Button>

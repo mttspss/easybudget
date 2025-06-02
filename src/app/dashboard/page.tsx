@@ -14,9 +14,9 @@ import {
   Filter,
   Download,
   Clock,
-  TrendingDown,
   BarChart3,
-  Activity
+  Activity,
+  CreditCard
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -336,7 +336,7 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
 
-                    {/* Income - Salesync Style Icon */}
+                    {/* Income - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -351,14 +351,15 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </div>
-                          <div className="p-2 bg-green-100 rounded-full">
-                            <TrendingUp className="h-5 w-5 text-green-600" />
+                          <div className="p-2 bg-green-100 rounded-lg relative">
+                            <CreditCard className="h-5 w-5 text-green-600" />
+                            <ArrowUpRight className="h-3 w-3 text-green-600 absolute -top-1 -right-1" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    {/* Expenses - Salesync Style Icon */}
+                    {/* Expenses - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -373,8 +374,9 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </div>
-                          <div className="p-2 bg-red-100 rounded-full">
-                            <TrendingDown className="h-5 w-5 text-red-600" />
+                          <div className="p-2 bg-red-100 rounded-lg relative">
+                            <CreditCard className="h-5 w-5 text-red-600" />
+                            <ArrowDownRight className="h-3 w-3 text-red-600 absolute -top-1 -right-1" />
                           </div>
                         </div>
                       </CardContent>

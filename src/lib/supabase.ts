@@ -120,6 +120,8 @@ export type Database = {
           description: string
           date: string
           type: 'income' | 'expense'
+          icon: string | null
+          image: string | null
           created_at: string
           updated_at: string
         }
@@ -131,6 +133,8 @@ export type Database = {
           description: string
           date: string
           type: 'income' | 'expense'
+          icon?: string | null
+          image?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -142,6 +146,8 @@ export type Database = {
           description?: string
           date?: string
           type?: 'income' | 'expense'
+          icon?: string | null
+          image?: string | null
           created_at?: string
           updated_at?: string
         }

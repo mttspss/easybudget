@@ -41,6 +41,8 @@ interface Transaction {
   description: string
   date: string
   category_id: string
+  icon?: string | null
+  image?: string | null
   category?: {
     name: string
     color: string
@@ -68,7 +70,9 @@ export default function ExpensesPage() {
     amount: "",
     description: "",
     date: new Date().toISOString().split('T')[0],
-    category_id: ""
+    category_id: "",
+    icon: "",
+    image: ""
   })
 
   const fetchData = useCallback(async () => {
@@ -144,6 +148,8 @@ export default function ExpensesPage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
+            icon: formData.icon || null,
+            image: formData.image || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingTransaction.id)
@@ -159,7 +165,9 @@ export default function ExpensesPage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
-            type: 'expense'
+            type: 'expense',
+            icon: formData.icon || null,
+            image: formData.image || null
           })
 
         if (error) throw error
@@ -170,7 +178,9 @@ export default function ExpensesPage() {
         amount: "",
         description: "",
         date: new Date().toISOString().split('T')[0],
-        category_id: ""
+        category_id: "",
+        icon: "",
+        image: ""
       })
       setEditingTransaction(null)
       setIsDialogOpen(false)
@@ -189,7 +199,9 @@ export default function ExpensesPage() {
       amount: transaction.amount.toString(),
       description: transaction.description,
       date: transaction.date,
-      category_id: transaction.category_id
+      category_id: transaction.category_id,
+      icon: transaction.icon || "",
+      image: transaction.image || ""
     })
     setIsDialogOpen(true)
   }
@@ -243,7 +255,10 @@ export default function ExpensesPage() {
                   
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button size="sm" className="h-8 text-xs bg-red-600 hover:bg-red-700">
+                      <Button 
+                        size="sm" 
+                        className="h-8 text-sm text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 shadow-lg shadow-red-500/50 font-medium rounded-lg px-5 py-2.5 border-0"
+                      >
                         <Plus className="h-3 w-3 mr-2" />
                         Add Expense
                       </Button>
@@ -316,6 +331,29 @@ export default function ExpensesPage() {
                           />
                         </div>
 
+                        <div>
+                          <Label htmlFor="icon">Icon (optional)</Label>
+                          <Input
+                            id="icon"
+                            value={formData.icon}
+                            onChange={(e) => setFormData({...formData, icon: e.target.value})}
+                            placeholder="e.g., 🍕, 🚗, 🛒, 🏠"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">You can use any emoji as an icon</p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="image">Image URL (optional)</Label>
+                          <Input
+                            id="image"
+                            type="url"
+                            value={formData.image}
+                            onChange={(e) => setFormData({...formData, image: e.target.value})}
+                            placeholder="https://example.com/image.jpg"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Add a receipt or related image</p>
+                        </div>
+
                         <DialogFooter>
                           <Button type="button" variant="outline" onClick={() => {
                             setIsDialogOpen(false)
@@ -324,7 +362,9 @@ export default function ExpensesPage() {
                               amount: "",
                               description: "",
                               date: new Date().toISOString().split('T')[0],
-                              category_id: ""
+                              category_id: "",
+                              icon: "",
+                              image: ""
                             })
                           }}>
                             Cancel
@@ -434,7 +474,8 @@ export default function ExpensesPage() {
                 {/* Table Header */}
                 <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-3">
                   <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="col-span-4">Description</div>
+                    <div className="col-span-1">Icon</div>
+                    <div className="col-span-3">Description</div>
                     <div className="col-span-2">Category</div>
                     <div className="col-span-2">Date</div>
                     <div className="col-span-2">Amount</div>
@@ -449,7 +490,10 @@ export default function ExpensesPage() {
                       {[...Array(5)].map((_, i) => (
                         <div key={i} className="px-6 py-4">
                           <div className="grid grid-cols-12 gap-4 items-center">
-                            <div className="col-span-4">
+                            <div className="col-span-1">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="col-span-3">
                               <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                             </div>
                             <div className="col-span-2">
@@ -473,8 +517,22 @@ export default function ExpensesPage() {
                       {filteredTransactions.map((transaction) => (
                         <div key={transaction.id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors group">
                           <div className="grid grid-cols-12 gap-4 items-center">
+                            {/* Icon */}
+                            <div className="col-span-1">
+                              <div className="w-6 h-6 flex items-center justify-center text-sm">
+                                {transaction.icon ? (
+                                  <span>{transaction.icon}</span>
+                                ) : (
+                                  <div 
+                                    className="w-3 h-3 rounded-full" 
+                                    style={{ backgroundColor: transaction.category?.color }}
+                                  />
+                                )}
+                              </div>
+                            </div>
+
                             {/* Description */}
-                            <div className="col-span-4">
+                            <div className="col-span-3">
                               <div className="font-medium text-gray-900 text-sm">
                                 {transaction.description}
                               </div>

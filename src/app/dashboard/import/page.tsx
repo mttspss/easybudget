@@ -41,8 +41,8 @@ export default function ImportPage() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Import Data</h1>
                 <p className="text-gray-600 mt-1">Import transactions from banks and other sources</p>
-              </div>
-            </div>
+                      </div>
+                      </div>
 
             {/* Coming Soon Message */}
             <Card className="bg-white border-0 shadow-sm">
@@ -51,15 +51,15 @@ export default function ImportPage() {
                   <div className="flex justify-center space-x-4 mb-6">
                     <div className="p-3 bg-blue-100 rounded-full">
                       <Upload className="h-8 w-8 text-blue-600" />
-                    </div>
+                      </div>
                     <div className="p-3 bg-green-100 rounded-full">
                       <FileText className="h-8 w-8 text-green-600" />
                     </div>
                     <div className="p-3 bg-purple-100 rounded-full">
                       <Database className="h-8 w-8 text-purple-600" />
-                    </div>
-                  </div>
-                  
+                      </div>
+            </div>
+
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     Data Import Coming Soon
                   </h2>
@@ -82,10 +82,10 @@ export default function ImportPage() {
                       <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                       <span>Automatic categorization</span>
                     </div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
           </div>
         </main>
