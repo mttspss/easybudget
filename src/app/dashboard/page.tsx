@@ -161,22 +161,8 @@ export default function Dashboard() {
     redirect("/")
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount)
-  }
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
   const LoadingCard = () => (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card className="bg-gradient-to-br from-gray-50 via-white to-gray-50/30 border border-gray-100 shadow-sm">
       <CardContent className="p-4">
         <div className="animate-pulse space-y-3">
           <div className="h-3 bg-gray-200 rounded w-1/3"></div>
@@ -186,14 +172,21 @@ export default function Dashboard() {
     </Card>
   )
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-6">
           {/* White Container for Dashboard Content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 min-h-full">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-full">
             <div className="max-w-7xl mx-auto space-y-6">
               
               {/* Greeting Component */}
@@ -247,7 +240,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Main Stats Cards - Compact Design */}
+              {/* Main Stats Cards - Gradient Design */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {isLoading ? (
                   <>
@@ -258,55 +251,66 @@ export default function Dashboard() {
                 ) : (
                   <>
                     {/* Net Income */}
-                    <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-green-50 via-white to-green-50/30 border border-green-100 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-1">Net Income</p>
-                            <p className={`text-xl font-bold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatCurrency(stats?.balance || 0)}
-                            </p>
+                            <p className="text-xs font-medium text-gray-600 mb-2">Net Income</p>
+                            <div className="flex items-baseline gap-1">
+                              <span className={`text-lg font-bold ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                $
+                              </span>
+                              <span className={`text-xl font-bold text-gray-900`}>
+                                {Math.abs(stats?.balance || 0).toFixed(2)}
+                              </span>
+                            </div>
                           </div>
-                          <div className={`p-2 rounded-lg ${(stats?.balance || 0) >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                            <TrendingUp className={`h-4 w-4 ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+                          <div className={`p-2 rounded-full ${(stats?.balance || 0) >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+                            <TrendingUp className={`h-5 w-5 ${(stats?.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
                     {/* Income */}
-                    <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-green-50 via-white to-green-50/30 border border-green-100 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-1">
+                            <p className="text-xs font-medium text-gray-600 mb-2">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Income
                             </p>
-                            <p className="text-xl font-bold text-green-600">
-                              {formatCurrency(stats?.income || 0)}
-                            </p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-lg font-bold text-green-600">$</span>
+                              <span className="text-xl font-bold text-gray-900">
+                                {(stats?.income || 0).toFixed(2)}
+                              </span>
+                            </div>
                           </div>
-                          <div className="p-2 bg-green-50 rounded-lg">
-                            <ArrowUpRight className="h-4 w-4 text-green-600" />
+                          <div className="p-2 bg-green-100 rounded-full">
+                            <ArrowUpRight className="h-5 w-5 text-green-600" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
                     {/* Expenses */}
-                    <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="bg-gradient-to-br from-red-50 via-white to-red-50/30 border border-red-100 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600 mb-1">
+                            <p className="text-xs font-medium text-gray-600 mb-2">
                               {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)} Expenses
                             </p>
-                            <p className="text-xl font-bold text-red-600">
-                              {formatCurrency(stats?.expenses || 0)}
-                            </p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-lg font-bold text-red-600">$</span>
+                              <span className="text-xl font-bold text-gray-900">
+                                {(stats?.expenses || 0).toFixed(2)}
+                              </span>
+                            </div>
                           </div>
-                          <div className="p-2 bg-red-50 rounded-lg">
-                            <ArrowDownRight className="h-4 w-4 text-red-600" />
+                          <div className="p-2 bg-red-100 rounded-full">
+                            <ArrowDownRight className="h-5 w-5 text-red-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -325,9 +329,9 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     {isLoading ? (
-                      <div className="h-48 bg-gray-50 rounded-lg animate-pulse"></div>
+                      <div className="h-48 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <div className="h-48 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
                         <div className="text-center">
                           <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-3" />
                           <h3 className="text-sm font-medium text-gray-900 mb-1">Chart Coming Soon</h3>
@@ -346,9 +350,9 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     {isLoading ? (
-                      <div className="h-48 bg-gray-50 rounded-lg animate-pulse"></div>
+                      <div className="h-48 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg animate-pulse"></div>
                     ) : (
-                      <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <div className="h-48 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
                         <div className="text-center">
                           <BarChart3 className="h-8 w-8 text-blue-600 mx-auto mb-3" />
                           <h3 className="text-sm font-medium text-gray-900 mb-1">Chart Coming Soon</h3>
@@ -392,12 +396,12 @@ export default function Dashboard() {
                       {stats.recentTransactions.map((transaction, index) => (
                         <div key={index} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
                           <div className={`p-2 rounded-full ${
-                            transaction.type === 'income' ? 'bg-green-50' : 'bg-red-50'
+                            transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
                           }`}>
                             {transaction.type === 'income' ? (
-                              <ArrowUpRight className="h-3 w-3 text-green-600" />
+                              <ArrowUpRight className="h-4 w-4 text-green-600" />
                             ) : (
-                              <ArrowDownRight className="h-3 w-3 text-red-600" />
+                              <ArrowDownRight className="h-4 w-4 text-red-600" />
                             )}
                           </div>
                           <div className="flex-1">
@@ -405,10 +409,15 @@ export default function Dashboard() {
                             <div className="text-xs text-gray-500">{formatDate(transaction.date)}</div>
                           </div>
                           <div className="text-right">
-                            <div className={`font-semibold text-sm ${
-                              transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}
+                            <div className="flex items-baseline gap-1">
+                              <span className={`text-sm font-bold ${
+                                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                {transaction.type === 'income' ? '+$' : '-$'}
+                              </span>
+                              <span className="text-sm font-bold text-gray-900">
+                                {Math.abs(transaction.amount).toFixed(2)}
+                              </span>
                             </div>
                           </div>
                         </div>
