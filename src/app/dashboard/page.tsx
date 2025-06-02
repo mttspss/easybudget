@@ -43,6 +43,7 @@ import {
   Bar,
   LineChart
 } from 'recharts'
+import { IconRenderer } from "@/components/ui/icon-renderer"
 
 interface DashboardStats {
   totalBalance: number
@@ -60,6 +61,8 @@ interface Transaction {
   description: string
   date: string
   type: 'income' | 'expense'
+  icon?: string | null
+  receipt_url?: string | null
   categories?: {
     name: string
     color: string
@@ -81,14 +84,12 @@ export default function Dashboard() {
         const transaction = row.original
         return (
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${
-              transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-            }`}>
-              {transaction.type === 'income' ? (
-                <ArrowUpRight className="h-4 w-4 text-green-600" />
-              ) : (
-                <ArrowDownRight className="h-4 w-4 text-red-600" />
-              )}
+            <div className="w-8 h-8 flex items-center justify-center">
+              <IconRenderer 
+                iconName={transaction.icon} 
+                className="h-4 w-4 text-gray-600"
+                fallbackColor={transaction.categories?.color}
+              />
             </div>
             <div>
               <div className="font-medium text-gray-900 text-sm">{transaction.description}</div>
@@ -109,7 +110,7 @@ export default function Dashboard() {
               className="w-2.5 h-2.5 rounded-full" 
               style={{ backgroundColor: category?.color || '#gray' }}
             />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
               {category?.name || 'Uncategorized'}
             </span>
           </div>

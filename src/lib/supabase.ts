@@ -121,7 +121,7 @@ export type Database = {
           date: string
           type: 'income' | 'expense'
           icon: string | null
-          image: string | null
+          receipt_url: string | null
           created_at: string
           updated_at: string
         }
@@ -134,7 +134,7 @@ export type Database = {
           date: string
           type: 'income' | 'expense'
           icon?: string | null
-          image?: string | null
+          receipt_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -147,7 +147,7 @@ export type Database = {
           date?: string
           type?: 'income' | 'expense'
           icon?: string | null
-          image?: string | null
+          receipt_url?: string | null
           created_at?: string
           updated_at?: string
         }

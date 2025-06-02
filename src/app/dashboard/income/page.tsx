@@ -35,6 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
+import { IconSelector } from "@/components/ui/icon-selector"
+import { IconRenderer } from "@/components/ui/icon-renderer"
 
 interface Transaction {
   id: string
@@ -43,7 +45,7 @@ interface Transaction {
   date: string
   category_id: string
   icon?: string | null
-  image?: string | null
+  receipt_url?: string | null
   category?: {
     name: string
     color: string
@@ -71,7 +73,8 @@ export default function IncomePage() {
     amount: "",
     description: "",
     date: new Date().toISOString().split('T')[0],
-    category_id: ""
+    category_id: "",
+    icon: "FileText"
   })
 
   const fetchData = useCallback(async () => {
@@ -147,6 +150,7 @@ export default function IncomePage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
+            icon: formData.icon,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingTransaction.id)
@@ -167,6 +171,7 @@ export default function IncomePage() {
             description: formData.description,
             date: formData.date,
             category_id: formData.category_id,
+            icon: formData.icon,
             type: 'income'
           })
 
@@ -183,7 +188,8 @@ export default function IncomePage() {
         amount: "",
         description: "",
         date: new Date().toISOString().split('T')[0],
-        category_id: ""
+        category_id: "",
+        icon: "FileText"
       })
       setEditingTransaction(null)
       setIsDialogOpen(false)
@@ -202,7 +208,8 @@ export default function IncomePage() {
       amount: transaction.amount.toString(),
       description: transaction.description,
       date: transaction.date,
-      category_id: transaction.category_id
+      category_id: transaction.category_id,
+      icon: transaction.icon || "FileText"
     })
     setIsDialogOpen(true)
   }
@@ -333,6 +340,11 @@ export default function IncomePage() {
                           />
                         </div>
 
+                        <div>
+                          <Label htmlFor="icon">Icon</Label>
+                          <IconSelector value={formData.icon} onValueChange={(value) => setFormData({...formData, icon: value})} />
+                        </div>
+
                         <DialogFooter>
                           <Button type="button" variant="outline" onClick={() => {
                             setIsDialogOpen(false)
@@ -341,7 +353,8 @@ export default function IncomePage() {
                               amount: "",
                               description: "",
                               date: new Date().toISOString().split('T')[0],
-                              category_id: ""
+                              category_id: "",
+                              icon: "FileText"
                             })
                           }}>
                             Cancel
@@ -496,15 +509,12 @@ export default function IncomePage() {
                           <div className="grid grid-cols-12 gap-4 items-center">
                             {/* Icon */}
                             <div className="col-span-1">
-                              <div className="w-6 h-6 flex items-center justify-center text-sm">
-                                {transaction.icon ? (
-                                  <span>{transaction.icon}</span>
-                                ) : (
-                                  <div 
-                                    className="w-3 h-3 rounded-full" 
-                                    style={{ backgroundColor: transaction.category?.color }}
-                                  />
-                                )}
+                              <div className="w-6 h-6 flex items-center justify-center">
+                                <IconRenderer 
+                                  iconName={transaction.icon} 
+                                  className="h-4 w-4 text-gray-600"
+                                  fallbackColor={transaction.category?.color}
+                                />
                               </div>
                             </div>
 
@@ -522,7 +532,7 @@ export default function IncomePage() {
                                   className="w-2.5 h-2.5 rounded-full" 
                                   style={{ backgroundColor: transaction.category?.color }}
                                 />
-                                <span className="text-sm text-gray-600">
+                                <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
                                   {transaction.category?.name}
                                 </span>
                               </div>
