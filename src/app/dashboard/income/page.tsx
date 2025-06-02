@@ -50,6 +50,10 @@ interface Transaction {
     name: string
     color: string
   }
+  categories?: {
+    name: string
+    color: string
+  }
 }
 
 interface Category {
@@ -513,7 +517,7 @@ export default function IncomePage() {
                                 <IconRenderer 
                                   iconName={transaction.icon} 
                                   className="h-4 w-4 text-gray-600"
-                                  fallbackColor={transaction.category?.color}
+                                  fallbackColor={transaction.categories?.color}
                                 />
                               </div>
                             </div>
@@ -530,10 +534,10 @@ export default function IncomePage() {
                               <div className="flex items-center gap-2">
                                 <div 
                                   className="w-2.5 h-2.5 rounded-full" 
-                                  style={{ backgroundColor: transaction.category?.color }}
+                                  style={{ backgroundColor: transaction.categories?.color }}
                                 />
                                 <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                                  {transaction.category?.name}
+                                  {transaction.categories?.name}
                                 </span>
                               </div>
                             </div>
