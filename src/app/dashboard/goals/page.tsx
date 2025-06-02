@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { 
   Plus,
   Search,
-  Download,
   Edit,
   Trash2,
   Target,
