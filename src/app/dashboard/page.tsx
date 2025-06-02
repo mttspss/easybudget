@@ -16,7 +16,7 @@ import {
   Clock,
   BarChart3,
   Activity,
-  CreditCard
+  Wallet
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -284,7 +284,7 @@ export default function Dashboard() {
                         key={period}
                         variant={selectedPeriod === period ? "default" : "ghost"}
                         size="sm"
-                        className={`h-7 px-3 text-xs transition-all ${
+                        className={`h-8 px-3 text-xs transition-all ${
                           selectedPeriod === period ? "bg-blue-600 text-white shadow-sm" : ""
                         }`}
                         onClick={() => setSelectedPeriod(period)}
@@ -293,11 +293,11 @@ export default function Dashboard() {
                       </Button>
                     ))}
                   </div>
-                  <Button variant="outline" size="sm" className="h-7 text-xs">
+                  <Button variant="outline" size="sm" className="h-8 text-xs">
                     <Filter className="h-3 w-3 mr-2" />
                     Filter
                   </Button>
-                  <Button variant="outline" size="sm" className="h-7 text-xs">
+                  <Button variant="outline" size="sm" className="h-8 text-xs">
                     <Download className="h-3 w-3 mr-2" />
                     Export
                   </Button>
@@ -316,7 +316,7 @@ export default function Dashboard() {
                   <>
                     {/* Net Income - Blue Theme */}
                     <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">Net Income</p>
@@ -338,7 +338,7 @@ export default function Dashboard() {
 
                     {/* Income - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
@@ -352,7 +352,7 @@ export default function Dashboard() {
                             </div>
                           </div>
                           <div className="p-2 bg-green-100 rounded-lg relative">
-                            <CreditCard className="h-5 w-5 text-green-600" />
+                            <Wallet className="h-5 w-5 text-green-600" />
                             <ArrowUpRight className="h-3 w-3 text-green-600 absolute -top-1 -right-1" />
                           </div>
                         </div>
@@ -361,7 +361,7 @@ export default function Dashboard() {
 
                     {/* Expenses - Credit Card Style Icon */}
                     <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600 mb-2">
@@ -375,7 +375,7 @@ export default function Dashboard() {
                             </div>
                           </div>
                           <div className="p-2 bg-red-100 rounded-lg relative">
-                            <CreditCard className="h-5 w-5 text-red-600" />
+                            <Wallet className="h-5 w-5 text-red-600" />
                             <ArrowDownRight className="h-3 w-3 text-red-600 absolute -top-1 -right-1" />
                           </div>
                         </div>
@@ -552,7 +552,7 @@ export default function Dashboard() {
                       </div>
                       <p className="text-sm text-gray-600 mt-1">Your latest financial activity</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-7 text-xs hover:bg-gray-50">
+                    <Button variant="outline" size="sm" className="h-8 text-xs hover:bg-gray-50">
                       View All
                     </Button>
                   </div>
@@ -610,7 +610,7 @@ export default function Dashboard() {
                       </div>
                       <h3 className="text-sm font-semibold text-gray-900 mb-1">No transactions yet</h3>
                       <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Start tracking your finances by adding your first transaction.</p>
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                      <Button size="sm" className="h-8 bg-blue-600 hover:bg-blue-700">
                         <Plus className="h-3 w-3 mr-2" />
                         Add Transaction
                       </Button>
