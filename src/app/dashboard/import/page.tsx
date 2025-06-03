@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
+import { createDefaultCategories } from "@/lib/default-categories"
 
 interface ParsedTransaction {
   id: string
@@ -116,9 +117,29 @@ export default function ImportPage() {
         .eq('user_id', user.id)
         .order('name')
 
-      setImportState(prev => ({ ...prev, categories: data || [] }))
+      if (!data || data.length === 0) {
+        // Create default categories if none exist
+        console.log('No categories found, creating default categories...')
+        const success = await createDefaultCategories(user.id)
+        
+        if (success) {
+          // Fetch the newly created categories
+          const { data: newData } = await supabase
+            .from('categories')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('name')
+          
+          setImportState(prev => ({ ...prev, categories: newData || [] }))
+        } else {
+          setImportState(prev => ({ ...prev, categories: [] }))
+        }
+      } else {
+        setImportState(prev => ({ ...prev, categories: data }))
+      }
     } catch (error) {
       console.error('Error fetching categories:', error)
+      setImportState(prev => ({ ...prev, categories: [] }))
     }
   }, [user])
 
@@ -478,22 +499,50 @@ export default function ImportPage() {
             categoryId = category?.id || null
           }
 
+          // If still no category, assign a default one based on type
+          if (!categoryId) {
+            const defaultCategory = importState.categories.find(c => 
+              c.type === transaction.type && 
+              (c.name === 'Other Expenses' || c.name === 'Other Income' || c.name === 'Uncategorized')
+            ) || importState.categories.find(c => c.type === transaction.type)
+            
+            categoryId = defaultCategory?.id || null
+          }
+
+          // Skip transaction if we still don't have a category
+          if (!categoryId) {
+            console.error('No category available for transaction:', transaction.description)
+            skipped++
+            continue
+          }
+
           console.log(`Inserting transaction with category:`, categoryId)
+
+          const transactionData = {
+            user_id: user.id,
+            description: transaction.description,
+            amount: transaction.amount,
+            date: transaction.date,
+            type: transaction.type,
+            category_id: categoryId
+          }
+
+          console.log('Transaction data to insert:', transactionData)
 
           const { data: insertedData, error } = await supabase
             .from('transactions')
-            .insert({
-              user_id: user.id,
-              description: transaction.description,
-              amount: transaction.amount,
-              date: transaction.date,
-              type: transaction.type,
-              category_id: categoryId
-            })
+            .insert(transactionData)
             .select()
 
           if (error) {
-            console.error('Error inserting transaction:', error, 'Transaction:', transaction)
+            console.error('Error inserting transaction:', error)
+            console.error('Error details:', {
+              message: error.message,
+              details: error.details,
+              hint: error.hint,
+              code: error.code
+            })
+            console.error('Transaction data that failed:', transactionData)
             skipped++
           } else {
             console.log('Transaction inserted successfully:', insertedData)
@@ -918,7 +967,7 @@ export default function ImportPage() {
                             <p className="text-2xl font-bold text-green-900 mt-1">
                               {importState.parsedTransactions.filter(t => t.errors.length === 0).length}
                             </p>
-            </div>
+                          </div>
 
                           <div className="bg-red-50 p-4 rounded-lg">
                             <div className="flex items-center gap-2">
@@ -1019,14 +1068,14 @@ export default function ImportPage() {
                                       <Plus className="h-4 w-4" />
                                     </Button>
                                   </div>
-                    </div>
-                    </div>
+                                </div>
+                              </div>
                             ))}
-                    </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
 
