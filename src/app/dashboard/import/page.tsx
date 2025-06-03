@@ -260,10 +260,8 @@ export default function ImportPage() {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file) return
-
-    if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
-      toast.error('Carica un file CSV o Excel')
+    if (!file) {
+      toast.error('Please upload a CSV or Excel file')
       return
     }
 
@@ -275,7 +273,7 @@ export default function ImportPage() {
       if (file.name.match(/\.csv$/i)) {
         content = await file.text()
       } else {
-        toast.error('File Excel non ancora supportati. Converti in CSV.')
+        toast.error('Excel files not yet supported. Please convert to CSV.')
         setIsProcessing(false)
         return
       }
@@ -283,7 +281,7 @@ export default function ImportPage() {
       const { headers, data } = parseCSV(content)
       
       if (headers.length === 0 || data.length === 0) {
-        toast.error('Il file sembra vuoto o non valido')
+        toast.error('The file appears to be empty or invalid')
         setIsProcessing(false)
         return
       }
@@ -299,9 +297,9 @@ export default function ImportPage() {
         columnMapping: detectedMapping
       }))
 
-      toast.success(`File caricato con successo! Trovate ${data.length} righe.`)
+      toast.success(`File uploaded successfully! Found ${data.length} rows.`)
     } catch (error) {
-      toast.error('Errore nella lettura del file. Controlla il formato.')
+      toast.error('Error reading file. Please check the format.')
       console.error('File upload error:', error)
     } finally {
       setIsProcessing(false)
@@ -436,10 +434,10 @@ export default function ImportPage() {
         duplicateCount: duplicates
       }))
 
-      toast.success(`Importazione completata! ${imported} transazioni importate.`)
+      toast.success(`Import completed! ${imported} transactions imported.`)
     } catch (error) {
       console.error('Import error:', error)
-      toast.error('Errore durante l\'importazione. Riprova.')
+      toast.error('Error during import. Please try again.')
     } finally {
       setIsProcessing(false)
     }
@@ -472,17 +470,25 @@ export default function ImportPage() {
   }
 
   const downloadTemplate = () => {
-    const csvContent = "description,amount,date,type\nSpesa Supermercato,-50.00,2024-01-15,expense\nStipendio,3000.00,2024-01-01,income\nBenzina,-40.00,2024-01-10,expense"
+    const csvContent = "description,amount,date,type\nGrocery Store,-50.00,2024-01-15,expense\nSalary,3000.00,2024-01-01,income\nGas Station,-40.00,2024-01-10,expense"
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'easybudget_template_importazione.csv'
+    a.download = 'easybudget_import_template.csv'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
-    toast.success('Template scaricato!')
+    toast.success('Template downloaded!')
+  }
+
+  const goToPreviousStep = () => {
+    const steps = ['upload', 'preview', 'mapping', 'processing', 'complete']
+    const currentIndex = steps.indexOf(importState.step)
+    if (currentIndex > 0) {
+      setImportState(prev => ({ ...prev, step: steps[currentIndex - 1] as any }))
+    }
   }
 
   const stepIndex = ['upload', 'preview', 'mapping', 'processing', 'complete'].indexOf(importState.step)
@@ -499,18 +505,22 @@ export default function ImportPage() {
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Importa Transazioni</h1>
-                  <p className="text-gray-600 text-sm mt-1">Importa transazioni da file CSV con categorizzazione intelligente</p>
+                  <h1 className="text-2xl font-bold text-gray-900">Import Transactions</h1>
+                  <p className="text-gray-600 text-sm mt-1">Import transactions from CSV files with intelligent categorization</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={downloadTemplate}>
-                    <Download className="h-3 w-3 mr-2" />
-                    Scarica Template
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={downloadTemplate}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Template
                   </Button>
-                  {importState.step !== 'upload' && (
-                    <Button variant="outline" size="sm" className="h-8 text-xs" onClick={resetImport}>
-                      <RefreshCw className="h-3 w-3 mr-2" />
-                      Ricomincia
+                  <Button variant="outline" onClick={resetImport}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Restart
+                  </Button>
+                  {stepIndex > 0 && stepIndex < 4 && (
+                    <Button variant="outline" onClick={goToPreviousStep}>
+                      <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
+                      Back
                     </Button>
                   )}
                 </div>
@@ -519,18 +529,16 @@ export default function ImportPage() {
               {/* Progress Steps */}
               <div className="flex items-center justify-center space-x-4 py-4">
                 {[
-                  { key: 'upload', label: 'Carica', icon: Upload },
-                  { key: 'preview', label: 'Anteprima', icon: Eye },
+                  { key: 'upload', label: 'Upload', icon: Upload },
+                  { key: 'preview', label: 'Preview', icon: Eye },
                   { key: 'mapping', label: 'Mapping', icon: Tag },
-                  { key: 'processing', label: 'Elaborazione', icon: Database },
-                  { key: 'complete', label: 'Completo', icon: CheckCircle }
+                  { key: 'processing', label: 'Processing', icon: Database },
+                  { key: 'complete', label: 'Complete', icon: CheckCircle }
                 ].map((step, index) => (
                   <div key={step.key} className="flex items-center">
-                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-                      importState.step === step.key 
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                      stepIndex >= index 
                         ? 'bg-blue-100 text-blue-700' 
-                        : index < stepIndex
-                        ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-500'
                     }`}>
                       <step.icon className="h-4 w-4" />
@@ -552,9 +560,9 @@ export default function ImportPage() {
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <FileSpreadsheet className="h-10 w-10 text-blue-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Carica il Tuo File di Transazioni</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Your Transaction File</h3>
                         <p className="text-gray-600 text-sm">
-                          Carica un file CSV con i dati delle tue transazioni. Rileveremo automaticamente le colonne e categorizzeremo le transazioni.
+                          Upload a CSV file with your transaction data. We&apos;ll automatically detect columns and categorize transactions.
                         </p>
                       </div>
 
@@ -575,18 +583,18 @@ export default function ImportPage() {
                           {isProcessing ? (
                             <>
                               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                              Elaborazione...
+                              Processing...
                             </>
                           ) : (
                             <>
                               <Upload className="h-4 w-4 mr-2" />
-                              Scegli File
+                              Choose Files
                             </>
                           )}
                         </Button>
 
                         <div className="text-xs text-gray-500">
-                          Formati supportati: CSV, Excel (.xlsx, .xls)
+                          Supported formats: CSV, Excel (.xlsx, .xls)
                         </div>
                       </div>
                     </div>
@@ -601,7 +609,7 @@ export default function ImportPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Eye className="h-5 w-5" />
-                        Anteprima File
+                        File Preview
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -609,10 +617,10 @@ export default function ImportPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{importState.file?.name}</p>
-                            <p className="text-sm text-gray-600">{importState.rawData.length} righe trovate</p>
+                            <p className="text-sm text-gray-600">{importState.rawData.length} rows found</p>
                           </div>
                           <Button onClick={parseTransactions}>
-                            Continua al Mapping
+                            Continue to Mapping
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </Button>
                         </div>
@@ -620,7 +628,7 @@ export default function ImportPage() {
                         {/* Column Mapping */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div>
-                            <Label htmlFor="description-mapping">Colonna Descrizione</Label>
+                            <Label htmlFor="description-mapping">Description Column</Label>
                             <Select 
                               value={importState.columnMapping.description} 
                               onValueChange={(value) => setImportState(prev => ({
@@ -629,7 +637,7 @@ export default function ImportPage() {
                               }))}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Seleziona colonna" />
+                                <SelectValue placeholder="Select column" />
                               </SelectTrigger>
                               <SelectContent>
                                 {importState.headers.map(header => (
@@ -640,7 +648,7 @@ export default function ImportPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="amount-mapping">Colonna Importo</Label>
+                            <Label htmlFor="amount-mapping">Amount Column</Label>
                             <Select 
                               value={importState.columnMapping.amount} 
                               onValueChange={(value) => setImportState(prev => ({
@@ -649,7 +657,7 @@ export default function ImportPage() {
                               }))}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Seleziona colonna" />
+                                <SelectValue placeholder="Select column" />
                               </SelectTrigger>
                               <SelectContent>
                                 {importState.headers.map(header => (
@@ -660,7 +668,7 @@ export default function ImportPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="date-mapping">Colonna Data</Label>
+                            <Label htmlFor="date-mapping">Date Column</Label>
                             <Select 
                               value={importState.columnMapping.date} 
                               onValueChange={(value) => setImportState(prev => ({
@@ -669,7 +677,7 @@ export default function ImportPage() {
                               }))}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Seleziona colonna" />
+                                <SelectValue placeholder="Select column" />
                               </SelectTrigger>
                               <SelectContent>
                                 {importState.headers.map(header => (
@@ -680,7 +688,7 @@ export default function ImportPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="type-mapping">Colonna Tipo (Opzionale)</Label>
+                            <Label htmlFor="type-mapping">Type Column (Optional)</Label>
                             <Select 
                               value={importState.columnMapping.type || undefined} 
                               onValueChange={(value) => setImportState(prev => ({
@@ -689,7 +697,7 @@ export default function ImportPage() {
                               }))}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Auto-rileva" />
+                                <SelectValue placeholder="Auto-detect" />
                               </SelectTrigger>
                               <SelectContent>
                                 {importState.headers.map(header => (
@@ -703,7 +711,7 @@ export default function ImportPage() {
                         {/* Data Preview */}
                         <div className="border rounded-lg overflow-hidden">
                           <div className="bg-gray-50 px-4 py-2 border-b">
-                            <h4 className="font-medium text-sm">Anteprima Dati (Prime 5 righe)</h4>
+                            <h4 className="font-medium text-sm">Data Preview (First 5 rows)</h4>
                           </div>
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm">
@@ -744,10 +752,10 @@ export default function ImportPage() {
                       <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2">
                           <Tag className="h-5 w-5" />
-                          Revisiona e Categorizza Transazioni
+                          Review and Categorize Transactions
                         </CardTitle>
                         <Button onClick={processImport} disabled={isProcessing}>
-                          Importa {importState.parsedTransactions.filter(t => t.errors.length === 0).length} Transazioni
+                          Import {importState.parsedTransactions.filter(t => t.errors.length === 0).length} Transactions
                           <ArrowRight className="h-4 w-4 ml-2" />
                         </Button>
                       </div>
@@ -759,7 +767,7 @@ export default function ImportPage() {
                           <div className="bg-green-50 p-4 rounded-lg">
                             <div className="flex items-center gap-2">
                               <CheckCircle className="h-5 w-5 text-green-600" />
-                              <span className="font-medium text-green-900">Valide</span>
+                              <span className="font-medium text-green-900">Valid</span>
                             </div>
                             <p className="text-2xl font-bold text-green-900 mt-1">
                               {importState.parsedTransactions.filter(t => t.errors.length === 0).length}
@@ -769,7 +777,7 @@ export default function ImportPage() {
                           <div className="bg-red-50 p-4 rounded-lg">
                             <div className="flex items-center gap-2">
                               <AlertCircle className="h-5 w-5 text-red-600" />
-                              <span className="font-medium text-red-900">Errori</span>
+                              <span className="font-medium text-red-900">Errors</span>
                             </div>
                             <p className="text-2xl font-bold text-red-900 mt-1">
                               {importState.parsedTransactions.filter(t => t.errors.length > 0).length}
@@ -779,7 +787,7 @@ export default function ImportPage() {
                           <div className="bg-blue-50 p-4 rounded-lg">
                             <div className="flex items-center gap-2">
                               <FileText className="h-5 w-5 text-blue-600" />
-                              <span className="font-medium text-blue-900">Totale</span>
+                              <span className="font-medium text-blue-900">Total</span>
                             </div>
                             <p className="text-2xl font-bold text-blue-900 mt-1">
                               {importState.parsedTransactions.length}
@@ -790,7 +798,7 @@ export default function ImportPage() {
                         {/* Transaction List */}
                         <div className="border rounded-lg overflow-hidden max-h-96 overflow-y-auto">
                           <div className="bg-gray-50 px-4 py-2 border-b">
-                            <h4 className="font-medium text-sm">Transazioni Analizzate</h4>
+                            <h4 className="font-medium text-sm">Analyzed Transactions</h4>
                           </div>
                           <div className="space-y-2 p-4">
                             {importState.parsedTransactions.map((transaction, index) => (
@@ -813,9 +821,9 @@ export default function ImportPage() {
                                     
                                     {transaction.suggested_category && (
                                       <div className="mt-1">
-                                        <span className="text-xs text-gray-500">Suggerita: </span>
+                                        <span className="text-xs text-gray-500">Suggested: </span>
                                         <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                          {transaction.suggested_category} ({Math.round(transaction.confidence * 100)}% confidenza)
+                                          {transaction.suggested_category} ({Math.round(transaction.confidence * 100)}% confidence)
                                         </span>
                                       </div>
                                     )}
@@ -837,7 +845,7 @@ export default function ImportPage() {
                                       }}
                                     >
                                       <SelectTrigger className="w-48">
-                                        <SelectValue placeholder="Seleziona categoria" />
+                                        <SelectValue placeholder="Select category" />
                                       </SelectTrigger>
                                       <SelectContent>
                                         {importState.categories
@@ -876,16 +884,16 @@ export default function ImportPage() {
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Database className="h-10 w-10 text-blue-600 animate-pulse" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Elaborazione Importazione</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing Import</h3>
                         <p className="text-gray-600 text-sm">
-                          Sto importando le tue transazioni nel database...
+                          Importing your transactions to the database...
                         </p>
                       </div>
 
                       <div className="space-y-4">
                         <Progress value={importState.progress} className="w-full" />
                         <p className="text-sm text-gray-600">
-                          {Math.round(importState.progress)}% completato
+                          {Math.round(importState.progress)}% completed
                         </p>
                       </div>
                     </div>
@@ -902,42 +910,35 @@ export default function ImportPage() {
                         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <CheckCircle className="h-10 w-10 text-green-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Importazione Completata!</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Import Completed!</h3>
                         <p className="text-gray-600 text-sm">
-                          Le tue transazioni sono state importate con successo.
+                          Your transactions have been successfully imported.
                         </p>
                       </div>
 
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                          <div>
-                            <p className="text-2xl font-bold text-green-600">{importState.importedCount}</p>
-                            <p className="text-xs text-gray-600">Importate</p>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-bold text-yellow-600">{importState.duplicateCount}</p>
-                            <p className="text-xs text-gray-600">Duplicate</p>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-bold text-red-600">{importState.skippedCount}</p>
-                            <p className="text-xs text-gray-600">Saltate</p>
-                          </div>
+                      <div className="grid grid-cols-3 gap-4 mb-6">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-green-600">{importState.importedCount}</p>
+                          <p className="text-xs text-gray-600">Imported</p>
                         </div>
-
-                        <div className="flex gap-3">
-                          <Button variant="outline" onClick={resetImport} className="flex-1">
-                            Importa Altro
-                          </Button>
-                          <Button asChild className="flex-1">
-                            <a href="/dashboard">Vai alla Dashboard</a>
-                          </Button>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-yellow-600">{importState.duplicateCount}</p>
+                          <p className="text-xs text-gray-600">Duplicates</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-red-600">{importState.skippedCount}</p>
+                          <p className="text-xs text-gray-600">Skipped</p>
                         </div>
                       </div>
+
+                      <Button onClick={resetImport} className="w-full">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Import More
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               )}
-
             </div>
           </div>
         </main>
