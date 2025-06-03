@@ -466,7 +466,7 @@ export default function GoalsPage() {
                                         ? `${daysRemaining} days left`
                                         : daysRemaining !== null && daysRemaining < 0
                                         ? `${Math.abs(daysRemaining)} days overdue`
-                                        : new Date(goal.target_date).toLocaleDateString()
+                                        : new Date(goal.target_date).toLocaleDateString('en-US')
                                       }
                                     </span>
                                   )}
