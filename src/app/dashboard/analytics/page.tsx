@@ -341,7 +341,7 @@ export default function AnalyticsPage() {
               {!isLoading && analyticsData && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
-                    <CardContent className="p-4">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-gray-600">Top Category</p>
@@ -357,7 +357,7 @@ export default function AnalyticsPage() {
                   </Card>
 
                   <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
-                    <CardContent className="p-4">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-gray-600">Trend</p>
@@ -381,7 +381,7 @@ export default function AnalyticsPage() {
                   </Card>
 
                   <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
-                    <CardContent className="p-4">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-gray-600">Daily Average</p>
@@ -397,7 +397,7 @@ export default function AnalyticsPage() {
                   </Card>
 
                   <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
-                    <CardContent className="p-4">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-gray-600">Monthly Projection</p>
