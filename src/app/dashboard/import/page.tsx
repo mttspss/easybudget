@@ -682,7 +682,7 @@ export default function ImportPage() {
                           <div>
                             <Label htmlFor="type-mapping">Colonna Tipo (Opzionale)</Label>
                             <Select 
-                              value={importState.columnMapping.type || ''} 
+                              value={importState.columnMapping.type || undefined} 
                               onValueChange={(value) => setImportState(prev => ({
                                 ...prev,
                                 columnMapping: { ...prev.columnMapping, type: value }
@@ -692,7 +692,6 @@ export default function ImportPage() {
                                 <SelectValue placeholder="Auto-rileva" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">Auto-rileva</SelectItem>
                                 {importState.headers.map(header => (
                                   <SelectItem key={header} value={header}>{header}</SelectItem>
                                 ))}
@@ -830,7 +829,7 @@ export default function ImportPage() {
                                   
                                   <div className="flex items-center gap-2">
                                     <Select 
-                                      value={transaction.category_id || ''} 
+                                      value={transaction.category_id || undefined} 
                                       onValueChange={(value) => {
                                         const updated = [...importState.parsedTransactions]
                                         updated[index].category_id = value
