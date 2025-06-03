@@ -280,15 +280,15 @@ export default function AnalyticsPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
-            <div className="max-w-7xl mx-auto space-y-6">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          <div className="max-w-7xl mx-auto space-y-6">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
                   <p className="text-gray-600 text-sm mt-1">Advanced insights into your financial patterns</p>
-                </div>
-                <div className="flex items-center gap-3">
+              </div>
+              <div className="flex items-center gap-3">
                   {/* Period Selection */}
                   <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
                     {[
@@ -310,7 +310,7 @@ export default function AnalyticsPage() {
                         }}
                       >
                         {period.label}
-                      </Button>
+                </Button>
                     ))}
                   </div>
                   
@@ -328,14 +328,14 @@ export default function AnalyticsPage() {
                   
                   <Button variant="outline" size="sm" className="h-8 text-xs">
                     <Filter className="h-3 w-3 mr-2" />
-                    Filter
-                  </Button>
+                  Filter
+                </Button>
                   <Button variant="outline" size="sm" className="h-8 text-xs">
                     <Download className="h-3 w-3 mr-2" />
-                    Export
-                  </Button>
-                </div>
+                  Export
+                </Button>
               </div>
+            </div>
 
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
@@ -371,12 +371,12 @@ export default function AnalyticsPage() {
                               {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
                                analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
                             </span>
-                          </div>
-                        </div>
+                    </div>
+                    </div>
                         <div className="p-2 bg-green-100 rounded-full">
                           <TrendingUp className="h-5 w-5 text-green-600" />
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                     </CardContent>
                   </Card>
 
@@ -622,15 +622,15 @@ export default function AnalyticsPage() {
                                   style={{ backgroundColor: category.color }}
                                 />
                                 <span className="text-sm text-gray-900">{category.name}</span>
-                              </div>
+                    </div>
                               <div className="text-right">
                                 <div className="text-sm font-medium text-gray-900">
                                   ${category.value.toLocaleString()}
-                                </div>
+                    </div>
                                 <div className="text-xs text-gray-500">
                                   {category.percentage.toFixed(1)}%
-                                </div>
-                              </div>
+                    </div>
+                  </div>
                             </div>
                           ))}
                         </div>
@@ -667,9 +667,9 @@ export default function AnalyticsPage() {
                             </div>
                           </>
                         )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                </div>
+              </CardContent>
+            </Card>
                 </div>
               </div>
 

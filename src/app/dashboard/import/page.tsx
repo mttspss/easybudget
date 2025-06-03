@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { 
   Upload,
@@ -19,7 +20,8 @@ import {
   RefreshCw,
   FileSpreadsheet,
   Tag,
-  Eye
+  Eye,
+  Plus
 } from "lucide-react"
 import { useState, useEffect, useCallback, useRef } from "react"
 import {
@@ -29,6 +31,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 
 interface ParsedTransaction {
@@ -89,6 +97,14 @@ export default function ImportPage() {
   })
 
   const [isProcessing, setIsProcessing] = useState(false)
+  const [newCategoryModal, setNewCategoryModal] = useState({
+    open: false,
+    transactionIndex: -1,
+    name: '',
+    color: '#3B82F6',
+    icon: '💰',
+    type: 'expense' as 'income' | 'expense'
+  })
 
   const fetchCategories = useCallback(async () => {
     if (!user) return
@@ -238,17 +254,59 @@ export default function ImportPage() {
 
   const parseDate = (dateStr: string): string | null => {
     try {
-      const formats = [
-        /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-        /^\d{2}\/\d{2}\/\d{4}$/, // MM/DD/YYYY or DD/MM/YYYY
-        /^\d{2}-\d{2}-\d{4}$/, // MM-DD-YYYY or DD-MM-YYYY
-        /^\d{1,2}\/\d{1,2}\/\d{4}$/, // M/D/YYYY
-      ]
-
-      if (formats.some(format => format.test(dateStr))) {
-        const date = new Date(dateStr)
-        if (!isNaN(date.getTime())) {
-          return date.toISOString().split('T')[0]
+      if (!dateStr || typeof dateStr !== 'string') return null
+      
+      const cleanDateStr = dateStr.trim()
+      
+      // Extract date part from common formats
+      let dateOnly = cleanDateStr
+      
+      // If it contains time/timestamp, extract only the date part
+      if (cleanDateStr.includes(' ')) {
+        dateOnly = cleanDateStr.split(' ')[0] // Take everything before the first space
+      } else if (cleanDateStr.includes('T')) {
+        dateOnly = cleanDateStr.split('T')[0] // Take everything before 'T' (ISO format)
+      }
+      
+      // Try to parse the date
+      const date = new Date(dateOnly)
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0]
+      }
+      
+      // If direct parsing fails, try with different separators
+      const dateParts = dateOnly.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,4})/)
+      if (dateParts) {
+        const [, part1, part2, part3] = dateParts
+        
+        // Determine if it's YYYY-MM-DD or DD/MM/YYYY or MM/DD/YYYY
+        let year, month, day
+        
+        if (part1.length === 4) {
+          // YYYY-MM-DD format
+          year = parseInt(part1)
+          month = parseInt(part2)
+          day = parseInt(part3)
+        } else {
+          // Assume DD/MM/YYYY or MM/DD/YYYY, try both
+          year = parseInt(part3)
+          // Try European format first (DD/MM/YYYY)
+          month = parseInt(part2)
+          day = parseInt(part1)
+          
+          // Validate and switch if day > 12 (likely MM/DD/YYYY)
+          if (day > 12 && month <= 12) {
+            [day, month] = [month, day]
+          }
+        }
+        
+        // Create date and validate
+        const parsedDate = new Date(year, month - 1, day)
+        if (!isNaN(parsedDate.getTime()) && 
+            parsedDate.getFullYear() === year &&
+            parsedDate.getMonth() === month - 1 &&
+            parsedDate.getDate() === day) {
+          return parsedDate.toISOString().split('T')[0]
         }
       }
 
@@ -313,7 +371,7 @@ export default function ImportPage() {
     rawData.forEach((row, index) => {
       const errors: string[] = []
       
-      const description = row[columnMapping.description] || `Transazione ${index + 1}`
+      const description = row[columnMapping.description] || `Transaction ${index + 1}`
       const amountStr = row[columnMapping.amount]
       const dateStr = row[columnMapping.date]
       const typeStr = row[columnMapping.type || '']
@@ -325,15 +383,15 @@ export default function ImportPage() {
         if (!isNaN(parsed)) {
           amount = Math.abs(parsed)
         } else {
-          errors.push('Formato importo non valido')
+          errors.push('Invalid amount format')
         }
       } else {
-        errors.push('Importo mancante')
+        errors.push('Missing amount')
       }
 
       const parsedDate = parseDate(dateStr)
       if (!parsedDate) {
-        errors.push('Data non valida o mancante')
+        errors.push('Invalid or missing date')
       }
 
       let type: 'income' | 'expense' = 'expense'
@@ -493,6 +551,65 @@ export default function ImportPage() {
 
   const stepIndex = ['upload', 'preview', 'mapping', 'processing', 'complete'].indexOf(importState.step)
 
+  const createNewCategory = async () => {
+    if (!user || !newCategoryModal.name.trim()) return
+
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          user_id: user.id,
+          name: newCategoryModal.name.trim(),
+          color: newCategoryModal.color,
+          icon: newCategoryModal.icon,
+          type: newCategoryModal.type
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Update categories list
+      setImportState(prev => ({
+        ...prev,
+        categories: [...prev.categories, data].sort((a, b) => a.name.localeCompare(b.name))
+      }))
+
+      // Assign the new category to the transaction
+      if (newCategoryModal.transactionIndex >= 0) {
+        const updated = [...importState.parsedTransactions]
+        updated[newCategoryModal.transactionIndex].category_id = data.id
+        setImportState(prev => ({ ...prev, parsedTransactions: updated }))
+      }
+
+      // Reset modal
+      setNewCategoryModal({
+        open: false,
+        transactionIndex: -1,
+        name: '',
+        color: '#3B82F6',
+        icon: '💰',
+        type: 'expense'
+      })
+
+      toast.success(`Category "${data.name}" created successfully!`)
+    } catch (error) {
+      console.error('Error creating category:', error)
+      toast.error('Failed to create category')
+    }
+  }
+
+  const openNewCategoryModal = (transactionIndex: number, type: 'income' | 'expense') => {
+    setNewCategoryModal({
+      open: true,
+      transactionIndex,
+      name: '',
+      color: type === 'income' ? '#10B981' : '#EF4444',
+      icon: type === 'income' ? '💰' : '💸',
+      type
+    })
+  }
+
   return (
     <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
@@ -501,10 +618,10 @@ export default function ImportPage() {
         <main className="flex-1 overflow-auto p-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
             <div className="max-w-6xl mx-auto space-y-6">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div>
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
                   <h1 className="text-2xl font-bold text-gray-900">Import Transactions</h1>
                   <p className="text-gray-600 text-sm mt-1">Import transactions from CSV files with intelligent categorization</p>
                 </div>
@@ -559,7 +676,7 @@ export default function ImportPage() {
                       <div className="mb-6">
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <FileSpreadsheet className="h-10 w-10 text-blue-600" />
-                        </div>
+                      </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Your Transaction File</h3>
                         <p className="text-gray-600 text-sm">
                           Upload a CSV file with your transaction data. We&apos;ll automatically detect columns and categorize transactions.
@@ -772,8 +889,8 @@ export default function ImportPage() {
                             <p className="text-2xl font-bold text-green-900 mt-1">
                               {importState.parsedTransactions.filter(t => t.errors.length === 0).length}
                             </p>
-                          </div>
-                          
+            </div>
+
                           <div className="bg-red-50 p-4 rounded-lg">
                             <div className="flex items-center gap-2">
                               <AlertCircle className="h-5 w-5 text-red-600" />
@@ -863,15 +980,24 @@ export default function ImportPage() {
                                           ))}
                                       </SelectContent>
                                     </Select>
+                                    
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => openNewCategoryModal(index, transaction.type)}
+                                      className="shrink-0"
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
                                   </div>
-                                </div>
-                              </div>
+                    </div>
+                    </div>
                             ))}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
                 </div>
               )}
 
@@ -943,6 +1069,81 @@ export default function ImportPage() {
           </div>
         </main>
       </div>
+
+      {/* Create Category Modal */}
+      <Dialog open={newCategoryModal.open} onOpenChange={(open) => setNewCategoryModal(prev => ({ ...prev, open }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Category</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="category-name">Category Name</Label>
+              <Input
+                id="category-name"
+                value={newCategoryModal.name}
+                onChange={(e) => setNewCategoryModal(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter category name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="category-color">Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="category-color"
+                  type="color"
+                  value={newCategoryModal.color}
+                  onChange={(e) => setNewCategoryModal(prev => ({ ...prev, color: e.target.value }))}
+                  className="w-16 h-8"
+                />
+                <span className="text-sm text-gray-600">{newCategoryModal.color}</span>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="category-icon">Icon</Label>
+              <Input
+                id="category-icon"
+                value={newCategoryModal.icon}
+                onChange={(e) => setNewCategoryModal(prev => ({ ...prev, icon: e.target.value }))}
+                placeholder="Choose an emoji"
+                className="w-20"
+              />
+            </div>
+
+            <div>
+              <Label>Type</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`px-3 py-1 rounded-full text-sm ${
+                  newCategoryModal.type === 'income' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {newCategoryModal.type === 'income' ? 'Income' : 'Expense'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setNewCategoryModal(prev => ({ ...prev, open: false }))}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={createNewCategory}
+                disabled={!newCategoryModal.name.trim()}
+                className="flex-1"
+              >
+                Create Category
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 
