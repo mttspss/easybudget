@@ -438,19 +438,36 @@ export default function ImportPage() {
       let skipped = 0
       let duplicates = 0
 
+      console.log(`Processing ${validTransactions.length} valid transactions`)
+
       for (let i = 0; i < validTransactions.length; i++) {
         const transaction = validTransactions[i]
         
-        const { data: existing } = await supabase
+        console.log(`Processing transaction ${i + 1}:`, {
+          description: transaction.description,
+          amount: transaction.amount,
+          date: transaction.date,
+          type: transaction.type
+        })
+        
+        // Check for duplicates
+        const { data: existing, error: checkError } = await supabase
           .from('transactions')
-          .select('id')
+          .select('id, description, amount, date')
           .eq('user_id', user.id)
           .eq('description', transaction.description)
           .eq('amount', transaction.amount)
           .eq('date', transaction.date)
           .limit(1)
 
+        if (checkError) {
+          console.error('Error checking duplicates:', checkError)
+          skipped++
+          continue
+        }
+
         if (existing && existing.length > 0) {
+          console.log(`Duplicate found:`, existing[0])
           duplicates++
         } else {
           let categoryId = null
@@ -461,7 +478,9 @@ export default function ImportPage() {
             categoryId = category?.id || null
           }
 
-          const { error } = await supabase
+          console.log(`Inserting transaction with category:`, categoryId)
+
+          const { data: insertedData, error } = await supabase
             .from('transactions')
             .insert({
               user_id: user.id,
@@ -471,11 +490,13 @@ export default function ImportPage() {
               type: transaction.type,
               category_id: categoryId
             })
+            .select()
 
           if (error) {
-            console.error('Error inserting transaction:', error)
+            console.error('Error inserting transaction:', error, 'Transaction:', transaction)
             skipped++
           } else {
+            console.log('Transaction inserted successfully:', insertedData)
             imported++
           }
         }
@@ -483,6 +504,8 @@ export default function ImportPage() {
         const progress = ((i + 1) / validTransactions.length) * 100
         setImportState(prev => ({ ...prev, progress }))
       }
+
+      console.log(`Import completed: ${imported} imported, ${duplicates} duplicates, ${skipped} skipped`)
 
       setImportState(prev => ({
         ...prev,
@@ -492,7 +515,13 @@ export default function ImportPage() {
         duplicateCount: duplicates
       }))
 
-      toast.success(`Import completed! ${imported} transactions imported.`)
+      if (imported > 0) {
+        toast.success(`Import completed! ${imported} transactions imported.`)
+      } else if (duplicates > 0) {
+        toast.warning(`No new transactions imported. ${duplicates} duplicates found.`)
+      } else {
+        toast.error(`Import failed. ${skipped} transactions had errors.`)
+      }
     } catch (error) {
       console.error('Import error:', error)
       toast.error('Error during import. Please try again.')
