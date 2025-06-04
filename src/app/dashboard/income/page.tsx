@@ -525,7 +525,7 @@ export default function IncomePage() {
                 ) : filteredTransactions.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                    <div className="px-4 py-3 bg-gray-50">
                       <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-1 flex items-center">
                           <Checkbox
@@ -583,7 +583,6 @@ export default function IncomePage() {
                             {/* Type */}
                             <div className="col-span-1">
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                <ArrowUpRight className="h-3 w-3 mr-1" />
                                 Income
                               </span>
                             </div>
@@ -600,7 +599,7 @@ export default function IncomePage() {
 
                             {/* Amount */}
                             <div className="col-span-2">
-                              <span className="text-sm font-medium text-green-600">
+                              <span className="text-sm font-medium text-gray-900">
                                 +${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
