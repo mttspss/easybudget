@@ -18,7 +18,6 @@ import {
   CreditCard,
   PiggyBank,
   CheckCircle,
-  Eye,
   Filter
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
@@ -28,6 +27,8 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -275,20 +276,20 @@ export default function Dashboard() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-auto p-4">
+          <div className="max-w-7xl mx-auto space-y-4">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900">
                   Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'}! 👋
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 text-sm">
                   Here&apos;s your financial overview for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm">
                   <Filter className="h-4 w-4 mr-2" />
                   Filter
@@ -300,25 +301,25 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Quick Stats - More Compact */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickStats.map((stat, index) => (
                 <Card key={index} className="relative overflow-hidden">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                        <div className="flex items-baseline gap-2 mt-2">
-                          <span className="text-2xl font-bold text-gray-900">
+                        <p className="text-xs font-medium text-gray-600">{stat.title}</p>
+                        <div className="flex items-baseline gap-1 mt-1">
+                          <span className="text-xl font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
                           </span>
-                          <Badge variant={stat.changeType === 'increase' ? 'default' : 'secondary'} className="text-xs">
+                          <Badge variant={stat.changeType === 'increase' ? 'default' : 'secondary'} className="text-xs py-0">
                             {stat.changeType === 'increase' ? '+' : ''}{stat.change}%
                           </Badge>
                         </div>
                       </div>
-                      <div className={`p-3 rounded-lg ${stat.color} bg-opacity-10`}>
-                        <stat.icon className={`h-6 w-6 ${stat.color.replace('bg-', 'text-')}`} />
+                      <div className={`p-2 rounded-lg ${stat.color} bg-opacity-10`}>
+                        <stat.icon className={`h-5 w-5 ${stat.color.replace('bg-', 'text-')}`} />
                       </div>
                     </div>
                   </CardContent>
@@ -326,87 +327,192 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Main Dashboard Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Dashboard Grid - Compact */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               
-              {/* Spending Overview - Left Column */}
-              <div className="lg:col-span-2 space-y-6">
+              {/* Left Column - Charts */}
+              <div className="lg:col-span-2 space-y-4">
                 
-                {/* Monthly Trend Chart */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <BarChart3 className="h-5 w-5 text-blue-600" />
-                          Monthly Trend
-                        </CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Income vs Expenses over time</p>
+                {/* Charts Section - Side by Side */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  
+                  {/* Financial Trend - Line Chart */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-blue-600" />
+                        <CardTitle className="text-sm font-medium text-gray-900">Financial Trend</CardTitle>
                       </div>
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoading ? (
-                      <div className="h-80 bg-gray-100 rounded-lg animate-pulse" />
-                    ) : (
-                      <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []}>
-                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 12 }} />
-                            <Tooltip 
-                              formatter={(value: any, name: string) => [
-                                `$${Number(value).toLocaleString()}`,
-                                name === 'income' ? 'Income' : name === 'expenses' ? 'Expenses' : 'Savings'
-                              ]}
-                              contentStyle={{
-                                backgroundColor: 'white',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                              }}
-                            />
-                            <Bar dataKey="income" fill="#10B981" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="expenses" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                      <p className="text-xs text-gray-600">Income, expenses and balance over time</p>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      {isLoading ? (
+                        <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                      ) : (
+                        <div className="h-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                              <XAxis 
+                                dataKey="month" 
+                                tick={{ fontSize: 10, fill: '#64748b' }}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis 
+                                tick={{ fontSize: 10, fill: '#64748b' }}
+                                axisLine={false}
+                                tickLine={false}
+                                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                              />
+                              <Tooltip 
+                                formatter={(value: any, name: string) => [
+                                  `$${Number(value).toLocaleString()}`, 
+                                  name === 'savings' ? 'Net Balance' : 
+                                  name === 'income' ? 'Income' : 'Expenses'
+                                ]}
+                                labelStyle={{ color: '#374151', fontWeight: 'normal' }}
+                                contentStyle={{
+                                  backgroundColor: 'white',
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                }}
+                              />
+                              <Line 
+                                type="monotone" 
+                                dataKey="income" 
+                                stroke="#10b981" 
+                                strokeWidth={2}
+                                dot={{ fill: '#10b981', strokeWidth: 0, r: 2 }}
+                                activeDot={{ r: 3, stroke: '#10b981', strokeWidth: 1 }}
+                              />
+                              <Line 
+                                type="monotone" 
+                                dataKey="expenses" 
+                                stroke="#ef4444" 
+                                strokeWidth={2}
+                                dot={{ fill: '#ef4444', strokeWidth: 0, r: 2 }}
+                                activeDot={{ r: 3, stroke: '#ef4444', strokeWidth: 1 }}
+                              />
+                              <Line 
+                                type="monotone" 
+                                dataKey="savings" 
+                                stroke="#3b82f6" 
+                                strokeWidth={2.5}
+                                dot={{ fill: '#3b82f6', strokeWidth: 0, r: 2 }}
+                                activeDot={{ r: 3, stroke: '#3b82f6', strokeWidth: 1 }}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-                {/* Budget Progress */}
+                  {/* Monthly Comparison - Bar Chart */}
+                  <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-purple-600" />
+                        <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
+                      </div>
+                      <p className="text-xs text-gray-600">Income vs Expenses</p>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      {isLoading ? (
+                        <div className="h-48 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg animate-pulse" />
+                      ) : (
+                        <div className="h-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                              <defs>
+                                <linearGradient id="incomeBar" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#22c55e"/>
+                                  <stop offset="100%" stopColor="#16a34a"/>
+                                </linearGradient>
+                                <linearGradient id="expenseBar" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#ef4444"/>
+                                  <stop offset="100%" stopColor="#dc2626"/>
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                              <XAxis 
+                                dataKey="month" 
+                                tick={{ fontSize: 10, fill: '#64748b' }}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis 
+                                tick={{ fontSize: 10, fill: '#64748b' }}
+                                axisLine={false}
+                                tickLine={false}
+                                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                              />
+                              <Tooltip 
+                                formatter={(value: any, name: string) => [
+                                  `$${Number(value).toLocaleString()}`, 
+                                  name === 'income' ? 'Income' : 'Expenses'
+                                ]}
+                                labelStyle={{ color: '#1e293b', fontWeight: '600' }}
+                                contentStyle={{
+                                  backgroundColor: 'white',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                }}
+                              />
+                              <Bar 
+                                dataKey="income" 
+                                fill="url(#incomeBar)"
+                                name="Income"
+                                radius={[3, 3, 0, 0]}
+                                maxBarSize={30}
+                              />
+                              <Bar 
+                                dataKey="expenses" 
+                                fill="url(#expenseBar)"
+                                name="Expenses"
+                                radius={[3, 3, 0, 0]}
+                                maxBarSize={30}
+                              />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Budget Progress - Compact */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-purple-600" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      <Target className="h-4 w-4 text-purple-600" />
                       Budget Progress
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">How you&apos;re doing against your monthly budgets</p>
+                    <p className="text-xs text-gray-600">How you&apos;re doing against your monthly budgets</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+                          <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
                         ))}
                       </div>
                     ) : stats?.budgetProgress && stats.budgetProgress.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {stats.budgetProgress.map((budget, index) => (
-                          <div key={index} className="space-y-2">
+                          <div key={index} className="space-y-1">
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: budget.color }} />
-                                <span className="font-medium text-gray-900">{budget.category}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: budget.color }} />
+                                <span className="text-sm font-medium text-gray-900">{budget.category}</span>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-medium">${budget.spent.toLocaleString()} / ${budget.budget.toLocaleString()}</p>
+                                <p className="text-xs font-medium">${budget.spent.toLocaleString()} / ${budget.budget.toLocaleString()}</p>
                                 <p className={`text-xs ${budget.percentage > 90 ? 'text-red-600' : budget.percentage > 70 ? 'text-orange-600' : 'text-gray-600'}`}>
                                   {budget.percentage.toFixed(1)}% used
                                 </p>
@@ -414,7 +520,7 @@ export default function Dashboard() {
                             </div>
                             <Progress 
                               value={Math.min(budget.percentage, 100)} 
-                              className="h-2"
+                              className="h-1.5"
                               style={{
                                 backgroundColor: budget.percentage > 100 ? '#FEE2E2' : '#F3F4F6'
                               }}
@@ -423,12 +529,12 @@ export default function Dashboard() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8">
-                        <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-medium text-gray-900 mb-1">No budgets set</h3>
-                        <p className="text-xs text-gray-500 mb-4">Create budgets to track your spending</p>
+                      <div className="text-center py-6">
+                        <Target className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <h3 className="text-xs font-medium text-gray-900 mb-1">No budgets set</h3>
+                        <p className="text-xs text-gray-500 mb-3">Create budgets to track your spending</p>
                         <Button size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-3 w-3 mr-1" />
                           Create Budget
                         </Button>
                       </div>
@@ -437,32 +543,32 @@ export default function Dashboard() {
                 </Card>
               </div>
 
-              {/* Right Column */}
-              <div className="space-y-6">
+              {/* Right Column - Compact */}
+              <div className="space-y-4">
                 
-                {/* Spending Breakdown */}
+                {/* Spending Breakdown - Compact */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <PieChart className="h-5 w-5 text-orange-600" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      <PieChart className="h-4 w-4 text-orange-600" />
                       Top Categories
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">Your biggest expenses this month</p>
+                    <p className="text-xs text-gray-600">Your biggest expenses this month</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
                     ) : stats?.topCategories && stats.topCategories.length > 0 ? (
                       <>
-                        <div className="h-48 mb-4">
+                        <div className="h-32 mb-3">
                           <ResponsiveContainer width="100%" height="100%">
                             <RechartsPieChart>
                               <Pie
                                 data={stats.topCategories}
                                 cx="50%"
                                 cy="50%"
-                                innerRadius={40}
-                                outerRadius={80}
+                                innerRadius={25}
+                                outerRadius={55}
                                 paddingAngle={2}
                                 dataKey="amount"
                               >
@@ -474,63 +580,63 @@ export default function Dashboard() {
                             </RechartsPieChart>
                           </ResponsiveContainer>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           {stats.topCategories.slice(0, 3).map((category, index) => (
                             <div key={index} className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
-                                <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
+                                <span className="text-xs font-medium text-gray-900">{category.name}</span>
                               </div>
-                              <span className="text-sm text-gray-600">${category.amount.toLocaleString()}</span>
+                              <span className="text-xs text-gray-600">${category.amount.toLocaleString()}</span>
                             </div>
                           ))}
                         </div>
                       </>
                     ) : (
-                      <div className="text-center py-8">
-                        <PieChart className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses yet</h3>
+                      <div className="text-center py-6">
+                        <PieChart className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <h3 className="text-xs font-medium text-gray-900 mb-1">No expenses yet</h3>
                         <p className="text-xs text-gray-500">Add transactions to see your spending breakdown</p>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
-                {/* Goals Progress */}
+                {/* Goals Progress - Compact */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-green-600" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      <Target className="h-4 w-4 text-green-600" />
                       Financial Goals
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">Track your progress towards financial goals</p>
+                    <p className="text-xs text-gray-600">Track your progress towards financial goals</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {[1, 2].map(i => (
-                          <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+                          <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />
                         ))}
                       </div>
                     ) : stats?.goalProgress && stats.goalProgress.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {stats.goalProgress.slice(0, 3).map((goal, index) => (
-                          <div key={index} className="space-y-2">
+                          <div key={index} className="space-y-1">
                             <div className="flex items-center justify-between">
-                              <h4 className="font-medium text-gray-900">{goal.name}</h4>
-                              <span className="text-sm text-gray-600">
+                              <h4 className="text-sm font-medium text-gray-900">{goal.name}</h4>
+                              <span className="text-xs text-gray-600">
                                 ${Number(goal.current_amount).toLocaleString()} / ${Number(goal.target_amount).toLocaleString()}
                               </span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <Progress value={Math.min(goal.percentage, 100)} className="flex-1 h-2" />
-                              <span className="text-sm font-medium text-gray-900 min-w-[3rem]">
+                            <div className="flex items-center gap-2">
+                              <Progress value={Math.min(goal.percentage, 100)} className="flex-1 h-1.5" />
+                              <span className="text-xs font-medium text-gray-900 min-w-[2.5rem]">
                                 {goal.percentage.toFixed(0)}%
                               </span>
                             </div>
                             {goal.percentage >= 100 && (
                               <div className="flex items-center gap-1 text-green-600">
-                                <CheckCircle className="h-4 w-4" />
+                                <CheckCircle className="h-3 w-3" />
                                 <span className="text-xs font-medium">Goal completed!</span>
                               </div>
                             )}
@@ -538,12 +644,12 @@ export default function Dashboard() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8">
-                        <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-medium text-gray-900 mb-1">No goals set</h3>
-                        <p className="text-xs text-gray-500 mb-4">Set financial goals to track your progress</p>
+                      <div className="text-center py-6">
+                        <Target className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <h3 className="text-xs font-medium text-gray-900 mb-1">No goals set</h3>
+                        <p className="text-xs text-gray-500 mb-3">Set financial goals to track your progress</p>
                         <Button size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-3 w-3 mr-1" />
                           Add Goal
                         </Button>
                       </div>
@@ -551,39 +657,39 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* Recent Transactions */}
+                {/* Recent Transactions - Compact */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-blue-600" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      <Activity className="h-4 w-4 text-blue-600" />
                       Recent Activity
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">Your latest transactions</p>
+                    <p className="text-xs text-gray-600">Your latest transactions</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {isLoading ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                          <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
                         ))}
                       </div>
                     ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {stats.recentTransactions.map((transaction, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center" 
+                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full flex items-center justify-center" 
                                    style={{ backgroundColor: `${transaction.categories?.color}20` }}>
-                                <div className="w-2 h-2 rounded-full" 
+                                <div className="w-1.5 h-1.5 rounded-full" 
                                      style={{ backgroundColor: transaction.categories?.color }} />
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+                                <p className="text-xs font-medium text-gray-900">{transaction.description}</p>
                                 <p className="text-xs text-gray-500">{transaction.categories?.name}</p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className={`text-sm font-medium ${
+                              <p className={`text-xs font-medium ${
                                 transaction.type === 'income' ? 'text-green-600' : 'text-gray-900'
                               }`}>
                                 {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toLocaleString()}
@@ -596,12 +702,12 @@ export default function Dashboard() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8">
-                        <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
-                        <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
+                      <div className="text-center py-6">
+                        <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <h3 className="text-xs font-medium text-gray-900 mb-1">No recent activity</h3>
+                        <p className="text-xs text-gray-500 mb-3">Start tracking your finances by adding transactions</p>
                         <Button size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-3 w-3 mr-1" />
                           Add Transaction
                         </Button>
                       </div>
