@@ -6,213 +6,86 @@ import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/ui/data-table"
-import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker"
+import { Progress } from "@/components/ui/progress"
 import { 
   TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
-  Plus,
-  Filter,
-  Download,
-  Clock,
-  BarChart3,
   Activity,
+  Target,
+  Plus,
+  PieChart,
+  BarChart3,
   Wallet,
-  MoreHorizontal,
-  Edit,
-  Trash2
+  CreditCard,
+  PiggyBank,
+  CheckCircle,
+  Eye,
+  Filter
 } from "lucide-react"
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { ColumnDef } from "@tanstack/react-table"
+import { useState, useEffect, useCallback } from "react"
+import { Badge } from "@/components/ui/badge"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Line,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   BarChart,
-  Bar,
-  LineChart
+  Bar
 } from 'recharts'
-import { IconRenderer } from "@/components/ui/icon-renderer"
 
 interface DashboardStats {
   totalBalance: number
-  income: number
-  expenses: number
-  balance: number
+  monthlyIncome: number
+  monthlyExpenses: number
+  savingsRate: number
   recentTransactions: any[]
+  budgetProgress: any[]
+  goalProgress: any[]
   categorySpending: any[]
-  monthlyData: any[]
-  currentPeriod?: string
+  monthlyTrend: any[]
+  topCategories: any[]
 }
 
-interface Transaction {
-  id: string
+interface QuickStat {
+  title: string
   amount: number
-  description: string
-  date: string
-  type: 'income' | 'expense'
-  icon?: string | null
-  receipt_url?: string | null
-  categories?: {
-    name: string
-    color: string
-  } | null
+  change: number
+  changeType: 'increase' | 'decrease'
+  icon: any
+  color: string
 }
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedPeriod, setSelectedPeriod] = useState("month")
-  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined)
 
-  // Transaction columns for data table
-  const transactionColumns: ColumnDef<Transaction>[] = useMemo(() => [
-    {
-      accessorKey: "description",
-      header: "Description",
-      cell: ({ row }) => {
-        const transaction = row.original
-        return (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <IconRenderer 
-                iconName={transaction.icon} 
-                className="h-4 w-4 text-gray-600"
-                fallbackColor={transaction.categories?.color}
-              />
-            </div>
-            <div>
-              <div className="font-medium text-gray-900 text-sm">{transaction.description}</div>
-              <div className="text-xs text-gray-500">{formatDate(transaction.date)}</div>
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "category",
-      header: "Category",
-      cell: ({ row }) => {
-        const category = row.original.categories
-        return (
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-2.5 h-2.5 rounded-full" 
-              style={{ backgroundColor: category?.color || '#gray' }}
-            />
-            <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-              {category?.name || 'Uncategorized'}
-            </span>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "amount",
-      header: () => <div className="text-right">Amount</div>,
-      cell: ({ row }) => {
-        const transaction = row.original
-        const amount = parseFloat(transaction.amount.toString())
-        return (
-          <div className="text-right">
-            <div className="flex items-baseline gap-1 justify-end">
-              <span className={`text-sm font-medium ${
-                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {transaction.type === 'income' ? '+$' : '-$'}
-              </span>
-              <span className="text-sm font-medium text-gray-900">
-                {Math.abs(amount).toFixed(2)}
-              </span>
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      id: "actions",
-      cell: () => {
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
-    },
-  ], [])
-
-  const fetchDashboardStats = useCallback(async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!user) return
     
     try {
       setIsLoading(true)
       
-      // Calculate date ranges
       const now = new Date()
-      let startDate: Date
-      let endDate: Date
-      let periodLabel: string
-
-      if (customDateRange?.from && customDateRange?.to) {
-        // Custom date range
-        startDate = customDateRange.from
-        endDate = customDateRange.to
-        periodLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-      } else {
-        // Preset periods
-        endDate = now
-        switch (selectedPeriod) {
-          case 'week':
-            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
-            periodLabel = 'Weekly'
-            break
-          case 'year':
-            startDate = new Date(now.getFullYear(), 0, 1)
-            periodLabel = 'Yearly'
-            break
-          default: // month
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-            periodLabel = 'Monthly'
-        }
-      }
-
-      // Get transactions for the period
-      const { data: periodTransactions } = await supabase
+      const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      
+      // Get current month transactions
+      const { data: currentTransactions } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          *,
+          categories (
+            name,
+            color,
+            type
+          )
+        `)
         .eq('user_id', user.id)
-        .gte('date', startDate.toISOString().split('T')[0])
-        .lte('date', endDate.toISOString().split('T')[0])
+        .gte('date', currentMonthStart.toISOString().split('T')[0])
+        .order('date', { ascending: false })
 
       // Get all transactions for total balance
       const { data: allTransactions } = await supabase
@@ -220,9 +93,9 @@ export default function Dashboard() {
         .select('*')
         .eq('user_id', user.id)
 
-      // Get recent transactions (last 5) with categories
-      const { data: recentTransactions } = await supabase
-        .from('transactions')
+      // Get budgets
+      const { data: budgets } = await supabase
+        .from('budgets')
         .select(`
           *,
           categories (
@@ -231,34 +104,65 @@ export default function Dashboard() {
           )
         `)
         .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(5)
 
-      // Get categories
-      const { data: categories } = await supabase
-        .from('categories')
+      // Get goals
+      const { data: goals } = await supabase
+        .from('goals')
         .select('*')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
       // Calculate stats
-      const periodIncome = (periodTransactions || [])
+      const currentIncome = (currentTransactions || [])
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
-      const periodExpenses = (periodTransactions || [])
+      const currentExpenses = (currentTransactions || [])
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
-      const totalIncome = (allTransactions || [])
-        .filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + Number(t.amount), 0)
+      const totalBalance = (allTransactions || [])
+        .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
 
-      const totalExpenses = (allTransactions || [])
+      const savingsRate = currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome) * 100 : 0
+
+      // Category spending with budget comparison
+      const categorySpending = await Promise.all(
+        (budgets || []).map(async (budget) => {
+          const spent = (currentTransactions || [])
+            .filter(t => t.category_id === budget.category_id && t.type === 'expense')
+            .reduce((sum, t) => sum + Number(t.amount), 0)
+
+          return {
+            category: budget.categories?.name || 'Unknown',
+            spent,
+            budget: Number(budget.amount),
+            color: budget.categories?.color || '#3B82F6',
+            percentage: (spent / Number(budget.amount)) * 100
+          }
+        })
+      )
+
+      // Top spending categories
+      const categoryTotals = (currentTransactions || [])
         .filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + Number(t.amount), 0)
+        .reduce((acc, t) => {
+          const categoryName = t.categories?.name || 'Uncategorized'
+          acc[categoryName] = (acc[categoryName] || 0) + Number(t.amount)
+          return acc
+        }, {} as Record<string, number>)
 
-      // Generate monthly data for charts
-      const monthlyData = []
+      const topCategories = Object.entries(categoryTotals)
+        .map(([name, amount]) => ({
+          name,
+          amount: amount as number,
+          color: (currentTransactions || []).find(t => t.categories?.name === name)?.categories?.color || '#6B7280'
+        }))
+        .sort((a, b) => (b.amount as number) - (a.amount as number))
+        .slice(0, 5)
+
+      // Monthly trend (last 6 months)
+      const monthlyTrend = []
       for (let i = 5; i >= 0; i--) {
         const date = new Date()
         date.setMonth(date.getMonth() - i)
@@ -270,77 +174,57 @@ export default function Dashboard() {
           return tDate >= monthStart && tDate <= monthEnd
         })
         
-        const monthIncome = monthTransactions
+        const income = monthTransactions
           .filter(t => t.type === 'income')
           .reduce((sum, t) => sum + Number(t.amount), 0)
         
-        const monthExpenses = monthTransactions
+        const expenses = monthTransactions
           .filter(t => t.type === 'expense')
           .reduce((sum, t) => sum + Number(t.amount), 0)
         
-        monthlyData.push({
+        monthlyTrend.push({
           month: date.toLocaleDateString('en-US', { month: 'short' }),
-          income: monthIncome,
-          expenses: monthExpenses,
-          balance: monthIncome - monthExpenses
+          income,
+          expenses,
+          savings: income - expenses
         })
       }
 
-      // Category spending with budgets
-      const categorySpending = await Promise.all(
-        (categories || []).map(async (category) => {
-          const categoryTransactions = (periodTransactions || []).filter(t => t.category_id === category.id)
-          const spent = categoryTransactions.reduce((sum, t) => sum + Number(t.amount), 0)
-          
-          // Get budget for this category
-          const { data: budgets } = await supabase
-            .from('budgets')
-            .select('*')
-            .eq('category_id', category.id)
-            .eq('user_id', user.id)
-            .lte('start_date', endDate.toISOString().split('T')[0])
-            .gte('end_date', startDate.toISOString().split('T')[0])
-            .limit(1)
-
-          const budget = budgets?.[0]
-
-          return {
-            category: category.name,
-            color: category.color,
-            spent,
-            budget: budget?.amount || 0,
-            percentage: budget?.amount ? (spent / budget.amount) * 100 : 0
-          }
-        })
-      )
+      // Goals progress
+      const goalProgress = (goals || []).map(goal => ({
+        ...goal,
+        percentage: (Number(goal.current_amount) / Number(goal.target_amount)) * 100
+      }))
 
       setStats({
-        totalBalance: totalIncome - totalExpenses,
-        income: periodIncome,
-        expenses: periodExpenses,
-        balance: periodIncome - periodExpenses,
-        recentTransactions: recentTransactions || [],
-        categorySpending: categorySpending.filter(c => c.spent > 0),
-        monthlyData: monthlyData,
-        currentPeriod: periodLabel
+        totalBalance,
+        monthlyIncome: currentIncome,
+        monthlyExpenses: currentExpenses,
+        savingsRate,
+        recentTransactions: (currentTransactions || []).slice(0, 5),
+        budgetProgress: categorySpending.filter(c => c.budget > 0),
+        goalProgress: goalProgress,
+        categorySpending: topCategories,
+        monthlyTrend,
+        topCategories
       })
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error)
+      console.error('Error fetching dashboard data:', error)
     } finally {
       setIsLoading(false)
     }
-  }, [user, selectedPeriod, customDateRange])
+  }, [user])
 
   useEffect(() => {
     if (user) {
-      fetchDashboardStats()
+      fetchDashboardData()
     }
-  }, [user, fetchDashboardStats])
+  }, [user, fetchDashboardData])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     )
   }
@@ -349,411 +233,382 @@ export default function Dashboard() {
     redirect("/")
   }
 
-  const LoadingCard = () => (
-    <Card className="bg-gradient-to-br from-gray-50/50 via-white to-white border border-gray-200/30 shadow-sm">
-      <CardContent className="p-4">
-        <div className="animate-pulse space-y-3">
-          <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </CardContent>
-    </Card>
-  )
+  const quickStats: QuickStat[] = [
+    {
+      title: "Total Balance",
+      amount: stats?.totalBalance || 0,
+      change: 12.5,
+      changeType: "increase",
+      icon: Wallet,
+      color: "bg-blue-500"
+    },
+    {
+      title: "Monthly Income",
+      amount: stats?.monthlyIncome || 0,
+      change: 8.2,
+      changeType: "increase",
+      icon: TrendingUp,
+      color: "bg-green-500"
+    },
+    {
+      title: "Monthly Expenses",
+      amount: stats?.monthlyExpenses || 0,
+      change: -3.1,
+      changeType: "decrease",
+      icon: CreditCard,
+      color: "bg-orange-500"
+    },
+    {
+      title: "Savings Rate",
+      amount: stats?.savingsRate || 0,
+      change: 2.4,
+      changeType: "increase",
+      icon: PiggyBank,
+      color: "bg-purple-500"
+    }
+  ]
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    })
-  }
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
 
   return (
-    <div className="flex h-screen bg-[#FAFAFA]">
+    <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          {/* White Container for Dashboard Content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
-            <div className="max-w-7xl mx-auto space-y-6">
-              
-              {/* Greeting Component - Aligned with sidebar */}
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'}! 👋
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Here&apos;s your financial overview for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </p>
+              </div>
               <div className="flex items-center gap-3">
-                <span className="text-2xl">👋</span>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Hello, {(() => {
-                      // Try to get full name from user metadata
-                      if (user.user_metadata?.full_name) {
-                        return user.user_metadata.full_name.split(' ')[0]
-                      }
-                      // Try to get first name from user metadata
-                      if (user.user_metadata?.first_name) {
-                        return user.user_metadata.first_name
-                      }
-                      // Try to get name from user metadata
-                      if (user.user_metadata?.name) {
-                        return user.user_metadata.name.split(' ')[0]
-                      }
-                      // Fallback to email username but make it prettier
-                      if (user.email) {
-                        const emailName = user.email.split('@')[0]
-                        // Convert "mttspss" to "Mttspss" 
-                        return emailName.charAt(0).toUpperCase() + emailName.slice(1)
-                      }
-                      return 'there'
-                    })()}
-                  </h1>
-                  <p className="text-gray-600 text-sm mt-1">
-                    It&apos;s {new Date().toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </p>
-                </div>
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Transaction
+                </Button>
               </div>
+            </div>
 
-              {/* Period Selection */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Financial Overview</h2>
-                  <p className="text-gray-600 text-sm mt-1">
-                    {stats?.currentPeriod ? `${stats.currentPeriod} overview` : 'Track your income and expenses'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {/* Quick Period Buttons */}
-                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
-                    {["week", "month", "year"].map((period) => (
-                      <Button
-                        key={period}
-                        variant={selectedPeriod === period && !customDateRange ? "default" : "ghost"}
-                        size="sm"
-                        className={`h-8 px-3 text-xs transition-all ${
-                          selectedPeriod === period && !customDateRange ? "bg-blue-600 text-white shadow-sm" : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedPeriod(period)
-                          setCustomDateRange(undefined)
-                        }}
-                      >
-                        {period.charAt(0).toUpperCase() + period.slice(1)}
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  {/* Custom Date Range Picker */}
-                  <DateRangePicker
-                    value={customDateRange}
-                    onValueChange={(range) => {
-                      setCustomDateRange(range)
-                      if (range?.from && range?.to) {
-                        setSelectedPeriod("") // Clear preset selection when custom range is used
-                      }
-                    }}
-                    className="h-8 text-xs"
-                    placeholder="Custom range"
-                  />
-                  
-                  <Button variant="outline" size="sm" className="h-8 text-xs">
-                    <Filter className="h-3 w-3 mr-2" />
-                    Filter
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-xs">
-                    <Download className="h-3 w-3 mr-2" />
-                    Export
-                  </Button>
-                </div>
-              </div>
-
-              {/* Main Stats Cards - Reduced Height */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {isLoading ? (
-                  <>
-                    <LoadingCard />
-                    <LoadingCard />
-                    <LoadingCard />
-                  </>
-                ) : (
-                  <>
-                    {/* Net Income - Blue Theme */}
-                    <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-2">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-gray-600 mb-2">Net Income</p>
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xl font-semibold text-blue-600">
-                                $
-                              </span>
-                              <span className="text-2xl font-semibold text-gray-900">
-                                {Math.abs(stats?.balance || 0).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="p-2 bg-blue-100 rounded-full">
-                            <TrendingUp className="h-5 w-5 text-blue-600" />
-                          </div>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {quickStats.map((stat, index) => (
+                <Card key={index} className="relative overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                        <div className="flex items-baseline gap-2 mt-2">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
+                          </span>
+                          <Badge variant={stat.changeType === 'increase' ? 'default' : 'secondary'} className="text-xs">
+                            {stat.changeType === 'increase' ? '+' : ''}{stat.change}%
+                          </Badge>
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Income - Credit Card Style Icon */}
-                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-2">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-gray-600 mb-2">
-                              {stats?.currentPeriod ? `${stats.currentPeriod} Income` : 'Income'}
-                            </p>
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xl font-semibold text-green-600">$</span>
-                              <span className="text-2xl font-semibold text-gray-900">
-                                {(stats?.income || 0).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="p-2 bg-green-100 rounded-lg relative">
-                            <Wallet className="h-5 w-5 text-green-600" />
-                            <ArrowUpRight className="h-3 w-3 text-green-600 absolute -top-1 -right-1" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Expenses - Credit Card Style Icon */}
-                    <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-2">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-gray-600 mb-2">
-                              {stats?.currentPeriod ? `${stats.currentPeriod} Expenses` : 'Expenses'}
-                            </p>
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xl font-semibold text-red-600">$</span>
-                              <span className="text-2xl font-semibold text-gray-900">
-                                {(stats?.expenses || 0).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="p-2 bg-red-100 rounded-lg relative">
-                            <Wallet className="h-5 w-5 text-red-600" />
-                            <ArrowDownRight className="h-3 w-3 text-red-600 absolute -top-1 -right-1" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-              </div>
-
-              {/* Charts Section - With Icons */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Financial Trend - With Icon */}
-                <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-blue-600" />
-                      <CardTitle className="text-lg font-medium text-gray-900">Financial Trend</CardTitle>
+                      </div>
+                      <div className={`p-3 rounded-lg ${stat.color} bg-opacity-10`}>
+                        <stat.icon className={`h-6 w-6 ${stat.color.replace('bg-', 'text-')}`} />
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">Income, expenses and balance over time</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Main Dashboard Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Spending Overview - Left Column */}
+              <div className="lg:col-span-2 space-y-6">
+                
+                {/* Monthly Trend Chart */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-blue-600" />
+                          Monthly Trend
+                        </CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Income vs Expenses over time</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent>
                     {isLoading ? (
-                      <div className="h-64 bg-gray-50 rounded-lg animate-pulse"></div>
+                      <div className="h-80 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                      <div className="h-64">
+                      <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                            <XAxis 
-                              dataKey="month" 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                            />
+                          <BarChart data={stats?.monthlyTrend || []}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                            <YAxis tick={{ fontSize: 12 }} />
                             <Tooltip 
                               formatter={(value: any, name: string) => [
-                                `$${Number(value).toLocaleString()}`, 
-                                name === 'balance' ? 'Net Balance' : 
-                                name === 'income' ? 'Income' : 'Expenses'
+                                `$${Number(value).toLocaleString()}`,
+                                name === 'income' ? 'Income' : name === 'expenses' ? 'Expenses' : 'Savings'
                               ]}
-                              labelStyle={{ color: '#374151', fontWeight: 'normal' }}
                               contentStyle={{
                                 backgroundColor: 'white',
                                 border: '1px solid #e5e7eb',
-                                borderRadius: '12px',
-                                fontSize: '13px',
-                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                               }}
                             />
-                            <Line 
-                              type="monotone" 
-                              dataKey="income" 
-                              stroke="#10b981" 
-                              strokeWidth={2}
-                              dot={{ fill: '#10b981', strokeWidth: 0, r: 3 }}
-                              activeDot={{ r: 4, stroke: '#10b981', strokeWidth: 1 }}
-                            />
-                            <Line 
-                              type="monotone" 
-                              dataKey="expenses" 
-                              stroke="#ef4444" 
-                              strokeWidth={2}
-                              dot={{ fill: '#ef4444', strokeWidth: 0, r: 3 }}
-                              activeDot={{ r: 4, stroke: '#ef4444', strokeWidth: 1 }}
-                            />
-                            <Line 
-                              type="monotone" 
-                              dataKey="balance" 
-                              stroke="#3b82f6" 
-                              strokeWidth={2.5}
-                              dot={{ fill: '#3b82f6', strokeWidth: 0, r: 3 }}
-                              activeDot={{ r: 4, stroke: '#3b82f6', strokeWidth: 1 }}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Monthly Comparison - Less Bold + Icon */}
-                <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40 shadow-lg">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="h-5 w-5 text-purple-600" />
-                          <CardTitle className="text-lg font-medium text-gray-900">Monthly Comparison</CardTitle>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Income vs Expenses</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {isLoading ? (
-                      <div className="h-64 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg animate-pulse"></div>
-                    ) : (
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyData || []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                            <defs>
-                              <linearGradient id="incomeBar" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#22c55e"/>
-                                <stop offset="100%" stopColor="#16a34a"/>
-                              </linearGradient>
-                              <linearGradient id="expenseBar" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#ef4444"/>
-                                <stop offset="100%" stopColor="#dc2626"/>
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                            <XAxis 
-                              dataKey="month" 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                            />
-                            <Tooltip 
-                              formatter={(value: any, name: string) => [
-                                `$${Number(value).toLocaleString()}`, 
-                                name === 'income' ? 'Income' : 'Expenses'
-                              ]}
-                              labelStyle={{ color: '#1e293b', fontWeight: '600' }}
-                              contentStyle={{
-                                backgroundColor: 'white',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '12px',
-                                fontSize: '13px',
-                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
-                              }}
-                            />
-                            <Bar 
-                              dataKey="income" 
-                              fill="url(#incomeBar)"
-                              name="Income"
-                              radius={[4, 4, 0, 0]}
-                              maxBarSize={40}
-                            />
-                            <Bar 
-                              dataKey="expenses" 
-                              fill="url(#expenseBar)"
-                              name="Expenses"
-                              radius={[4, 4, 0, 0]}
-                              maxBarSize={40}
-                            />
+                            <Bar dataKey="income" fill="#10B981" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="expenses" fill="#EF4444" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Budget Progress */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-purple-600" />
+                      Budget Progress
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">How you&apos;re doing against your monthly budgets</p>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-4">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+                        ))}
+                      </div>
+                    ) : stats?.budgetProgress && stats.budgetProgress.length > 0 ? (
+                      <div className="space-y-4">
+                        {stats.budgetProgress.map((budget, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: budget.color }} />
+                                <span className="font-medium text-gray-900">{budget.category}</span>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium">${budget.spent.toLocaleString()} / ${budget.budget.toLocaleString()}</p>
+                                <p className={`text-xs ${budget.percentage > 90 ? 'text-red-600' : budget.percentage > 70 ? 'text-orange-600' : 'text-gray-600'}`}>
+                                  {budget.percentage.toFixed(1)}% used
+                                </p>
+                              </div>
+                            </div>
+                            <Progress 
+                              value={Math.min(budget.percentage, 100)} 
+                              className="h-2"
+                              style={{
+                                backgroundColor: budget.percentage > 100 ? '#FEE2E2' : '#F3F4F6'
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">No budgets set</h3>
+                        <p className="text-xs text-gray-500 mb-4">Create budgets to track your spending</p>
+                        <Button size="sm">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Budget
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Recent Transactions - With Icon and Better Font */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-gray-600" />
-                        <CardTitle className="text-lg font-medium text-gray-900">Recent Transactions</CardTitle>
+              {/* Right Column */}
+              <div className="space-y-6">
+                
+                {/* Spending Breakdown */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-orange-600" />
+                      Top Categories
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">Your biggest expenses this month</p>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                    ) : stats?.topCategories && stats.topCategories.length > 0 ? (
+                      <>
+                        <div className="h-48 mb-4">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPieChart>
+                              <Pie
+                                data={stats.topCategories}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={40}
+                                outerRadius={80}
+                                paddingAngle={2}
+                                dataKey="amount"
+                              >
+                                {stats.topCategories.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <Tooltip formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Amount']} />
+                            </RechartsPieChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <div className="space-y-2">
+                          {stats.topCategories.slice(0, 3).map((category, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                                <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                              </div>
+                              <span className="text-sm text-gray-600">${category.amount.toLocaleString()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <PieChart className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses yet</h3>
+                        <p className="text-xs text-gray-500">Add transactions to see your spending breakdown</p>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Your latest financial activity</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-8 text-xs hover:bg-gray-50">
-                      View All
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="animate-pulse">
-                      <div className="h-8 bg-gray-200 rounded mb-3"></div>
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
-                    <DataTable 
-                      columns={transactionColumns} 
-                      data={stats.recentTransactions} 
-                      searchKey="description"
-                      searchPlaceholder="Search transactions..."
-                      showPagination={false}
-                      showColumnToggle={false}
-                      showSearch={false}
-                    />
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Clock className="h-6 w-6 text-gray-400" />
-                      </div>
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">No transactions yet</h3>
-                      <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Start tracking your finances by adding your first transaction.</p>
-                      <Button size="sm" className="h-8 bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-3 w-3 mr-2" />
-                        Add Transaction
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    )}
+                  </CardContent>
+                </Card>
 
+                {/* Goals Progress */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-green-600" />
+                      Financial Goals
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">Track your progress towards financial goals</p>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-4">
+                        {[1, 2].map(i => (
+                          <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+                        ))}
+                      </div>
+                    ) : stats?.goalProgress && stats.goalProgress.length > 0 ? (
+                      <div className="space-y-4">
+                        {stats.goalProgress.slice(0, 3).map((goal, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium text-gray-900">{goal.name}</h4>
+                              <span className="text-sm text-gray-600">
+                                ${Number(goal.current_amount).toLocaleString()} / ${Number(goal.target_amount).toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Progress value={Math.min(goal.percentage, 100)} className="flex-1 h-2" />
+                              <span className="text-sm font-medium text-gray-900 min-w-[3rem]">
+                                {goal.percentage.toFixed(0)}%
+                              </span>
+                            </div>
+                            {goal.percentage >= 100 && (
+                              <div className="flex items-center gap-1 text-green-600">
+                                <CheckCircle className="h-4 w-4" />
+                                <span className="text-xs font-medium">Goal completed!</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">No goals set</h3>
+                        <p className="text-xs text-gray-500 mb-4">Set financial goals to track your progress</p>
+                        <Button size="sm">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Goal
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Recent Transactions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                      Recent Activity
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">Your latest transactions</p>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-3">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                        ))}
+                      </div>
+                    ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
+                      <div className="space-y-3">
+                        {stats.recentTransactions.map((transaction, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center" 
+                                   style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                                <div className="w-2 h-2 rounded-full" 
+                                     style={{ backgroundColor: transaction.categories?.color }} />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+                                <p className="text-xs text-gray-500">{transaction.categories?.name}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-sm font-medium ${
+                                transaction.type === 'income' ? 'text-green-600' : 'text-gray-900'
+                              }`}>
+                                {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toLocaleString()}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(transaction.date).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
+                        <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
+                        <Button size="sm">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Transaction
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </main>
