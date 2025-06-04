@@ -349,13 +349,13 @@ export default function ExpensesPage() {
                 <p className="text-gray-600 text-sm">Track and manage your expense transactions</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline">
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" onClick={() => setEditingTransaction(null)}>
+                    <Button onClick={() => setEditingTransaction(null)}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Expense
                     </Button>
@@ -496,12 +496,14 @@ export default function ExpensesPage() {
                 <div className="lg:col-span-1">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {customDateRange.startDate && customDateRange.endDate 
-                          ? `${new Date(customDateRange.startDate).toLocaleDateString()} - ${new Date(customDateRange.endDate).toLocaleDateString()}`
-                          : "Select range"
-                        }
+                      <Button variant="outline" className="w-full justify-start text-left">
+                        <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">
+                          {customDateRange.startDate && customDateRange.endDate 
+                            ? `${new Date(customDateRange.startDate).toLocaleDateString('en-GB')} - ${new Date(customDateRange.endDate).toLocaleDateString('en-GB')}`
+                            : "Select date range"
+                          }
+                        </span>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-3" align="start">
@@ -525,7 +527,6 @@ export default function ExpensesPage() {
                           />
                         </div>
                         <Button 
-                          size="sm" 
                           className="w-full"
                           onClick={() => {
                             if (!customDateRange.startDate || !customDateRange.endDate) {
@@ -570,7 +571,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Transactions Table - Notion Style */}
-            <Card>
+            <Card className="border border-gray-200">
               <CardContent className="p-0">
                 {isLoading ? (
                   <div className="p-4 space-y-3">
@@ -581,7 +582,7 @@ export default function ExpensesPage() {
                 ) : filteredTransactions.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="bg-gray-50 px-4 py-3">
+                    <div className="px-4 py-3 border-b border-gray-200/60">
                       <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-1 flex items-center">
                           <Checkbox
@@ -600,9 +601,9 @@ export default function ExpensesPage() {
                     </div>
 
                     {/* Table Body */}
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-gray-100/60">
                       {paginatedTransactions.map((transaction) => (
-                        <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                        <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
                           <div className="grid grid-cols-12 gap-4 items-center">
                             {/* Checkbox */}
                             <div className="col-span-1">
@@ -690,7 +691,7 @@ export default function ExpensesPage() {
                     </div>
 
                     {/* Pagination - Always visible */}
-                    <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                    <div className="border-t border-gray-200/60 px-4 py-3 bg-white">
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-gray-600">
                           Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
@@ -747,7 +748,7 @@ export default function ExpensesPage() {
                     <ArrowDownRight className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses found</h3>
                     <p className="text-xs text-gray-500 mb-4">Start tracking your expenses by adding your first transaction</p>
-                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                    <Button onClick={() => setIsDialogOpen(true)}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Expense
                     </Button>

@@ -258,11 +258,11 @@ export default function Dashboard() {
                   </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                     Filter
                   </Button>
-                <Button size="sm">
+                <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Transaction
                   </Button>
@@ -515,7 +515,7 @@ export default function Dashboard() {
                     </div>
 
               {/* Recent Activities Full Width */}
-              <Card>
+              <Card className="border border-gray-200">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-blue-600" />
@@ -533,7 +533,7 @@ export default function Dashboard() {
                   ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
                     <>
                       {/* Table Header */}
-                      <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                      <div className="px-4 py-3 border-b border-gray-200/60">
                         <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4">Description</div>
                           <div className="col-span-2">Date</div>
@@ -544,11 +544,11 @@ export default function Dashboard() {
                       </div>
 
                       {/* Table Body */}
-                      <div className="divide-y divide-gray-100">
+                      <div className="divide-y divide-gray-100/60">
                         {stats.recentTransactions
                           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                           .map((transaction, index) => (
-                            <div key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                            <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
                               <div className="grid grid-cols-12 gap-4 items-center">
                                 {/* Description with Icon */}
                                 <div className="col-span-4">
@@ -605,7 +605,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Pagination - Always visible */}
-                      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                      <div className="border-t border-gray-200/60 px-4 py-3 bg-white">
                         <div className="flex items-center justify-between">
                           <div className="text-sm text-gray-600">
                             Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
@@ -662,7 +662,7 @@ export default function Dashboard() {
                       <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                       <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
                       <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
-                      <Button size="sm">
+                      <Button>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Transaction
                       </Button>
