@@ -294,13 +294,10 @@ export default function Dashboard() {
                         </div>
                             </div>
                       <div className={`p-2 rounded-lg bg-opacity-10 ${stat.color}`}>
-                        <stat.icon className={`h-5 w-5 ${
-                          stat.color === 'bg-green-500' ? 'text-green-500' :
-                          stat.color === 'bg-blue-500' ? 'text-blue-500' :
-                          stat.color === 'bg-orange-500' ? 'text-orange-500' :
-                          stat.color === 'bg-purple-500' ? 'text-purple-500' :
-                          'text-gray-500'
-                        }`} />
+                        {stat.title === "Total Balance" && <Wallet className="h-5 w-5 text-blue-500" />}
+                        {stat.title === "Monthly Income" && <DollarSign className="h-5 w-5 text-green-500" />}
+                        {stat.title === "Monthly Expenses" && <CreditCard className="h-5 w-5 text-orange-500" />}
+                        {stat.title === "Savings Rate" && <PiggyBank className="h-5 w-5 text-purple-500" />}
                           </div>
                         </div>
                       </CardContent>
