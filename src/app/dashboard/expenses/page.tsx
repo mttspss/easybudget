@@ -15,7 +15,10 @@ import {
   ArrowDownRight,
   Edit,
   Trash2,
-  CalendarDays
+  CalendarDays,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -34,6 +37,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
@@ -56,6 +67,7 @@ interface Category {
   id: string
   name: string
   color: string
+  icon?: string
 }
 
 export default function ExpensesPage() {
@@ -67,6 +79,9 @@ export default function ExpensesPage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
   
   // Form state
   const [formData, setFormData] = useState({
@@ -239,13 +254,39 @@ export default function ExpensesPage() {
     return matchesSearch && matchesCategory
   })
 
-  // Calculate this month's expenses
+  // Calculate this month's expenses and pagination
   const thisMonthExpenses = filteredTransactions.filter(transaction => {
     const transactionDate = new Date(transaction.date)
     const currentDate = new Date()
     return transactionDate.getMonth() === currentDate.getMonth() && 
            transactionDate.getFullYear() === currentDate.getFullYear()
   }).reduce((sum, t) => sum + Number(t.amount), 0)
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage)
+
+  // Checkbox handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedItems(new Set(paginatedTransactions.map(t => t.id)))
+    } else {
+      setSelectedItems(new Set())
+    }
+  }
+
+  const handleSelectItem = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedItems)
+    if (checked) {
+      newSelected.add(id)
+    } else {
+      newSelected.delete(id)
+    }
+    setSelectedItems(newSelected)
+  }
+
+  const isAllSelected = paginatedTransactions.length > 0 && paginatedTransactions.every(t => selectedItems.has(t.id))
 
   return (
     <div className="flex h-screen bg-gray-50/50">
@@ -332,7 +373,16 @@ export default function ExpensesPage() {
                             {categories.map((category) => (
                               <SelectItem key={category.id} value={category.id}>
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                                  <div 
+                                    className="w-4 h-4 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: category.color + '20' }}
+                                  >
+                                    <IconRenderer 
+                                      iconName={category.icon} 
+                                      className="h-2.5 w-2.5"
+                                      fallbackColor={category.color}
+                                    />
+                                  </div>
                                   {category.name}
                                 </div>
                               </SelectItem>
@@ -391,7 +441,16 @@ export default function ExpensesPage() {
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
+                          <div 
+                            className="w-4 h-4 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: category.color + '20' }}
+                          >
+                            <IconRenderer 
+                              iconName={category.icon} 
+                              className="h-2.5 w-2.5"
+                              fallbackColor={category.color}
+                            />
+                          </div>
                           {category.name}
                         </div>
                       </SelectItem>
@@ -450,65 +509,163 @@ export default function ExpensesPage() {
               </Card>
             </div>
 
-            {/* Transactions List - Compact */}
+            {/* Transactions Table - Notion Style */}
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="space-y-3">
+                  <div className="p-4 space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
                       <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredTransactions.length > 0 ? (
-                  <div className="space-y-2">
-                    {filteredTransactions.map((transaction) => (
-                      <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${transaction.categories?.color}20` }}>
-                            <IconRenderer 
-                              iconName={transaction.icon} 
-                              className="h-4 w-4"
-                              fallbackColor={transaction.categories?.color}
-                            />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                              <span className="text-xs text-gray-500">{transaction.categories?.name}</span>
-                              <span className="text-xs text-gray-400">•</span>
-                              <span className="text-xs text-gray-500">
+                  <>
+                    {/* Table Header */}
+                    <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                      <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        <div className="col-span-1 flex items-center">
+                          <Checkbox
+                            checked={isAllSelected}
+                            onCheckedChange={handleSelectAll}
+                            className="h-4 w-4"
+                          />
+                        </div>
+                        <div className="col-span-3">Description</div>
+                        <div className="col-span-2">Date</div>
+                        <div className="col-span-1">Type</div>
+                        <div className="col-span-2">Category</div>
+                        <div className="col-span-2">Amount</div>
+                        <div className="col-span-1">Actions</div>
+                      </div>
+                    </div>
+
+                    {/* Table Body */}
+                    <div className="divide-y divide-gray-100">
+                      {paginatedTransactions.map((transaction) => (
+                        <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                          <div className="grid grid-cols-12 gap-4 items-center">
+                            {/* Checkbox */}
+                            <div className="col-span-1">
+                              <Checkbox
+                                checked={selectedItems.has(transaction.id)}
+                                onCheckedChange={(checked) => handleSelectItem(transaction.id, checked)}
+                                className="h-4 w-4"
+                              />
+                            </div>
+
+                            {/* Description with Icon */}
+                            <div className="col-span-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                                  <IconRenderer 
+                                    iconName={transaction.icon} 
+                                    className="h-4 w-4"
+                                    fallbackColor={transaction.categories?.color}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium text-gray-900 truncate">
+                                  {transaction.description}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Date */}
+                            <div className="col-span-2">
+                              <span className="text-sm text-gray-600">
                                 {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
+
+                            {/* Type */}
+                            <div className="col-span-1">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                <ArrowDownRight className="h-3 w-3 mr-1" />
+                                Expense
+                              </span>
+                            </div>
+
+                            {/* Category */}
+                            <div className="col-span-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                <span className="text-sm text-gray-600 truncate">
+                                  {transaction.categories?.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Amount */}
+                            <div className="col-span-2">
+                              <span className="text-sm font-medium text-red-600">
+                                -${Number(transaction.amount).toFixed(2)}
+                              </span>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="col-span-1">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleEdit(transaction)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem 
+                                    onClick={() => handleDelete(transaction.id)}
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium text-red-600">
-                            -${Number(transaction.amount).toFixed(2)}
-                          </span>
-                          <div className="flex items-center gap-1">
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-600">
+                            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
+                          </div>
+                          <div className="flex items-center gap-2">
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              onClick={() => handleEdit(transaction)}
-                              className="h-8 w-8 p-0"
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className="h-8"
                             >
-                              <Edit className="h-3 w-3" />
+                              <ChevronLeft className="h-4 w-4" />
+                              Previous
                             </Button>
+                            <span className="text-sm text-gray-600">
+                              Page {currentPage} of {totalPages}
+                            </span>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              onClick={() => handleDelete(transaction.id)}
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className="h-8"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              Next
+                              <ChevronRight className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 ) : (
                   <div className="text-center py-8">
                     <ArrowDownRight className="h-12 w-12 text-gray-400 mx-auto mb-3" />

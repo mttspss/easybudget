@@ -15,7 +15,10 @@ import {
   ArrowUpRight,
   Edit,
   Trash2,
-  CalendarDays
+  CalendarDays,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -34,6 +37,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
@@ -60,6 +71,7 @@ interface Category {
   id: string
   name: string
   color: string
+  icon?: string
 }
 
 export default function IncomePage() {
@@ -71,6 +83,9 @@ export default function IncomePage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
   
   // Form state
   const [formData, setFormData] = useState({
@@ -336,7 +351,16 @@ export default function IncomePage() {
                             {categories.map((category) => (
                               <SelectItem key={category.id} value={category.id}>
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                                  <div 
+                                    className="w-4 h-4 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: category.color + '20' }}
+                                  >
+                                    <IconRenderer 
+                                      iconName={category.icon} 
+                                      className="h-2.5 w-2.5"
+                                      fallbackColor={category.color}
+                                    />
+                                  </div>
                                   {category.name}
                                 </div>
                               </SelectItem>
@@ -395,7 +419,16 @@ export default function IncomePage() {
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
+                          <div 
+                            className="w-4 h-4 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: category.color + '20' }}
+                          >
+                            <IconRenderer 
+                              iconName={category.icon} 
+                              className="h-2.5 w-2.5"
+                              fallbackColor={category.color}
+                            />
+                          </div>
                           {category.name}
                         </div>
                       </SelectItem>

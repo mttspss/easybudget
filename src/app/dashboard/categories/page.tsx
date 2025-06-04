@@ -44,6 +44,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { createDefaultCategories } from "@/lib/default-categories"
+import { IconSelector } from "@/components/ui/icon-selector"
+import { IconRenderer } from "@/components/ui/icon-renderer"
 
 interface Category {
   id: string
@@ -74,7 +76,7 @@ export default function CategoriesPage() {
     name: "",
     color: colorOptions[0],
     type: "expense" as 'income' | 'expense',
-    icon: ""
+    icon: "FolderOpen"
   })
 
   const fetchCategories = useCallback(async () => {
@@ -202,7 +204,7 @@ export default function CategoriesPage() {
         name: "",
         color: colorOptions[0],
         type: "expense",
-        icon: ""
+        icon: "FolderOpen"
       })
       setEditingCategory(null)
       setIsDialogOpen(false)
@@ -221,7 +223,7 @@ export default function CategoriesPage() {
       name: category.name,
       color: category.color,
       type: category.type,
-      icon: category.icon || ""
+      icon: category.icon || "FolderOpen"
     })
     setIsDialogOpen(true)
   }
@@ -343,6 +345,15 @@ export default function CategoriesPage() {
                         </div>
                       </div>
 
+                      <div>
+                        <Label htmlFor="icon" className="text-sm">Icon</Label>
+                        <IconSelector 
+                          value={formData.icon} 
+                          onValueChange={(value) => setFormData({...formData, icon: value})}
+                          className="mt-1"
+                        />
+                      </div>
+
                       <DialogFooter>
                         <Button type="button" variant="outline" size="sm" onClick={() => {
                           setIsDialogOpen(false)
@@ -452,9 +463,10 @@ export default function CategoriesPage() {
                               className="w-8 h-8 rounded-full flex items-center justify-center"
                               style={{ backgroundColor: category.color + '20' }}
                             >
-                              <div 
-                                className="w-4 h-4 rounded-full"
-                                style={{ backgroundColor: category.color }}
+                              <IconRenderer 
+                                iconName={category.icon} 
+                                className="h-4 w-4"
+                                fallbackColor={category.color}
                               />
                             </div>
                             <div>
