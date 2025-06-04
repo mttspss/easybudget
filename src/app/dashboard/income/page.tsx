@@ -15,7 +15,6 @@ import {
   ArrowUpRight,
   Edit,
   Trash2,
-  CalendarDays,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
@@ -595,8 +594,8 @@ export default function IncomePage() {
                             className="h-4 w-4"
                           />
                         </div>
-                        <div className="col-span-3">Description</div>
                         <div className="col-span-2">Date</div>
+                        <div className="col-span-3">Description</div>
                         <div className="col-span-1">Type</div>
                         <div className="col-span-2">Category</div>
                         <div className="col-span-2">Amount</div>
@@ -618,6 +617,13 @@ export default function IncomePage() {
                               />
                             </div>
 
+                            {/* Date */}
+                            <div className="col-span-2">
+                              <span className="text-sm text-gray-600">
+                                {new Date(transaction.date).toLocaleDateString()}
+                              </span>
+                            </div>
+
                             {/* Description with Icon */}
                             <div className="col-span-3">
                               <div className="flex items-center gap-3">
@@ -632,13 +638,6 @@ export default function IncomePage() {
                                   {transaction.description}
                                 </span>
                               </div>
-                            </div>
-
-                            {/* Date */}
-                            <div className="col-span-2">
-                              <span className="text-sm text-gray-600">
-                                {new Date(transaction.date).toLocaleDateString()}
-                              </span>
                             </div>
 
                             {/* Type */}
@@ -761,53 +760,34 @@ export default function IncomePage() {
               </CardContent>
             </Card>
 
-            {/* Mini Summary Cards - Below Table */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="border-gray-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">Total Income</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <ArrowUpRight className="h-5 w-5 text-gray-600" />
-                    </div>
+            {/* Summary Info Bar - More elegant */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-8">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Total Income</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-gray-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">This Month</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        ${thisMonthIncome.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <CalendarDays className="h-5 w-5 text-gray-600" />
-                    </div>
+                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">This Month</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ${thisMonthIncome.toLocaleString()}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-gray-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">Transactions</p>
-                      <p className="text-xl font-bold text-gray-900">{filteredTransactions.length}</p>
-                    </div>
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <div className="h-5 w-5 bg-gray-600 rounded-full" />
-                    </div>
+                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Transactions</p>
+                    <p className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">Last updated</p>
+                  <p className="text-sm text-gray-700">{new Date().toLocaleDateString()}</p>
+                </div>
+              </div>
             </div>
           </div>
         </main>

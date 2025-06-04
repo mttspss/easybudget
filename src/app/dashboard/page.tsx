@@ -63,7 +63,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 8
+  const itemsPerPage = 5
 
   const fetchDashboardData = useCallback(async () => {
     if (!user) return
@@ -293,8 +293,14 @@ export default function Dashboard() {
                           </Badge>
                         </div>
                             </div>
-                      <div className={`p-2 rounded-lg ${stat.color} bg-opacity-10`}>
-                        <stat.icon className={`h-5 w-5 ${stat.color.replace('bg-', 'text-')}`} />
+                      <div className={`p-2 rounded-lg bg-opacity-10 ${stat.color}`}>
+                        <stat.icon className={`h-5 w-5 ${
+                          stat.color === 'bg-green-500' ? 'text-green-500' :
+                          stat.color === 'bg-blue-500' ? 'text-blue-500' :
+                          stat.color === 'bg-orange-500' ? 'text-orange-500' :
+                          stat.color === 'bg-purple-500' ? 'text-purple-500' :
+                          'text-gray-500'
+                        }`} />
                           </div>
                         </div>
                       </CardContent>
