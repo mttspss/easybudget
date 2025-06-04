@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,9 +16,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   FolderOpen,
-  Palette,
-  MoreHorizontal,
-  Building
+  MoreHorizontal
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -260,300 +258,265 @@ export default function CategoriesPage() {
     return matchesSearch && matchesType
   })
 
-  const incomeCategories = filteredCategories.filter(c => c.type === 'income')
-  const expenseCategories = filteredCategories.filter(c => c.type === 'expense')
+  const incomeCategories = categories.filter(c => c.type === 'income')
+  const expenseCategories = categories.filter(c => c.type === 'expense')
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-6">
+        <main className="flex-1 overflow-auto p-4">
+          <div className="max-w-7xl mx-auto space-y-4">
             
-            {/* Header - Professional */}
-            <div className="flex items-center justify-between mb-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-                <p className="text-gray-600 mt-1">Organize and manage your transaction categories</p>
+                <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+                <p className="text-gray-600 text-sm">Organize your income and expense categories</p>
               </div>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Category
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingCategory ? 'Edit Category' : 'Add New Category'}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {editingCategory ? 'Update the category details below.' : 'Create a new category to organize your transactions.'}
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <Label htmlFor="name">Category Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        placeholder="e.g., Groceries, Salary, etc."
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="type">Type</Label>
-                      <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="expense">
-                            <div className="flex items-center gap-2">
-                              <ArrowDownRight className="h-4 w-4 text-red-600" />
-                              Expense
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="income">
-                            <div className="flex items-center gap-2">
-                              <ArrowUpRight className="h-4 w-4 text-green-600" />
-                              Income
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="color">Color</Label>
-                      <div className="grid grid-cols-6 gap-2 mt-2">
-                        {colorOptions.map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            className={`w-8 h-8 rounded-full border-2 transition-all ${
-                              formData.color === color ? 'border-gray-400 scale-110' : 'border-gray-200'
-                            }`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => setFormData({...formData, color})}
-                          />
-                        ))}
+              <div className="flex items-center gap-2">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" onClick={() => setEditingCategory(null)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Category
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg">
+                        {editingCategory ? 'Edit Category' : 'Add New Category'}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm">
+                        {editingCategory ? 'Update category details' : 'Create a new category to organize your transactions'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <Label htmlFor="name" className="text-sm">Name *</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g., Groceries, Salary, etc."
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          className="mt-1"
+                          required
+                        />
                       </div>
-                    </div>
 
-                    <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => {
-                        setIsDialogOpen(false)
-                        setEditingCategory(null)
-                        setFormData({
-                          name: "",
-                          color: colorOptions[0],
-                          type: "expense",
-                          icon: ""
-                        })
-                      }}>
-                        Cancel
-                      </Button>
-                      <Button type="submit">
-                        {editingCategory ? 'Update' : 'Create'} Category
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
+                      <div>
+                        <Label htmlFor="type" className="text-sm">Type *</Label>
+                        <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="expense">
+                              <div className="flex items-center gap-2">
+                                <ArrowDownRight className="h-4 w-4 text-red-500" />
+                                Expense
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="income">
+                              <div className="flex items-center gap-2">
+                                <ArrowUpRight className="h-4 w-4 text-green-500" />
+                                Income
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-            {/* Stats Cards - Professional Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card className="border-0 shadow-lg bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2">Total Categories</p>
-                      <p className="text-3xl font-bold text-gray-900">{filteredCategories.length}</p>
-                    </div>
-                    <div className="p-3 bg-blue-100 rounded-full">
-                      <FolderOpen className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 shadow-lg bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2">Income Categories</p>
-                      <p className="text-3xl font-bold text-green-600">{incomeCategories.length}</p>
-                    </div>
-                    <div className="p-3 bg-green-100 rounded-full">
-                      <ArrowUpRight className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 shadow-lg bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2">Expense Categories</p>
-                      <p className="text-3xl font-bold text-red-600">{expenseCategories.length}</p>
-                    </div>
-                    <div className="p-3 bg-red-100 rounded-full">
-                      <ArrowDownRight className="h-6 w-6 text-red-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 shadow-lg bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2">Active Colors</p>
-                      <p className="text-3xl font-bold text-purple-600">{new Set(filteredCategories.map(c => c.color)).size}</p>
-                    </div>
-                    <div className="p-3 bg-purple-100 rounded-full">
-                      <Palette className="h-6 w-6 text-purple-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Filters - Professional */}
-            <Card className="border-0 shadow-lg bg-white mb-8">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Search categories..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  
-                  <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Filter by type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="income">Income Only</SelectItem>
-                      <SelectItem value="expense">Expense Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Categories List - Professional Table-like Design */}
-            <Card className="border-0 shadow-lg bg-white">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-xl font-semibold text-gray-900">All Categories</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <div className="p-6">
-                    <div className="animate-pulse space-y-4">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-100">
-                          <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
-                          <div className="flex-1">
-                            <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                          </div>
-                          <div className="w-20 h-4 bg-gray-200 rounded"></div>
+                      <div>
+                        <Label className="text-sm">Color *</Label>
+                        <div className="grid grid-cols-6 gap-2 mt-1">
+                          {colorOptions.map(color => (
+                            <button
+                              key={color}
+                              type="button"
+                              className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-transparent'}`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => setFormData({...formData, color})}
+                            />
+                          ))}
                         </div>
-                      ))}
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" variant="outline" size="sm" onClick={() => {
+                          setIsDialogOpen(false)
+                          setEditingCategory(null)
+                        }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" size="sm">
+                          {editingCategory ? 'Update' : 'Create'} Category
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            {/* Search and Filters - Compact */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <div className="lg:col-span-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search categories..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="expense">Expenses</SelectItem>
+                    <SelectItem value="income">Income</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Summary Cards - Compact */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Total Categories</p>
+                      <p className="text-xl font-bold text-gray-900">{categories.length}</p>
                     </div>
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <FolderOpen className="h-5 w-5 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Income Categories</p>
+                      <p className="text-xl font-bold text-gray-900">{incomeCategories.length}</p>
+                    </div>
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <ArrowUpRight className="h-5 w-5 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Expense Categories</p>
+                      <p className="text-xl font-bold text-gray-900">{expenseCategories.length}</p>
+                    </div>
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <ArrowDownRight className="h-5 w-5 text-red-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Categories Grid - Compact */}
+            <Card>
+              <CardContent className="p-4">
+                {isLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                      <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
                   </div>
                 ) : filteredCategories.length > 0 ? (
-                  <div className="divide-y divide-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {filteredCategories.map((category) => (
-                      <div key={category.id} className="flex items-center gap-4 p-6 hover:bg-gray-50 transition-colors group">
-                        <div 
-                          className="w-12 h-12 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: `${category.color}20` }}
-                        >
-                          {category.type === 'income' ? (
-                            <ArrowUpRight className="h-6 w-6" style={{ color: category.color }} />
-                          ) : (
-                            <ArrowDownRight className="h-6 w-6" style={{ color: category.color }} />
-                          )}
+                      <div key={category.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div 
+                              className="w-8 h-8 rounded-full flex items-center justify-center"
+                              style={{ backgroundColor: category.color + '20' }}
+                            >
+                              <div 
+                                className="w-4 h-4 rounded-full"
+                                style={{ backgroundColor: category.color }}
+                              />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-medium text-gray-900">{category.name}</h3>
+                              <div className="flex items-center gap-1 mt-0.5">
+                                {category.type === 'income' ? (
+                                  <ArrowUpRight className="h-3 w-3 text-green-500" />
+                                ) : (
+                                  <ArrowDownRight className="h-3 w-3 text-red-500" />
+                                )}
+                                <span className="text-xs text-gray-500 capitalize">{category.type}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                <MoreHorizontal className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(category)}>
+                                <Edit className="h-3 w-3 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(category.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="h-3 w-3 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                        
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 text-lg">{category.name}</h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              category.type === 'income' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-red-100 text-red-700'
-                            }`}>
-                              {category.type === 'income' ? 'Income' : 'Expense'}
-                            </span>
-                            <span>{category.transaction_count} transactions</span>
-                            <span className="font-medium">${category.total_amount?.toFixed(2) || '0.00'}</span>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-gray-500">Transactions:</span>
+                            <span className="font-medium ml-1">{category.transaction_count || 0}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Total:</span>
+                            <span className="font-medium ml-1">${(category.total_amount || 0).toFixed(0)}</span>
                           </div>
                         </div>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(category)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Category
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-red-600"
-                              onClick={() => handleDelete(category.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete Category
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Building className="h-10 w-10 text-blue-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No categories found</h3>
-                    <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                      {searchTerm ? 'No categories match your search criteria.' : 'You don\'t have any categories yet. Create your first category to get started.'}
-                    </p>
-                    {!searchTerm && (
-                      <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Your First Category
-                      </Button>
-                    )}
+                  <div className="text-center py-8">
+                    <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No categories found</h3>
+                    <p className="text-xs text-gray-500 mb-4">Create your first category to start organizing your transactions</p>
+                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Category
+                    </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
-
           </div>
         </main>
       </div>

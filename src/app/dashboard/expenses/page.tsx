@@ -239,218 +239,159 @@ export default function ExpensesPage() {
     return matchesSearch && matchesCategory
   })
 
-  const totalExpenses = filteredTransactions.reduce((sum, t) => sum + t.amount, 0)
+  // Calculate this month's expenses
+  const thisMonthExpenses = filteredTransactions.filter(transaction => {
+    const transactionDate = new Date(transaction.date)
+    const currentDate = new Date()
+    return transactionDate.getMonth() === currentDate.getMonth() && 
+           transactionDate.getFullYear() === currentDate.getFullYear()
+  }).reduce((sum, t) => sum + Number(t.amount), 0)
 
   return (
-    <div className="flex h-screen bg-[#FAFAFA]">
+    <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
-            <div className="max-w-7xl mx-auto space-y-6">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Expense Management</h1>
-                  <p className="text-gray-600 text-sm mt-1">Track and manage your expenses</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" size="sm" className="h-8 text-xs">
-                    <Download className="h-3 w-3 mr-2" />
-                    Export
-                  </Button>
-                  
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="sm" 
-                        className="h-8 text-sm text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 shadow-lg shadow-red-500/50 font-medium rounded-lg px-5 py-2.5 border-0"
-                      >
-                        <Plus className="h-3 w-3 mr-2" />
-                        Add Expense
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>
-                          {editingTransaction ? 'Edit Expense' : 'Add New Expense'}
-                        </DialogTitle>
-                        <DialogDescription>
-                          {editingTransaction ? 'Update the expense details below.' : 'Enter the details for your new expense.'}
-                        </DialogDescription>
-                      </DialogHeader>
-                      
-                      <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="max-w-7xl mx-auto space-y-4">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Expenses</h1>
+                <p className="text-gray-600 text-sm">Track and manage your expense transactions</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" onClick={() => setEditingTransaction(null)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Expense
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg">
+                        {editingTransaction ? 'Edit Expense' : 'Add New Expense'}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm">
+                        {editingTransaction ? 'Update expense details' : 'Add a new expense to track your spending'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="amount">Amount</Label>
+                          <Label htmlFor="amount" className="text-sm">Amount *</Label>
                           <Input
                             id="amount"
                             type="number"
                             step="0.01"
+                            placeholder="0.00"
                             value={formData.amount}
                             onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                            placeholder="0.00"
+                            className="mt-1"
                             required
                           />
                         </div>
-
                         <div>
-                          <Label htmlFor="description">Description</Label>
-                          <Input
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({...formData, description: e.target.value})}
-                            placeholder="e.g., Groceries, Gas, etc."
-                            required
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="category">Category</Label>
-                          <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="w-3 h-3 rounded-full" 
-                                      style={{ backgroundColor: category.color }}
-                                    />
-                                    {category.name}
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="date">Date</Label>
+                          <Label htmlFor="date" className="text-sm">Date *</Label>
                           <Input
                             id="date"
                             type="date"
                             value={formData.date}
                             onChange={(e) => setFormData({...formData, date: e.target.value})}
+                            className="mt-1"
                             required
                           />
                         </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="description" className="text-sm">Description *</Label>
+                        <Input
+                          id="description"
+                          placeholder="e.g., Grocery shopping at Whole Foods"
+                          value={formData.description}
+                          onChange={(e) => setFormData({...formData, description: e.target.value})}
+                          className="mt-1"
+                          required
+                        />
+                      </div>
 
-                        <div>
-                          <Label htmlFor="icon">Icon</Label>
-                          <IconSelector value={formData.icon} onValueChange={(value) => setFormData({...formData, icon: value})} />
-                        </div>
+                      <div>
+                        <Label htmlFor="category" className="text-sm">Category *</Label>
+                        <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                                  {category.name}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                        <DialogFooter>
-                          <Button type="button" variant="outline" onClick={() => {
-                            setIsDialogOpen(false)
-                            setEditingTransaction(null)
-                            setFormData({
-                              amount: "",
-                              description: "",
-                              date: new Date().toISOString().split('T')[0],
-                              category_id: "",
-                              icon: "FileText"
-                            })
-                          }}>
-                            Cancel
-                          </Button>
-                          <Button type="submit" className="bg-red-600 hover:bg-red-700">
-                            {editingTransaction ? 'Update' : 'Add'} Expense
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                      <div>
+                        <Label htmlFor="icon" className="text-sm">Icon</Label>
+                        <IconSelector 
+                          value={formData.icon} 
+                          onValueChange={(value) => setFormData({...formData, icon: value})}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" variant="outline" size="sm" onClick={() => {
+                          setIsDialogOpen(false)
+                          setEditingTransaction(null)
+                        }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" size="sm">
+                          {editingTransaction ? 'Update' : 'Add'} Expense
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
+            </div>
 
-              {/* Stats - Less Bold */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Total Expenses</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-medium text-red-600">$</span>
-                          <span className="text-2xl font-medium text-gray-900">
-                            {totalExpenses.toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 bg-red-100 rounded-full">
-                        <ArrowDownRight className="h-5 w-5 text-red-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Transactions</p>
-                        <div className="text-2xl font-medium text-gray-900">
-                          {filteredTransactions.length}
-                        </div>
-                      </div>
-                      <div className="p-2 bg-blue-100 rounded-full">
-                        <CalendarDays className="h-5 w-5 text-blue-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Avg per Transaction</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-medium text-red-600">$</span>
-                          <span className="text-2xl font-medium text-gray-900">
-                            {filteredTransactions.length > 0 ? (totalExpenses / filteredTransactions.length).toFixed(2) : '0.00'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 bg-purple-100 rounded-full">
-                        <CalendarDays className="h-5 w-5 text-purple-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Filters */}
-              <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            {/* Stats and Search - Compact */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <div className="lg:col-span-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search transactions..."
+                    type="text"
+                    placeholder="Search expenses..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
                   />
                 </div>
-                
+              </div>
+              <div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filter by category" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full" 
-                            style={{ backgroundColor: category.color }}
-                          />
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
                           {category.name}
                         </div>
                       </SelectItem>
@@ -458,149 +399,129 @@ export default function ExpensesPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
-              {/* Notion-Style Transactions List */}
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                {/* Table Header */}
-                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-3">
-                  <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="col-span-1">Icon</div>
-                    <div className="col-span-3">Description</div>
-                    <div className="col-span-2">Category</div>
-                    <div className="col-span-2">Date</div>
-                    <div className="col-span-2">Amount</div>
-                    <div className="col-span-2">Actions</div>
-                  </div>
-                </div>
-
-                {/* Table Body */}
-                <div className="divide-y divide-gray-100">
-                  {isLoading ? (
-                    <div className="space-y-0">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="px-6 py-4">
-                          <div className="grid grid-cols-12 gap-4 items-center">
-                            <div className="col-span-1">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                            <div className="col-span-3">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                            <div className="col-span-2">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                            <div className="col-span-2">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                            <div className="col-span-2">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                            <div className="col-span-2">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+            {/* Summary Cards - Compact */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Total Expenses</p>
+                      <p className="text-xl font-bold text-gray-900">
+                        ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
+                      </p>
                     </div>
-                  ) : filteredTransactions.length > 0 ? (
-                    <>
-                      {filteredTransactions.map((transaction) => (
-                        <div key={transaction.id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors group">
-                          <div className="grid grid-cols-12 gap-4 items-center">
-                            {/* Icon */}
-                            <div className="col-span-1">
-                              <div className="w-6 h-6 flex items-center justify-center">
-                                <IconRenderer 
-                                  iconName={transaction.icon} 
-                                  className="h-4 w-4 text-gray-600"
-                                  fallbackColor={transaction.categories?.color}
-                                />
-                              </div>
-                            </div>
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <ArrowDownRight className="h-5 w-5 text-red-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">This Month</p>
+                      <p className="text-xl font-bold text-gray-900">
+                        ${thisMonthExpenses.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <CalendarDays className="h-5 w-5 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Transactions</p>
+                      <p className="text-xl font-bold text-gray-900">{filteredTransactions.length}</p>
+                    </div>
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <div className="h-5 w-5 bg-blue-600 rounded-full" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-                            {/* Description */}
-                            <div className="col-span-3">
-                              <div className="font-medium text-gray-900 text-sm">
-                                {transaction.description}
-                              </div>
-                            </div>
-
-                            {/* Category */}
-                            <div className="col-span-2">
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-2.5 h-2.5 rounded-full" 
-                                  style={{ backgroundColor: transaction.categories?.color }}
-                                />
-                                <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                                  {transaction.categories?.name}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Date */}
-                            <div className="col-span-2">
-                              <span className="text-sm text-gray-600">
-                                {new Date(transaction.date).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric'
-                                })}
+            {/* Transactions List - Compact */}
+            <Card>
+              <CardContent className="p-4">
+                {isLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredTransactions.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredTransactions.map((transaction) => (
+                      <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                            <IconRenderer 
+                              iconName={transaction.icon} 
+                              className="h-4 w-4"
+                              fallbackColor={transaction.categories?.color}
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                              <span className="text-xs text-gray-500">{transaction.categories?.name}</span>
+                              <span className="text-xs text-gray-400">•</span>
+                              <span className="text-xs text-gray-500">
+                                {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
-
-                            {/* Amount */}
-                            <div className="col-span-2">
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-medium text-red-600">-$</span>
-                                <span className="text-sm font-medium text-gray-900">
-                                  {transaction.amount.toLocaleString()}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="col-span-2">
-                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 w-7 p-0 hover:bg-gray-100"
-                                  onClick={() => handleEdit(transaction)}
-                                >
-                                  <Edit className="h-3.5 w-3.5 text-gray-500" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 w-7 p-0 hover:bg-red-50"
-                                  onClick={() => handleDelete(transaction.id)}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5 text-gray-500 hover:text-red-600" />
-                                </Button>
-                              </div>
-                            </div>
                           </div>
                         </div>
-                      ))}
-                    </>
-                  ) : (
-                    <div className="px-6 py-16 text-center">
-                      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <ArrowDownRight className="h-8 w-8 text-red-600" />
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-red-600">
+                            -${Number(transaction.amount).toFixed(2)}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(transaction)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(transaction.id)}
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No expense transactions yet</h3>
-                      <p className="text-gray-600 mb-6 max-w-sm mx-auto">Start tracking your expenses by adding your first transaction.</p>
-                      <Button onClick={() => setIsDialogOpen(true)} className="bg-red-600 hover:bg-red-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Your First Expense
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-            </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <ArrowDownRight className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses found</h3>
+                    <p className="text-xs text-gray-500 mb-4">Start tracking your expenses by adding your first transaction</p>
+                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Expense
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>

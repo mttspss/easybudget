@@ -16,7 +16,6 @@ import {
   Trash2,
   Target,
   Calendar,
-  TrendingUp,
   CheckCircle,
   Clock
 } from "lucide-react"
@@ -198,354 +197,279 @@ export default function GoalsPage() {
   const totalGoals = filteredGoals.length
   const completedGoals = filteredGoals.filter(g => g.current_amount >= g.target_amount).length
   const inProgressGoals = totalGoals - completedGoals
-  const totalTargetAmount = filteredGoals.reduce((sum, g) => sum + g.target_amount, 0)
-  const totalCurrentAmount = filteredGoals.reduce((sum, g) => sum + g.current_amount, 0)
 
   const getProgressPercentage = (current: number, target: number) => {
-    return target > 0 ? Math.min((current / target) * 100, 100) : 0
+    return Math.min(Math.round((current / target) * 100), 100)
   }
 
   const getDaysRemaining = (targetDate?: string) => {
     if (!targetDate) return null
-    const today = new Date()
     const target = new Date(targetDate)
+    const today = new Date()
     const diffTime = target.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     return diffDays
   }
 
   return (
-    <div className="flex h-screen bg-[#FAFAFA]">
+    <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
-            <div className="max-w-7xl mx-auto space-y-6">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Financial Goals</h1>
-                  <p className="text-gray-600 text-sm mt-1">Set and track your financial objectives</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-3 w-3 mr-2" />
-                        Add Goal
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>
-                          {editingGoal ? 'Edit Goal' : 'Add New Goal'}
-                        </DialogTitle>
-                        <DialogDescription>
-                          {editingGoal ? 'Update your goal details.' : 'Create a new financial goal to stay motivated.'}
-                        </DialogDescription>
-                      </DialogHeader>
-                      
-                      <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="max-w-7xl mx-auto space-y-4">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Goals</h1>
+                <p className="text-gray-600 text-sm">Set and track your financial goals</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" onClick={() => setEditingGoal(null)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Goal
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg">
+                        {editingGoal ? 'Edit Goal' : 'Add New Goal'}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm">
+                        {editingGoal ? 'Update goal details' : 'Create a new financial goal to track your progress'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <Label htmlFor="name" className="text-sm">Goal Name *</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g., Emergency Fund, Vacation"
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="description" className="text-sm">Description</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Optional description of your goal"
+                          value={formData.description}
+                          onChange={(e) => setFormData({...formData, description: e.target.value})}
+                          className="mt-1"
+                          rows={2}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="name">Goal Name</Label>
+                          <Label htmlFor="target_amount" className="text-sm">Target Amount *</Label>
                           <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            placeholder="e.g., Emergency Fund, New Car, etc."
+                            id="target_amount"
+                            type="number"
+                            step="0.01"
+                            placeholder="5000.00"
+                            value={formData.target_amount}
+                            onChange={(e) => setFormData({...formData, target_amount: e.target.value})}
+                            className="mt-1"
                             required
                           />
                         </div>
-
                         <div>
-                          <Label htmlFor="description">Description (Optional)</Label>
-                          <Textarea
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({...formData, description: e.target.value})}
-                            placeholder="Describe your goal in detail..."
-                            rows={3}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="target_amount">Target Amount</Label>
-                            <Input
-                              id="target_amount"
-                              type="number"
-                              step="0.01"
-                              value={formData.target_amount}
-                              onChange={(e) => setFormData({...formData, target_amount: e.target.value})}
-                              placeholder="0.00"
-                              required
-                            />
-                          </div>
-
-                          <div>
-                            <Label htmlFor="current_amount">Current Amount</Label>
-                            <Input
-                              id="current_amount"
-                              type="number"
-                              step="0.01"
-                              value={formData.current_amount}
-                              onChange={(e) => setFormData({...formData, current_amount: e.target.value})}
-                              placeholder="0.00"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="target_date">Target Date (Optional)</Label>
+                          <Label htmlFor="current_amount" className="text-sm">Current Amount</Label>
                           <Input
-                            id="target_date"
-                            type="date"
-                            value={formData.target_date}
-                            onChange={(e) => setFormData({...formData, target_date: e.target.value})}
-                          />
-                        </div>
-
-                        <DialogFooter>
-                          <Button type="button" variant="outline" onClick={() => {
-                            setIsDialogOpen(false)
-                            setEditingGoal(null)
-                            setFormData({
-                              name: "",
-                              description: "",
-                              target_amount: "",
-                              current_amount: "",
-                              target_date: ""
-                            })
-                          }}>
-                            Cancel
-                          </Button>
-                          <Button type="submit">
-                            {editingGoal ? 'Update' : 'Create'} Goal
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-
-              {/* Stats - Goals-specific design with mixed layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                {/* Main stats - larger cards */}
-                <Card className="lg:col-span-2 bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Total Goals</p>
-                        <div className="text-3xl font-medium text-gray-900">{totalGoals}</div>
-                        <p className="text-xs text-gray-500 mt-1">Active financial targets</p>
-                      </div>
-                      <div className="p-2 bg-blue-100 rounded-full">
-                        <Target className="h-6 w-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="lg:col-span-2 bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Overall Progress</p>
-                        <div className="text-3xl font-medium text-purple-600">
-                          {totalTargetAmount > 0 ? Math.round((totalCurrentAmount / totalTargetAmount) * 100) : 0}%
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-purple-600 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${totalTargetAmount > 0 ? Math.min(Math.round((totalCurrentAmount / totalTargetAmount) * 100), 100) : 0}%` }}
+                            id="current_amount"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={formData.current_amount}
+                            onChange={(e) => setFormData({...formData, current_amount: e.target.value})}
+                            className="mt-1"
                           />
                         </div>
                       </div>
-                      <div className="p-2 bg-purple-100 rounded-full">
-                        <TrendingUp className="h-6 w-6 text-purple-600" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                {/* Secondary stats - smaller cards */}
-                <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="p-2 bg-green-100 rounded-full mb-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      <div>
+                        <Label htmlFor="target_date" className="text-sm">Target Date</Label>
+                        <Input
+                          id="target_date"
+                          type="date"
+                          value={formData.target_date}
+                          onChange={(e) => setFormData({...formData, target_date: e.target.value})}
+                          className="mt-1"
+                        />
                       </div>
-                      <div className="text-xl font-medium text-gray-900">{completedGoals}</div>
-                      <p className="text-xs text-gray-600">Completed</p>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30 shadow-sm">
-                  <CardContent className="p-2">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="p-2 bg-orange-100 rounded-full mb-2">
-                        <Clock className="h-4 w-4 text-orange-600" />
-                      </div>
-                      <div className="text-xl font-medium text-gray-900">{inProgressGoals}</div>
-                      <p className="text-xs text-gray-600">In Progress</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <DialogFooter>
+                        <Button type="button" variant="outline" size="sm" onClick={() => {
+                          setIsDialogOpen(false)
+                          setEditingGoal(null)
+                        }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" size="sm">
+                          {editingGoal ? 'Update' : 'Create'} Goal
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
+            </div>
 
-              {/* Search */}
-              <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Search goals..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+            {/* Search - Compact */}
+            <div className="max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search goals..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
+            </div>
 
-              {/* Goals List */}
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div className="space-y-2">
-                              <div className="h-5 bg-gray-200 rounded w-48"></div>
-                              <div className="h-3 bg-gray-200 rounded w-32"></div>
-                            </div>
-                            <div className="h-8 w-16 bg-gray-200 rounded"></div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="h-3 bg-gray-200 rounded w-24"></div>
-                            <div className="h-2 bg-gray-200 rounded"></div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : filteredGoals.length > 0 ? (
-                <div className="space-y-4">
-                  {filteredGoals.map((goal) => {
-                    const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
-                    const daysRemaining = getDaysRemaining(goal.target_date)
-                    const isCompleted = goal.current_amount >= goal.target_amount
-                    
-                    return (
-                      <Card key={goal.id} className="hover:shadow-md transition-shadow group">
-                        <CardContent className="p-6">
-                          <div className="space-y-4">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-semibold text-gray-900 text-lg">{goal.name}</h3>
-                                {goal.description && (
-                                  <p className="text-gray-600 text-sm mt-1">{goal.description}</p>
+            {/* Summary Cards - Compact */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Total Goals</p>
+                      <p className="text-xl font-bold text-gray-900">{totalGoals}</p>
+                    </div>
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Target className="h-5 w-5 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">Completed</p>
+                      <p className="text-xl font-bold text-gray-900">{completedGoals}</p>
+                    </div>
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-600">In Progress</p>
+                      <p className="text-xl font-bold text-gray-900">{inProgressGoals}</p>
+                    </div>
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Clock className="h-5 w-5 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Goals List - Compact */}
+            <Card>
+              <CardContent className="p-4">
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredGoals.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredGoals.map((goal) => {
+                      const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
+                      const daysRemaining = getDaysRemaining(goal.target_date)
+                      const isCompleted = goal.current_amount >= goal.target_amount
+                      
+                      return (
+                        <div key={goal.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-sm font-medium text-gray-900">{goal.name}</h3>
+                                {isCompleted && (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
                                 )}
-                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                  <span>Target: ${goal.target_amount.toFixed(2)}</span>
-                                  <span>Current: ${goal.current_amount.toFixed(2)}</span>
-                                  {goal.target_date && (
-                                    <span className={`flex items-center gap-1 ${
-                                      daysRemaining !== null && daysRemaining < 0 
-                                        ? 'text-red-600' 
-                                        : daysRemaining !== null && daysRemaining < 30 
-                                        ? 'text-orange-600' 
-                                        : 'text-gray-500'
-                                    }`}>
-                                      <Calendar className="h-3 w-3" />
-                                      {daysRemaining !== null && daysRemaining >= 0 
-                                        ? `${daysRemaining} days left`
-                                        : daysRemaining !== null && daysRemaining < 0
-                                        ? `${Math.abs(daysRemaining)} days overdue`
-                                        : new Date(goal.target_date).toLocaleDateString('en-US')
+                              </div>
+                              {goal.description && (
+                                <p className="text-xs text-gray-600 mb-2">{goal.description}</p>
+                              )}
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="text-gray-600">
+                                    ${goal.current_amount.toLocaleString()} of ${goal.target_amount.toLocaleString()}
+                                  </span>
+                                  <span className="font-medium text-gray-900">{progress}%</span>
+                                </div>
+                                <Progress value={progress} className="h-2" />
+                                {daysRemaining !== null && (
+                                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                                    <Calendar className="h-3 w-3" />
+                                    <span>
+                                      {daysRemaining > 0 
+                                        ? `${daysRemaining} days remaining`
+                                        : daysRemaining === 0 
+                                        ? 'Due today'
+                                        : `${Math.abs(daysRemaining)} days overdue`
                                       }
                                     </span>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-2">
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  isCompleted 
-                                    ? 'bg-green-100 text-green-700'
-                                    : progress > 75
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : progress > 25
-                                    ? 'bg-orange-100 text-orange-700'
-                                    : 'bg-gray-100 text-gray-700'
-                                }`}>
-                                  {isCompleted ? 'Completed' : 'In Progress'}
-                                </span>
-                                
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                    onClick={() => handleEdit(goal)}
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                                    onClick={() => handleDelete(goal.id)}
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
-                                </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-600">Progress</span>
-                                <span className="font-medium text-gray-900">{progress.toFixed(1)}%</span>
-                              </div>
-                              <Progress 
-                                value={progress} 
-                                className={`h-2 ${
-                                  isCompleted 
-                                    ? '[&>div]:bg-green-500'
-                                    : progress > 75
-                                    ? '[&>div]:bg-blue-500'
-                                    : progress > 25
-                                    ? '[&>div]:bg-orange-500'
-                                    : '[&>div]:bg-gray-400'
-                                }`}
-                              />
+                            <div className="flex items-center gap-1 ml-4">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEdit(goal)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Edit className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(goal.id)}
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Target className="h-8 w-8 text-blue-600" />
+                        </div>
+                      )
+                    })}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals yet</h3>
-                  <p className="text-gray-600 mb-6 max-w-sm mx-auto">Set your first financial goal and start working towards it!</p>
-                  <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Goal
-                  </Button>
-                </div>
-              )}
-
-            </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No goals found</h3>
+                    <p className="text-xs text-gray-500 mb-4">Set your first financial goal to start tracking your progress</p>
+                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Goal
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
