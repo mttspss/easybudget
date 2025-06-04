@@ -525,7 +525,7 @@ export default function IncomePage() {
                 ) : filteredTransactions.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="px-4 py-3 bg-gray-50">
+                    <div className="bg-gray-50 px-4 py-3">
                       <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-1 flex items-center">
                           <Checkbox
@@ -633,41 +633,58 @@ export default function IncomePage() {
                       ))}
                     </div>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-600">
-                            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
+                    {/* Pagination - Always visible */}
+                    <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                          Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="h-8"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                          </Button>
+                          
+                          {/* Page Numbers */}
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                              const pageNum = i + 1;
+                              return (
+                                <Button
+                                  key={pageNum}
+                                  variant={currentPage === pageNum ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => setCurrentPage(pageNum)}
+                                  className="h-8 w-8"
+                                >
+                                  {pageNum}
+                                </Button>
+                              );
+                            })}
+                            {totalPages > 5 && (
+                              <span className="text-sm text-gray-600 px-2">...</span>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setCurrentPage(currentPage - 1)}
-                              disabled={currentPage === 1}
-                              className="h-8"
-                            >
-                              <ChevronLeft className="h-4 w-4" />
-                              Previous
-                            </Button>
-                            <span className="text-sm text-gray-600">
-                              Page {currentPage} of {totalPages}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setCurrentPage(currentPage + 1)}
-                              disabled={currentPage === totalPages}
-                              className="h-8"
-                            >
-                              Next
-                              <ChevronRight className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="h-8"
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </>
                 ) : (
                   <div className="text-center py-8">

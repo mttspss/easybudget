@@ -294,23 +294,20 @@ export default function Dashboard() {
               ))}
               </div>
 
-            {/* Main Dashboard Grid - Compact */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Main Dashboard Grid - Restructured */}
+            <div className="space-y-4">
               
-              {/* Left Column - Charts */}
-              <div className="space-y-4">
+              {/* Charts Section - 3 Charts Side by Side */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 
-                {/* Charts Section - Side by Side */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  
-                  {/* Financial Trend - Line Chart */}
-                  <Card>
-                    <CardHeader className="pb-2">
-                    <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-blue-600" />
-                        <CardTitle className="text-sm font-medium text-gray-900">Financial Trend</CardTitle>
-                    </div>
-                      <p className="text-xs text-gray-600">Income, expenses and balance over time</p>
+                {/* Financial Trend - Line Chart */}
+                <Card>
+                  <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-blue-600" />
+                      <CardTitle className="text-sm font-medium text-gray-900">Financial Trend</CardTitle>
+                  </div>
+                    <p className="text-xs text-gray-600">Income, expenses and balance over time</p>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {isLoading ? (
@@ -451,7 +448,6 @@ export default function Dashboard() {
                     )}
                   </CardContent>
                 </Card>
-              </div>
 
                 {/* Top Categories - Compact */}
                 <Card>
@@ -510,147 +506,145 @@ export default function Dashboard() {
                 </Card>
               </div>
 
-              {/* Right Column - Recent Activities Full Table */}
-              <div>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                      <Activity className="h-4 w-4 text-blue-600" />
-                      Recent Activities
-                    </CardTitle>
-                    <p className="text-xs text-gray-600">Your latest financial activities</p>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    {isLoading ? (
-                      <div className="p-4 space-y-3">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
-                          <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
-                        ))}
-                      </div>
-                    ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
-                      <>
-                        {/* Table Header */}
-                        <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
-                          <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            <div className="col-span-4">Description</div>
-                            <div className="col-span-2">Date</div>
-                            <div className="col-span-2">Type</div>
-                            <div className="col-span-2">Category</div>
-                            <div className="col-span-2">Amount</div>
-                          </div>
+              {/* Recent Activities Full Width */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <Activity className="h-4 w-4 text-blue-600" />
+                    Recent Activities
+                  </CardTitle>
+                  <p className="text-xs text-gray-600">Your latest financial activities</p>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="p-4 space-y-3">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
+                        <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      ))}
+                    </div>
+                  ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
+                    <>
+                      {/* Table Header */}
+                      <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                        <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          <div className="col-span-4">Description</div>
+                          <div className="col-span-2">Date</div>
+                          <div className="col-span-2">Type</div>
+                          <div className="col-span-2">Category</div>
+                          <div className="col-span-2">Amount</div>
                         </div>
+                      </div>
 
-                        {/* Table Body */}
-                        <div className="divide-y divide-gray-100">
-                          {stats.recentTransactions
-                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                            .map((transaction, index) => (
-                              <div key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <div className="grid grid-cols-12 gap-4 items-center">
-                                  {/* Description with Icon */}
-                                  <div className="col-span-4">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-8 h-8 rounded-full flex items-center justify-center" 
-                                           style={{ backgroundColor: `${transaction.categories?.color}20` }}>
-                                        <IconRenderer 
-                                          iconName={transaction.icon || transaction.categories?.icon} 
-                                          className="h-4 w-4"
-                                          fallbackColor={transaction.categories?.color}
-                                        />
-                                      </div>
-                                      <span className="text-sm font-medium text-gray-900 truncate">
-                                        {transaction.description}
-                                      </span>
+                      {/* Table Body */}
+                      <div className="divide-y divide-gray-100">
+                        {stats.recentTransactions
+                          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                          .map((transaction, index) => (
+                            <div key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                              <div className="grid grid-cols-12 gap-4 items-center">
+                                {/* Description with Icon */}
+                                <div className="col-span-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center" 
+                                         style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                                      <IconRenderer 
+                                        iconName={transaction.icon || transaction.categories?.icon} 
+                                        className="h-4 w-4"
+                                        fallbackColor={transaction.categories?.color}
+                                      />
                                     </div>
-                                  </div>
-
-                                  {/* Date */}
-                                  <div className="col-span-2">
-                                    <span className="text-sm text-gray-600">
-                                      {new Date(transaction.date).toLocaleDateString()}
-                                    </span>
-                                  </div>
-
-                                  {/* Type */}
-                                  <div className="col-span-2">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                    }`}>
-                                      {transaction.type === 'income' ? 'Income' : 'Expense'}
-                                    </span>
-                                  </div>
-
-                                  {/* Category */}
-                                  <div className="col-span-2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                      <span className="text-sm text-gray-600 truncate">
-                                        {transaction.categories?.name}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  {/* Amount */}
-                                  <div className="col-span-2">
-                                    <span className="text-sm font-medium text-gray-900">
-                                      {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+                                    <span className="text-sm font-medium text-gray-900 truncate">
+                                      {transaction.description}
                                     </span>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                        </div>
 
-                        {/* Pagination */}
-                        {stats.recentTransactions.length > itemsPerPage && (
-                          <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
-                            <div className="flex items-center justify-between">
-                              <div className="text-sm text-gray-600">
-                                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setCurrentPage(currentPage - 1)}
-                                  disabled={currentPage === 1}
-                                  className="h-8"
-                                >
-                                  <ChevronLeft className="h-4 w-4" />
-                                  Previous
-                                </Button>
-                                <span className="text-sm text-gray-600">
-                                  Page {currentPage} / {Math.ceil(stats.recentTransactions.length / itemsPerPage)}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setCurrentPage(currentPage + 1)}
-                                  disabled={currentPage >= Math.ceil(stats.recentTransactions.length / itemsPerPage)}
-                                  className="h-8"
-                                >
-                                  Next
-                                  <ChevronRight className="h-4 w-4" />
-                                </Button>
+                                {/* Date */}
+                                <div className="col-span-2">
+                                  <span className="text-sm text-gray-600">
+                                    {new Date(transaction.date).toLocaleDateString()}
+                                  </span>
+                                </div>
+
+                                {/* Type */}
+                                <div className="col-span-2">
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                  }`}>
+                                    {transaction.type === 'income' ? 'Income' : 'Expense'}
+                                  </span>
+                                </div>
+
+                                {/* Category */}
+                                <div className="col-span-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                    <span className="text-sm text-gray-600 truncate">
+                                      {transaction.categories?.name}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Amount */}
+                                <div className="col-span-2">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
-                        <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
-                        <Button size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Transaction
-                        </Button>
+                          ))}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+
+                      {/* Pagination */}
+                      {stats.recentTransactions.length > itemsPerPage && (
+                        <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-600">
+                              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="h-8"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                                Previous
+                              </Button>
+                              <span className="text-sm text-gray-600">
+                                Page {currentPage} / {Math.ceil(stats.recentTransactions.length / itemsPerPage)}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                disabled={currentPage >= Math.ceil(stats.recentTransactions.length / itemsPerPage)}
+                                className="h-8"
+                              >
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
+                      <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Transaction
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>
