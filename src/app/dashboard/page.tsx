@@ -7,7 +7,6 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
-  TrendingUp,
   Activity,
   Plus,
   PieChart,
@@ -17,7 +16,9 @@ import {
   PiggyBank,
   Filter,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Clock,
+  DollarSign
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { Badge } from "@/components/ui/badge"
@@ -54,7 +55,7 @@ interface QuickStat {
   change: number
   changeType: 'increase' | 'decrease'
   icon: any
-  color: string
+    color: string
 }
 
 export default function Dashboard() {
@@ -215,7 +216,7 @@ export default function Dashboard() {
       amount: stats?.monthlyIncome || 0,
       change: 8.2,
       changeType: "increase",
-      icon: TrendingUp,
+      icon: DollarSign,
       color: "bg-green-500"
     },
     {
@@ -254,7 +255,7 @@ export default function Dashboard() {
                   </h1>
                 <p className="text-gray-600 text-sm">
                   Here&apos;s your financial overview for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </p>
+                  </p>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm">
@@ -280,7 +281,14 @@ export default function Dashboard() {
                           <span className="text-xl font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
                               </span>
-                          <Badge variant={stat.changeType === 'increase' ? 'default' : 'secondary'} className="text-xs py-0">
+                          <Badge 
+                            variant={stat.changeType === 'increase' ? 'default' : 'secondary'} 
+                            className={`text-xs py-0 ${
+                              stat.changeType === 'increase' 
+                                ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                                : 'bg-red-100 text-red-700 hover:bg-red-100'
+                            }`}
+                          >
                             {stat.changeType === 'increase' ? '+' : ''}{stat.change}%
                           </Badge>
                         </div>
@@ -303,10 +311,10 @@ export default function Dashboard() {
                 {/* Financial Trend - Line Chart */}
                 <Card>
                   <CardHeader className="pb-2">
-                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <Activity className="h-4 w-4 text-blue-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Financial Trend</CardTitle>
-                  </div>
+                    </div>
                     <p className="text-xs text-gray-600">Income, expenses and balance over time</p>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -482,11 +490,11 @@ export default function Dashboard() {
                               <Tooltip formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Amount']} />
                             </RechartsPieChart>
                           </ResponsiveContainer>
-                        </div>
+              </div>
                         <div className="space-y-1">
                           {stats.topCategories.slice(0, 3).map((category, index) => (
                             <div key={index} className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
                                 <span className="text-xs font-medium text-gray-900">{category.name}</span>
                               </div>
@@ -504,13 +512,13 @@ export default function Dashboard() {
                     )}
                   </CardContent>
                 </Card>
-              </div>
+                    </div>
 
               {/* Recent Activities Full Width */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
-                    <Activity className="h-4 w-4 text-blue-600" />
+                    <Clock className="h-4 w-4 text-blue-600" />
                     Recent Activities
                   </CardTitle>
                   <p className="text-xs text-gray-600">Your latest financial activities</p>
@@ -596,45 +604,62 @@ export default function Dashboard() {
                           ))}
                       </div>
 
-                      {/* Pagination */}
-                      {stats.recentTransactions.length > itemsPerPage && (
-                        <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
-                              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
+                      {/* Pagination - Always visible */}
+                      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-600">
+                            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className="h-8"
+                            >
+                              <ChevronLeft className="h-4 w-4" />
+                              Previous
+                            </Button>
+                            
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1">
+                              {Array.from({ length: Math.min(Math.ceil(stats.recentTransactions.length / itemsPerPage), 5) }, (_, i) => {
+                                const pageNum = i + 1;
+                                return (
+                                  <Button
+                                    key={pageNum}
+                                    variant={currentPage === pageNum ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className="h-8 w-8"
+                                  >
+                                    {pageNum}
+                                  </Button>
+                                );
+                              })}
+                              {Math.ceil(stats.recentTransactions.length / itemsPerPage) > 5 && (
+                                <span className="text-sm text-gray-600 px-2">...</span>
+                              )}
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="h-8"
-                              >
-                                <ChevronLeft className="h-4 w-4" />
-                                Previous
-                              </Button>
-                              <span className="text-sm text-gray-600">
-                                Page {currentPage} / {Math.ceil(stats.recentTransactions.length / itemsPerPage)}
-                              </span>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                                disabled={currentPage >= Math.ceil(stats.recentTransactions.length / itemsPerPage)}
-                                className="h-8"
-                              >
-                                Next
-                                <ChevronRight className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage >= Math.ceil(stats.recentTransactions.length / itemsPerPage)}
+                              className="h-8"
+                            >
+                              Next
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
-                      )}
+                      </div>
                     </>
                   ) : (
                     <div className="text-center py-8">
-                      <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                       <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
                       <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
                       <Button size="sm">

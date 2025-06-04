@@ -83,6 +83,7 @@ export default function IncomePage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedMonth, setSelectedMonth] = useState<string>("all")
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
@@ -255,7 +256,35 @@ export default function IncomePage() {
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === "all" || transaction.category_id === selectedCategory
-    return matchesSearch && matchesCategory
+    
+    // Month filter logic
+    let matchesMonth = true
+    if (selectedMonth !== "all") {
+      const transactionDate = new Date(transaction.date)
+      const currentDate = new Date()
+      
+      switch (selectedMonth) {
+        case "thisMonth":
+          matchesMonth = transactionDate.getMonth() === currentDate.getMonth() && 
+                       transactionDate.getFullYear() === currentDate.getFullYear()
+          break
+        case "lastMonth":
+          const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+          matchesMonth = transactionDate.getMonth() === lastMonth.getMonth() && 
+                       transactionDate.getFullYear() === lastMonth.getFullYear()
+          break
+        case "last3Months":
+          const threeMonthsAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1)
+          matchesMonth = transactionDate >= threeMonthsAgo
+          break
+        case "last6Months":
+          const sixMonthsAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, 1)
+          matchesMonth = transactionDate >= sixMonthsAgo
+          break
+      }
+    }
+    
+    return matchesSearch && matchesCategory && matchesMonth
   })
 
   // Calculate this month's income and pagination
@@ -421,8 +450,8 @@ export default function IncomePage() {
               </div>
             </div>
 
-            {/* Stats and Search - Compact */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            {/* Stats and Search - Improved */}
+            <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
               <div className="lg:col-span-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -435,7 +464,21 @@ export default function IncomePage() {
                   />
                 </div>
               </div>
-              <div>
+              <div className="lg:col-span-2">
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="thisMonth">This Month</SelectItem>
+                    <SelectItem value="lastMonth">Last Month</SelectItem>
+                    <SelectItem value="last3Months">Last 3 Months</SelectItem>
+                    <SelectItem value="last6Months">Last 6 Months</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="lg:col-span-1">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="All categories" />
@@ -462,55 +505,6 @@ export default function IncomePage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            {/* Summary Cards - Compact */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">Total Income</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <ArrowUpRight className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">This Month</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        ${thisMonthIncome.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <CalendarDays className="h-5 w-5 text-blue-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium text-gray-600">Transactions</p>
-                      <p className="text-xl font-bold text-gray-900">{filteredTransactions.length}</p>
-                    </div>
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <div className="h-5 w-5 bg-purple-600 rounded-full" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Transactions Table - Notion Style */}
@@ -699,6 +693,55 @@ export default function IncomePage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Mini Summary Cards - Below Table */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <ArrowUpRight className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-green-700">Total Income</p>
+                      <p className="text-lg font-bold text-green-900">
+                        ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <CalendarDays className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-blue-700">This Month</p>
+                      <p className="text-lg font-bold text-blue-900">
+                        ${thisMonthIncome.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <div className="h-4 w-4 bg-purple-600 rounded-full" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-purple-700">Transactions</p>
+                      <p className="text-lg font-bold text-purple-900">{filteredTransactions.length}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>
