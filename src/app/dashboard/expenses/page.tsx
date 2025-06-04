@@ -18,7 +18,8 @@ import {
   CalendarDays,
   MoreHorizontal,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -44,6 +45,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { IconSelector } from "@/components/ui/icon-selector"
@@ -80,6 +86,10 @@ export default function ExpensesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+  const [customDateRange, setCustomDateRange] = useState<{startDate: string, endDate: string}>({
+    startDate: "",
+    endDate: ""
+  })
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
@@ -277,6 +287,13 @@ export default function ExpensesPage() {
           const sixMonthsAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, 1)
           matchesMonth = transactionDate >= sixMonthsAgo
           break
+        case "custom":
+          if (customDateRange.startDate && customDateRange.endDate) {
+            const startDate = new Date(customDateRange.startDate)
+            const endDate = new Date(customDateRange.endDate)
+            matchesMonth = transactionDate >= startDate && transactionDate <= endDate
+          }
+          break
       }
     }
     
@@ -447,7 +464,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Stats and Search - Improved */}
-            <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
               <div className="lg:col-span-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -471,10 +488,59 @@ export default function ExpensesPage() {
                     <SelectItem value="lastMonth">Last Month</SelectItem>
                     <SelectItem value="last3Months">Last 3 Months</SelectItem>
                     <SelectItem value="last6Months">Last 6 Months</SelectItem>
+                    <SelectItem value="custom">Custom Range</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="lg:col-span-1">
+              {selectedMonth === "custom" && (
+                <div className="lg:col-span-1">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        {customDateRange.startDate && customDateRange.endDate 
+                          ? `${new Date(customDateRange.startDate).toLocaleDateString()} - ${new Date(customDateRange.endDate).toLocaleDateString()}`
+                          : "Select range"
+                        }
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-3" align="start">
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs">From Date</Label>
+                          <Input
+                            type="date"
+                            value={customDateRange.startDate}
+                            onChange={(e) => setCustomDateRange({...customDateRange, startDate: e.target.value})}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">To Date</Label>
+                          <Input
+                            type="date"
+                            value={customDateRange.endDate}
+                            onChange={(e) => setCustomDateRange({...customDateRange, endDate: e.target.value})}
+                            className="mt-1"
+                          />
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="w-full"
+                          onClick={() => {
+                            if (!customDateRange.startDate || !customDateRange.endDate) {
+                              toast.error('Please select both start and end dates')
+                            }
+                          }}
+                        >
+                          Apply Range
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+              <div className={selectedMonth === "custom" ? "lg:col-span-1" : "lg:col-span-2"}>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="All categories" />
@@ -692,47 +758,47 @@ export default function ExpensesPage() {
 
             {/* Mini Summary Cards - Below Table */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-gradient-to-r from-red-50 to-rose-50 border-red-200">
+              <Card className="border-gray-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <ArrowDownRight className="h-4 w-4 text-red-600" />
-                    </div>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium text-red-700">Total Expenses</p>
-                      <p className="text-lg font-bold text-red-900">
+                      <p className="text-xs font-medium text-gray-600">Total Expenses</p>
+                      <p className="text-xl font-bold text-gray-900">
                         ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
                       </p>
                     </div>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <ArrowDownRight className="h-5 w-5 text-gray-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200">
+              <Card className="border-gray-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <CalendarDays className="h-4 w-4 text-orange-600" />
-                    </div>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium text-orange-700">This Month</p>
-                      <p className="text-lg font-bold text-orange-900">
+                      <p className="text-xs font-medium text-gray-600">This Month</p>
+                      <p className="text-xl font-bold text-gray-900">
                         ${thisMonthExpenses.toLocaleString()}
                       </p>
                     </div>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <CalendarDays className="h-5 w-5 text-gray-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+              <Card className="border-gray-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <div className="h-4 w-4 bg-blue-600 rounded-full" />
-                    </div>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium text-blue-700">Transactions</p>
-                      <p className="text-lg font-bold text-blue-900">{filteredTransactions.length}</p>
+                      <p className="text-xs font-medium text-gray-600">Transactions</p>
+                      <p className="text-xl font-bold text-gray-900">{filteredTransactions.length}</p>
+                    </div>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <div className="h-5 w-5 bg-gray-600 rounded-full" />
                     </div>
                   </div>
                 </CardContent>
