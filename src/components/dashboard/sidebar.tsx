@@ -142,11 +142,11 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-3">
         {/* Monthly Budget */}
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-1.5 bg-white rounded-lg shadow-sm">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1 bg-white rounded-lg shadow-sm">
               <Layers className="h-4 w-4 text-gray-600" />
             </div>
             <div>
@@ -155,7 +155,7 @@ export function Sidebar() {
             </div>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">$3,847</span>
               <span className="text-xs text-gray-500">of $5,500</span>

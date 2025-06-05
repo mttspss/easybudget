@@ -425,7 +425,7 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-3 pt-3">
+                  <CardHeader className="pb-0 px-3 pt-2">
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
@@ -446,13 +446,13 @@ export default function Dashboard() {
                     </div>
                     <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-3 pb-3">
+                  <CardContent className="pt-1 px-2 pb-2">
                     {isLoading ? (
                         <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
                         <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -501,20 +501,20 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-3 pt-3">
+                  <CardHeader className="pb-0 px-3 pt-2">
                         <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
                     <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-3 pb-3">
+                  <CardContent className="pt-1 px-2 pb-2">
                     {isLoading ? (
                       <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
                       <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
@@ -564,7 +564,7 @@ export default function Dashboard() {
 
               {/* Recent Transactions Full Width */}
               <Card className="border border-gray-200">
-                <CardHeader className="pb-1 px-3 pt-3">
+                <CardHeader className="pb-0 px-3 pt-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-blue-600" />
                     Recent Transactions
