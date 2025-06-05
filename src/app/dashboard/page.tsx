@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { 
   Activity,
   Plus,
-  PieChart,
   BarChart3,
   Wallet,
   CreditCard,
@@ -23,10 +22,6 @@ import {
 import { useState, useEffect, useCallback } from "react"
 import { Badge } from "@/components/ui/badge"
 import {
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
@@ -34,7 +29,8 @@ import {
   CartesianGrid,
   Tooltip,
   BarChart,
-  Bar
+  Bar,
+  ResponsiveContainer
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 
@@ -237,8 +233,6 @@ export default function Dashboard() {
     }
   ]
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
-
   return (
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
@@ -293,11 +287,11 @@ export default function Dashboard() {
                           </Badge>
                         </div>
                             </div>
-                      <div className={`p-2 rounded-lg bg-opacity-10 ${stat.color}`}>
-                        {stat.title === "Total Balance" && <Wallet className="h-5 w-5 text-blue-500" />}
-                        {stat.title === "Monthly Income" && <DollarSign className="h-5 w-5 text-green-500" />}
-                        {stat.title === "Monthly Expenses" && <CreditCard className="h-5 w-5 text-orange-500" />}
-                        {stat.title === "Savings Rate" && <PiggyBank className="h-5 w-5 text-purple-500" />}
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
+                        {stat.title === "Total Balance" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm"><Wallet className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Monthly Income" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm"><DollarSign className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Monthly Expenses" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm"><CreditCard className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Savings Rate" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm"><PiggyBank className="h-6 w-6 text-white" /></div>}
                           </div>
                         </div>
                       </CardContent>
@@ -308,8 +302,8 @@ export default function Dashboard() {
             {/* Main Dashboard Grid - Restructured */}
             <div className="space-y-4">
               
-              {/* Charts Section - 3 Charts Side by Side */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Charts Section - 2 Charts Side by Side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 
                 {/* Financial Trend - Line Chart */}
                 <Card>
@@ -350,77 +344,46 @@ export default function Dashboard() {
                               contentStyle={{
                                 backgroundColor: 'white',
                                 border: '1px solid #e5e7eb',
-                                  borderRadius: '8px',
-                                  fontSize: '12px',
-                                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                borderRadius: '6px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                fontSize: '12px'
                               }}
                             />
-                            <Line 
-                              type="monotone" 
-                              dataKey="income" 
-                              stroke="#10b981" 
-                              strokeWidth={2}
-                                dot={{ fill: '#10b981', strokeWidth: 0, r: 2 }}
-                                activeDot={{ r: 3, stroke: '#10b981', strokeWidth: 1 }}
-                            />
-                            <Line 
-                              type="monotone" 
-                              dataKey="expenses" 
-                              stroke="#ef4444" 
-                              strokeWidth={2}
-                                dot={{ fill: '#ef4444', strokeWidth: 0, r: 2 }}
-                                activeDot={{ r: 3, stroke: '#ef4444', strokeWidth: 1 }}
-                            />
-                            <Line 
-                              type="monotone" 
-                                dataKey="savings" 
-                              stroke="#3b82f6" 
-                              strokeWidth={2.5}
-                                dot={{ fill: '#3b82f6', strokeWidth: 0, r: 2 }}
-                                activeDot={{ r: 3, stroke: '#3b82f6', strokeWidth: 1 }}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
+                            <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 3 }} />
+                            <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} />
+                            <Line type="monotone" dataKey="savings" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', r: 3 }} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
                     )}
                   </CardContent>
                 </Card>
 
-                  {/* Monthly Comparison - Bar Chart */}
-                  <Card className="bg-gradient-to-br from-purple-50/30 via-white to-white border border-purple-200/40">
-                    <CardHeader className="pb-2">
-                        <div className="flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4 text-purple-600" />
-                        <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
-                      </div>
-                      <p className="text-xs text-gray-600">Income vs Expenses</p>
+                {/* Monthly Comparison - Bar Chart */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4 text-indigo-600" />
+                      <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
+                    </div>
+                    <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {isLoading ? (
-                        <div className="h-48 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg animate-pulse" />
+                      <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                        <div className="h-48">
+                      <div className="h-48">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                            <defs>
-                              <linearGradient id="incomeBar" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#22c55e"/>
-                                <stop offset="100%" stopColor="#16a34a"/>
-                              </linearGradient>
-                              <linearGradient id="expenseBar" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#ef4444"/>
-                                <stop offset="100%" stopColor="#dc2626"/>
-                              </linearGradient>
-                            </defs>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                                tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 10, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                                tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 10, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
@@ -430,99 +393,45 @@ export default function Dashboard() {
                                 `$${Number(value).toLocaleString()}`, 
                                 name === 'income' ? 'Income' : 'Expenses'
                               ]}
-                              labelStyle={{ color: '#1e293b', fontWeight: '600' }}
+                              labelStyle={{ color: '#374151', fontWeight: 'normal' }}
                               contentStyle={{
                                 backgroundColor: 'white',
-                                border: '1px solid #e2e8f0',
-                                  borderRadius: '8px',
-                                  fontSize: '12px',
-                                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '6px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                fontSize: '12px'
                               }}
                             />
-                            <Bar 
-                              dataKey="income" 
-                              fill="url(#incomeBar)"
-                              name="Income"
-                                radius={[3, 3, 0, 0]}
-                                maxBarSize={30}
-                            />
-                            <Bar 
-                              dataKey="expenses" 
-                              fill="url(#expenseBar)"
-                              name="Expenses"
-                                radius={[3, 3, 0, 0]}
-                                maxBarSize={30}
-                            />
+                            <defs>
+                              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                              </linearGradient>
+                              <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0.3}/>
+                              </linearGradient>
+                            </defs>
+                            <Bar dataKey="income" fill="url(#incomeGradient)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
                     )}
                   </CardContent>
                 </Card>
-
-                {/* Top Categories - Compact */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                      <PieChart className="h-4 w-4 text-orange-600" />
-                      Top Categories
-                    </CardTitle>
-                    <p className="text-xs text-gray-600">Your biggest expenses this month</p>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {isLoading ? (
-                      <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
-                    ) : stats?.topCategories && stats.topCategories.length > 0 ? (
-                      <>
-                        <div className="h-32 mb-3">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <RechartsPieChart>
-                              <Pie
-                                data={stats.topCategories}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={25}
-                                outerRadius={55}
-                                paddingAngle={2}
-                                dataKey="amount"
-                              >
-                                {stats.topCategories.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
-                                ))}
-                              </Pie>
-                              <Tooltip formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Amount']} />
-                            </RechartsPieChart>
-                          </ResponsiveContainer>
-              </div>
-                        <div className="space-y-1">
-                          {stats.topCategories.slice(0, 3).map((category, index) => (
-                            <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }} />
-                                <span className="text-xs font-medium text-gray-900">{category.name}</span>
-                              </div>
-                              <span className="text-xs text-gray-600">${category.amount.toLocaleString()}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-6">
-                        <PieChart className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <h3 className="text-xs font-medium text-gray-900 mb-1">No expenses yet</h3>
-                        <p className="text-xs text-gray-500">Add transactions to see your spending breakdown</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
                     </div>
 
-              {/* Recent Activities Full Width */}
+              {/* Recent Transactions Full Width */}
               <Card className="border border-gray-200">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-blue-600" />
-                    Recent Activities
+                    Recent Transactions
+                    <span className="mx-1 text-gray-400">•</span>
+                    <span className="text-xs font-normal text-gray-500">
+                      {stats?.recentTransactions?.length || 0} total
+                    </span>
                   </CardTitle>
                   <p className="text-xs text-gray-600">Your latest financial activities</p>
                 </CardHeader>
