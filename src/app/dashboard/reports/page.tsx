@@ -172,100 +172,101 @@ export default function ReportsPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-                <p className="text-gray-600 text-sm">Detailed insights into your financial data</p>
+                <h1 className="text-xl font-bold text-gray-900">Reports</h1>
+                <p className="text-gray-600 text-xs">Analyze your financial data and trends</p>
               </div>
               <div className="flex items-center gap-2">
                 <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="6months">Last 6 Months</SelectItem>
-                    <SelectItem value="12months">Last 12 Months</SelectItem>
-                    <SelectItem value="24months">Last 24 Months</SelectItem>
+                    <SelectItem value="last3months">Last 3 Months</SelectItem>
+                    <SelectItem value="last6months">Last 6 Months</SelectItem>
+                    <SelectItem value="lastyear">Last 12 Months</SelectItem>
+                    <SelectItem value="thisyear">This Year</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export PDF
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-1" />
+                  Export
                 </Button>
               </div>
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Monthly Income</p>
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900">
                         ${reportData?.monthlyData ? 
                           Math.round(reportData.monthlyData.reduce((sum, m) => sum + m.income, 0) / reportData.monthlyData.length).toLocaleString() 
                           : '0'}
                       </p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                      <TrendingUp className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <TrendingUp className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Monthly Expenses</p>
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900">
                         ${reportData?.monthlyData ? 
                           Math.round(reportData.monthlyData.reduce((sum, m) => sum + m.expenses, 0) / reportData.monthlyData.length).toLocaleString() 
                           : '0'}
                       </p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
-                      <ArrowUpDown className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                      <ArrowUpDown className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Net Average</p>
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900">
                         ${reportData?.monthlyData ? 
                           Math.round(reportData.monthlyData.reduce((sum, m) => sum + m.net, 0) / reportData.monthlyData.length).toLocaleString() 
                           : '0'}
                       </p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                      <DollarSign className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <DollarSign className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Top Category</p>
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900">
                         {reportData?.categoryData?.[0]?.name || 'N/A'}
                       </p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
-                      <PieChart className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                      <PieChart className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -273,21 +274,21 @@ export default function ReportsPage() {
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               
               {/* Income vs Expenses Trend */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                <CardHeader className="pb-1 px-3 pt-3">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <TrendingUp className="h-4 w-4 text-blue-600" />
                     Income vs Expenses Trend
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0 px-3 pb-3">
                   {isLoading ? (
-                    <div className="h-64 bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                   ) : (
-                    <div className="h-64">
+                    <div className="h-48">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={reportData?.monthlyData || []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -306,24 +307,24 @@ export default function ReportsPage() {
 
               {/* Expense Categories */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <PieChart className="h-5 w-5 text-purple-600" />
+                <CardHeader className="pb-1 px-3 pt-3">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <PieChart className="h-4 w-4 text-purple-600" />
                     Expense Categories
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0 px-3 pb-3">
                   {isLoading ? (
-                    <div className="h-64 bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                   ) : (
-                    <div className="h-64">
+                    <div className="h-48">
                       <ResponsiveContainer width="100%" height="100%">
                         <RechartsPieChart>
                           <Pie
                             data={reportData?.categoryData || []}
                             cx="50%"
                             cy="50%"
-                            outerRadius={80}
+                            outerRadius={60}
                             dataKey="amount"
                             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                           >
@@ -342,23 +343,23 @@ export default function ReportsPage() {
 
             {/* Top Expenses Table */}
             <Card className="border border-gray-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <FileText className="h-5 w-5 text-orange-600" />
+              <CardHeader className="pb-1 px-3 pt-3">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <FileText className="h-4 w-4 text-orange-600" />
                   Top Expenses
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-4 space-y-3">
+                  <div className="p-3 space-y-2">
                     {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : reportData?.topExpenses && reportData.topExpenses.length > 0 ? (
                   <>
-                    <div className="px-4 py-3 border-b border-gray-200/60">
-                      <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    <div className="px-3 py-2 border-b border-gray-200/60">
+                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-4">Description</div>
                         <div className="col-span-2">Date</div>
                         <div className="col-span-3">Category</div>
@@ -367,20 +368,20 @@ export default function ReportsPage() {
                     </div>
                     <div className="divide-y divide-gray-100/60">
                       {reportData.topExpenses.slice(0, 10).map((transaction, index) => (
-                        <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
-                          <div className="grid grid-cols-12 gap-4 items-center">
+                        <div key={index} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                          <div className="grid grid-cols-12 gap-3 items-center">
                             <div className="col-span-4">
                               <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
                             <div className="col-span-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                <span className="text-sm text-gray-600">{transaction.categories?.name}</span>
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                <span className="text-xs text-gray-600">{transaction.categories?.name}</span>
                               </div>
                             </div>
                             <div className="col-span-3">
@@ -394,8 +395,8 @@ export default function ReportsPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <div className="text-center py-6">
+                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No expense data</h3>
                     <p className="text-xs text-gray-500">Add some expenses to see reports</p>
                   </div>

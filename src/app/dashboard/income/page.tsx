@@ -11,14 +11,13 @@ import { Label } from "@/components/ui/label"
 import { 
   Plus,
   Search,
-  Download,
   ArrowUpRight,
+  MoreHorizontal,
   Edit,
   Trash2,
-  MoreHorizontal,
+  Calendar,
   ChevronLeft,
-  ChevronRight,
-  Calendar
+  ChevronRight
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -338,132 +337,138 @@ export default function IncomePage() {
   const isAllSelected = paginatedTransactions.length > 0 && paginatedTransactions.every(t => selectedItems.has(t.id))
 
   return (
-    <div className="flex h-screen bg-gray-50/50">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Income</h1>
-                <p className="text-gray-600 text-sm">Track and manage your income transactions</p>
+                <h1 className="text-xl font-bold text-gray-900">Income</h1>
+                <p className="text-gray-600 text-xs">Track and manage your income sources</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={() => setEditingTransaction(null)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Income
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-lg">
-                        {editingTransaction ? 'Edit Income' : 'Add New Income'}
-                      </DialogTitle>
-                      <DialogDescription className="text-sm">
-                        {editingTransaction ? 'Update income details' : 'Add a new income to track your earnings'}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="amount" className="text-sm">Amount *</Label>
-                          <Input
-                            id="amount"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            value={formData.amount}
-                            onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                            className="mt-1"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="date" className="text-sm">Date *</Label>
-                          <Input
-                            id="date"
-                            type="date"
-                            value={formData.date}
-                            onChange={(e) => setFormData({...formData, date: e.target.value})}
-                            className="mt-1"
-                            required
-                          />
-                        </div>
-                      </div>
-                      
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      setEditingTransaction(null)
+                      setFormData({
+                        amount: "",
+                        description: "",
+                        date: new Date().toISOString().split('T')[0],
+                        category_id: "",
+                        icon: "FileText"
+                      })
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Income
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg">
+                      {editingTransaction ? 'Edit Income' : 'Add New Income'}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {editingTransaction ? 'Update income details' : 'Add a new income to track your earnings'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="description" className="text-sm">Description *</Label>
+                        <Label htmlFor="amount" className="text-sm">Amount *</Label>
                         <Input
-                          id="description"
-                          placeholder="e.g., Salary from Company XYZ"
-                          value={formData.description}
-                          onChange={(e) => setFormData({...formData, description: e.target.value})}
+                          id="amount"
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={formData.amount}
+                          onChange={(e) => setFormData({...formData, amount: e.target.value})}
                           className="mt-1"
                           required
                         />
                       </div>
-
                       <div>
-                        <Label htmlFor="category" className="text-sm">Category *</Label>
-                        <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                <div className="flex items-center gap-2">
-                                  <div 
-                                    className="w-6 h-6 rounded-lg flex items-center justify-center"
-                                    style={{ backgroundColor: category.color }}
-                                  >
-                                    <IconRenderer 
-                                      iconName={category.icon} 
-                                      className="h-3 w-3 text-white"
-                                      fallbackColor="white"
-                                    />
-                                  </div>
-                                  {category.name}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="icon" className="text-sm">Icon</Label>
-                        <IconSelector 
-                          value={formData.icon} 
-                          onValueChange={(value) => setFormData({...formData, icon: value})}
+                        <Label htmlFor="date" className="text-sm">Date *</Label>
+                        <Input
+                          id="date"
+                          type="date"
+                          value={formData.date}
+                          onChange={(e) => setFormData({...formData, date: e.target.value})}
                           className="mt-1"
+                          required
                         />
                       </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="description" className="text-sm">Description *</Label>
+                      <Input
+                        id="description"
+                        placeholder="e.g., Salary from Company XYZ"
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
 
-                      <DialogFooter>
-                        <Button type="button" variant="outline" size="sm" onClick={() => {
-                          setIsDialogOpen(false)
-                          setEditingTransaction(null)
-                        }}>
-                          Cancel
-                        </Button>
-                        <Button type="submit" size="sm">
-                          {editingTransaction ? 'Update' : 'Add'} Income
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                    <div>
+                      <Label htmlFor="category" className="text-sm">Category *</Label>
+                      <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center"
+                                  style={{ backgroundColor: category.color }}
+                                >
+                                  <IconRenderer 
+                                    iconName={category.icon} 
+                                    className="h-3 w-3 text-white"
+                                    fallbackColor="white"
+                                  />
+                                </div>
+                                {category.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="icon" className="text-sm">Icon</Label>
+                      <IconSelector 
+                        value={formData.icon} 
+                        onValueChange={(value) => setFormData({...formData, icon: value})}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <DialogFooter>
+                      <Button type="button" variant="outline" size="sm" onClick={() => {
+                        setIsDialogOpen(false)
+                        setEditingTransaction(null)
+                      }}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="sm">
+                        {editingTransaction ? 'Update' : 'Add'} Income
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Stats and Search - Improved */}
@@ -577,16 +582,16 @@ export default function IncomePage() {
             <Card className="border border-gray-200">
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-4 space-y-3">
+                  <div className="p-3 space-y-2">
                     {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredTransactions.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="px-4 py-3 border-b border-gray-200/60">
-                      <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    <div className="px-3 py-2 border-b border-gray-200/60">
+                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-1 flex items-center">
                           <Checkbox
                             checked={isAllSelected}
@@ -594,20 +599,20 @@ export default function IncomePage() {
                             className="h-4 w-4"
                           />
                         </div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Date</div>
-                        <div className="col-span-3 border-l border-gray-200/40 pl-4">Description</div>
-                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Type</div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Category</div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Amount</div>
-                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Actions</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Date</div>
+                        <div className="col-span-3 border-l border-gray-200/40 pl-3">Description</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-3">Type</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Category</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Amount</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-3">Actions</div>
                       </div>
                     </div>
 
                     {/* Table Body */}
                     <div className="divide-y divide-gray-100/60">
                       {paginatedTransactions.map((transaction) => (
-                        <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
-                          <div className="grid grid-cols-12 gap-4 items-center">
+                        <div key={transaction.id} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                          <div className="grid grid-cols-12 gap-3 items-center">
                             {/* Checkbox */}
                             <div className="col-span-1">
                               <Checkbox
@@ -618,19 +623,19 @@ export default function IncomePage() {
                             </div>
 
                             {/* Date */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                              <span className="text-sm text-gray-600">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                              <span className="text-xs text-gray-600">
                                 {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
 
                             {/* Description with Icon */}
-                            <div className="col-span-3 border-l border-gray-200/40 pl-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
+                            <div className="col-span-3 border-l border-gray-200/40 pl-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
                                   <IconRenderer 
                                     iconName={transaction.icon} 
-                                    className="h-4 w-4 text-white"
+                                    className="h-3 w-3 text-white"
                                     fallbackColor="white"
                                   />
                                 </div>
@@ -641,35 +646,35 @@ export default function IncomePage() {
                             </div>
 
                             {/* Type */}
-                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-3">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                 Income
                               </span>
                             </div>
 
                             {/* Category */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                <span className="text-sm text-gray-600 truncate">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                <span className="text-xs text-gray-600 truncate">
                                   {transaction.categories?.name}
                                 </span>
                               </div>
                             </div>
 
                             {/* Amount */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
                               <span className="text-sm font-medium text-gray-900">
                                 +${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
 
                             {/* Actions */}
-                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-3">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreHorizontal className="h-3 w-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
@@ -694,20 +699,20 @@ export default function IncomePage() {
                     </div>
 
                     {/* Pagination - Always visible */}
-                    <div className="border-t border-gray-200/60 px-4 py-3 bg-white">
+                    <div className="border-t border-gray-200/60 px-3 py-2 bg-white">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs text-gray-600">
                           Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className="h-8"
+                            className="h-7 px-2"
                           >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-3 w-3" />
                             Previous
                           </Button>
                           
@@ -721,14 +726,14 @@ export default function IncomePage() {
                                   variant={currentPage === pageNum ? "default" : "outline"}
                                   size="sm"
                                   onClick={() => setCurrentPage(pageNum)}
-                                  className="h-8 w-8"
+                                  className="h-7 w-7 text-xs"
                                 >
                                   {pageNum}
                                 </Button>
                               );
                             })}
                             {totalPages > 5 && (
-                              <span className="text-sm text-gray-600 px-2">...</span>
+                              <span className="text-xs text-gray-600 px-1">...</span>
                             )}
                           </div>
                           
@@ -737,22 +742,22 @@ export default function IncomePage() {
                             size="sm"
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className="h-8"
+                            className="h-7 px-2"
                           >
                             Next
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <ArrowUpRight className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <div className="text-center py-6">
+                    <ArrowUpRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No income found</h3>
-                    <p className="text-xs text-gray-500 mb-4">Start tracking your income by adding your first transaction</p>
-                    <Button onClick={() => setIsDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
+                    <p className="text-xs text-gray-500 mb-3">Start tracking your income by adding your first transaction</p>
+                    <Button onClick={() => setIsDialogOpen(true)} size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
                       Add Income
                     </Button>
                   </div>
@@ -761,31 +766,31 @@ export default function IncomePage() {
             </Card>
 
             {/* Summary Info Bar - More elegant */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-6">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">Total Income</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
                     </p>
                   </div>
-                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div className="h-8 w-px bg-gray-200"></div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">This Month</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       ${thisMonthIncome.toLocaleString()}
                     </p>
                   </div>
-                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div className="h-8 w-px bg-gray-200"></div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">Transactions</p>
-                    <p className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</p>
+                    <p className="text-lg font-bold text-gray-900">{filteredTransactions.length}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-gray-500">Last updated</p>
-                  <p className="text-sm text-gray-700">{new Date().toLocaleDateString()}</p>
+                  <p className="text-xs text-gray-700">{new Date().toLocaleDateString()}</p>
                 </div>
               </div>
             </div>

@@ -356,46 +356,46 @@ export default function Dashboard() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
               
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-xl font-bold text-gray-900">
                   Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'}! 👋
                   </h1>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs">
                   Here&apos;s your financial overview for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-1" />
                     Filter
                   </Button>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
                   Add Transaction
                   </Button>
                 </div>
               </div>
 
             {/* Quick Stats - More Compact */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {quickStats.map((stat, index) => (
                 <Card key={index} className="relative overflow-hidden">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                         <p className="text-xs font-medium text-gray-600">{stat.title}</p>
-                        <div className="flex items-baseline gap-1 mt-1">
-                          <span className="text-xl font-bold text-gray-900">
+                        <div className="flex items-baseline gap-1 mt-0.5">
+                          <span className="text-lg font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
                               </span>
                           <Badge 
                             variant={stat.changeType === 'increase' ? 'default' : 'secondary'} 
-                            className={`text-xs py-0 ${
+                            className={`text-xs py-0 px-1 ${
                               stat.changeType === 'increase' 
                                 ? 'bg-green-100 text-green-700 hover:bg-green-100' 
                                 : 'bg-red-100 text-red-700 hover:bg-red-100'
@@ -405,11 +405,11 @@ export default function Dashboard() {
                           </Badge>
                         </div>
                             </div>
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
-                        {stat.title === "Total Balance" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm"><Wallet className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Monthly Income" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm"><DollarSign className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Monthly Expenses" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm"><CreditCard className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Savings Rate" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm"><PiggyBank className="h-6 w-6 text-white" /></div>}
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm">
+                        {stat.title === "Total Balance" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm"><Wallet className="h-5 w-5 text-white" /></div>}
+                        {stat.title === "Monthly Income" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm"><DollarSign className="h-5 w-5 text-white" /></div>}
+                        {stat.title === "Monthly Expenses" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm"><CreditCard className="h-5 w-5 text-white" /></div>}
+                        {stat.title === "Savings Rate" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm"><PiggyBank className="h-5 w-5 text-white" /></div>}
                           </div>
                         </div>
                       </CardContent>
@@ -418,21 +418,21 @@ export default function Dashboard() {
               </div>
 
             {/* Main Dashboard Grid - Restructured */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               
               {/* Charts Section - 2 Charts Side by Side */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-1 px-3 pt-3">
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
                         <CardTitle className="text-sm font-medium text-gray-900">Total Balance</CardTitle>
                       </div>
                       <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                        <SelectTrigger className="w-32 h-8 text-xs">
+                        <SelectTrigger className="w-28 h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -446,13 +446,13 @@ export default function Dashboard() {
                     </div>
                     <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 px-3 pb-3">
                     {isLoading ? (
-                        <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                        <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                        <div className="h-48">
+                        <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -501,20 +501,20 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-1 px-3 pt-3">
                         <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
                     <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 px-3 pb-3">
                     {isLoading ? (
-                      <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                      <div className="h-48">
+                      <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
@@ -564,7 +564,7 @@ export default function Dashboard() {
 
               {/* Recent Transactions Full Width */}
               <Card className="border border-gray-200">
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-1 px-3 pt-3">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-blue-600" />
                     Recent Transactions
@@ -577,21 +577,21 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="p-0">
                   {isLoading ? (
-                    <div className="p-4 space-y-3">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
-                        <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="p-3 space-y-2">
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                        <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                       ))}
                     </div>
                   ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
                     <>
                       {/* Table Header */}
-                      <div className="px-4 py-3 border-b border-gray-200/60">
-                        <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      <div className="px-3 py-2 border-b border-gray-200/60">
+                        <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4">Description</div>
-                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Date</div>
-                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Type</div>
-                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Category</div>
-                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Amount</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-3">Date</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-3">Type</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-3">Category</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-3">Amount</div>
                         </div>
                       </div>
 
@@ -600,16 +600,16 @@ export default function Dashboard() {
                         {stats.recentTransactions
                           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                           .map((transaction, index) => (
-                            <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
-                              <div className="grid grid-cols-12 gap-4 items-center">
+                            <div key={index} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                              <div className="grid grid-cols-12 gap-3 items-center">
                                 {/* Description with Icon */}
                                 <div className="col-span-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm" 
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-lg flex items-center justify-center shadow-sm" 
                                          style={{ backgroundColor: transaction.categories?.color }}>
                                       <IconRenderer 
                                         iconName={transaction.icon || transaction.categories?.icon} 
-                                        className="h-4 w-4 text-white"
+                                        className="h-3 w-3 text-white"
                                         fallbackColor="white"
                                       />
                                     </div>
@@ -620,15 +620,15 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Date */}
-                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                                  <span className="text-sm text-gray-600">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  <span className="text-xs text-gray-600">
                                     {new Date(transaction.date).toLocaleDateString()}
                                   </span>
                                 </div>
 
                                 {/* Type */}
-                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                     transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                   }`}>
                                     {transaction.type === 'income' ? 'Income' : 'Expense'}
@@ -636,17 +636,17 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Category */}
-                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                    <span className="text-sm text-gray-600 truncate">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                    <span className="text-xs text-gray-600 truncate">
                                       {transaction.categories?.name}
                                     </span>
                                   </div>
                                 </div>
 
                                 {/* Amount */}
-                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <span className="text-sm font-medium text-gray-900">
                                     {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
                                   </span>
@@ -657,20 +657,20 @@ export default function Dashboard() {
                       </div>
 
                       {/* Pagination - Always visible */}
-                      <div className="border-t border-gray-200/60 px-4 py-3 bg-white">
+                      <div className="border-t border-gray-200/60 px-3 py-2 bg-white">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs text-gray-600">
                             Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => setCurrentPage(currentPage - 1)}
                               disabled={currentPage === 1}
-                              className="h-8"
+                              className="h-7 px-2"
                             >
-                              <ChevronLeft className="h-4 w-4" />
+                              <ChevronLeft className="h-3 w-3" />
                               Previous
                             </Button>
                             
@@ -684,14 +684,14 @@ export default function Dashboard() {
                                     variant={currentPage === pageNum ? "default" : "outline"}
                                     size="sm"
                                     onClick={() => setCurrentPage(pageNum)}
-                                    className="h-8 w-8"
+                                    className="h-7 w-7 text-xs"
                                   >
                                     {pageNum}
                                   </Button>
                                 );
                               })}
                               {Math.ceil(stats.recentTransactions.length / itemsPerPage) > 5 && (
-                                <span className="text-sm text-gray-600 px-2">...</span>
+                                <span className="text-xs text-gray-600 px-1">...</span>
                               )}
                             </div>
                             
@@ -700,22 +700,22 @@ export default function Dashboard() {
                               size="sm"
                               onClick={() => setCurrentPage(currentPage + 1)}
                               disabled={currentPage >= Math.ceil(stats.recentTransactions.length / itemsPerPage)}
-                              className="h-8"
+                              className="h-7 px-2"
                             >
                               Next
-                              <ChevronRight className="h-4 w-4" />
+                              <ChevronRight className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
                       </div>
                     </>
                   ) : (
-                    <div className="text-center py-8">
-                      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <div className="text-center py-6">
+                      <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                       <h3 className="text-sm font-medium text-gray-900 mb-1">No recent activity</h3>
-                      <p className="text-xs text-gray-500 mb-4">Start tracking your finances by adding transactions</p>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
+                      <p className="text-xs text-gray-500 mb-3">Start tracking your finances by adding transactions</p>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-1" />
                         Add Transaction
                       </Button>
                     </div>

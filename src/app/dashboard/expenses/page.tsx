@@ -338,24 +338,24 @@ export default function ExpensesPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Expenses</h1>
-                <p className="text-gray-600 text-sm">Track and manage your expense transactions</p>
+                <h1 className="text-xl font-bold text-gray-900">Expenses</h1>
+                <p className="text-gray-600 text-xs">Track and manage your expense transactions</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-1" />
                   Export
                 </Button>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button onClick={() => setEditingTransaction(null)}>
-                      <Plus className="h-4 w-4 mr-2" />
+                    <Button size="sm" onClick={() => setEditingTransaction(null)}>
+                      <Plus className="h-4 w-4 mr-1" />
                       Add Expense
                     </Button>
                   </DialogTrigger>
@@ -368,7 +368,7 @@ export default function ExpensesPage() {
                         {editingTransaction ? 'Update expense details' : 'Add a new expense to track your spending'}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label htmlFor="amount" className="text-sm">Amount *</Label>
@@ -463,7 +463,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Stats and Search - Improved */}
-            <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-7 gap-3">
               <div className="lg:col-span-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -573,16 +573,16 @@ export default function ExpensesPage() {
             <Card className="border border-gray-200">
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-4 space-y-3">
+                  <div className="p-3 space-y-2">
                     {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredTransactions.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="px-4 py-3 border-b border-gray-200/60">
-                      <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    <div className="px-3 py-2 border-b border-gray-200/60">
+                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-1 flex items-center">
                           <Checkbox
                             checked={isAllSelected}
@@ -590,20 +590,20 @@ export default function ExpensesPage() {
                             className="h-4 w-4"
                           />
                         </div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Date</div>
-                        <div className="col-span-3 border-l border-gray-200/40 pl-4">Description</div>
-                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Type</div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Category</div>
-                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Amount</div>
-                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Actions</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Date</div>
+                        <div className="col-span-3 border-l border-gray-200/40 pl-3">Description</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-3">Type</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Category</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Amount</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-3">Actions</div>
                       </div>
                     </div>
 
                     {/* Table Body */}
                     <div className="divide-y divide-gray-100/60">
                       {paginatedTransactions.map((transaction) => (
-                        <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
-                          <div className="grid grid-cols-12 gap-4 items-center">
+                        <div key={transaction.id} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                          <div className="grid grid-cols-12 gap-3 items-center">
                             {/* Checkbox */}
                             <div className="col-span-1">
                               <Checkbox
@@ -614,19 +614,19 @@ export default function ExpensesPage() {
                             </div>
 
                             {/* Date */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                              <span className="text-sm text-gray-600">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                              <span className="text-xs text-gray-600">
                                 {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
 
                             {/* Description with Icon */}
-                            <div className="col-span-3 border-l border-gray-200/40 pl-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
+                            <div className="col-span-3 border-l border-gray-200/40 pl-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
                                   <IconRenderer 
                                     iconName={transaction.icon} 
-                                    className="h-4 w-4 text-white"
+                                    className="h-3 w-3 text-white"
                                     fallbackColor="white"
                                   />
                                 </div>
@@ -637,35 +637,35 @@ export default function ExpensesPage() {
                             </div>
 
                             {/* Type */}
-                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-3">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                 Expense
                               </span>
                             </div>
 
                             {/* Category */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                <span className="text-sm text-gray-600 truncate">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                <span className="text-xs text-gray-600 truncate">
                                   {transaction.categories?.name}
                                 </span>
                               </div>
                             </div>
 
                             {/* Amount */}
-                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-3">
                               <span className="text-sm font-medium text-gray-900">
                                 -${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
 
                             {/* Actions */}
-                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-3">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreHorizontal className="h-3 w-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
@@ -690,20 +690,20 @@ export default function ExpensesPage() {
                     </div>
 
                     {/* Pagination - Always visible */}
-                    <div className="border-t border-gray-200/60 px-4 py-3 bg-white">
+                    <div className="border-t border-gray-200/60 px-3 py-2 bg-white">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs text-gray-600">
                           Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className="h-8"
+                            className="h-7 px-2"
                           >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-3 w-3" />
                             Previous
                           </Button>
                           
@@ -717,14 +717,14 @@ export default function ExpensesPage() {
                                   variant={currentPage === pageNum ? "default" : "outline"}
                                   size="sm"
                                   onClick={() => setCurrentPage(pageNum)}
-                                  className="h-8 w-8"
+                                  className="h-7 w-7 text-xs"
                                 >
                                   {pageNum}
                                 </Button>
                               );
                             })}
                             {totalPages > 5 && (
-                              <span className="text-sm text-gray-600 px-2">...</span>
+                              <span className="text-xs text-gray-600 px-1">...</span>
                             )}
                           </div>
                           
@@ -733,22 +733,22 @@ export default function ExpensesPage() {
                             size="sm"
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className="h-8"
+                            className="h-7 px-2"
                           >
                             Next
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <ArrowDownRight className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <div className="text-center py-6">
+                    <ArrowDownRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses found</h3>
-                    <p className="text-xs text-gray-500 mb-4">Start tracking your expenses by adding your first transaction</p>
-                    <Button onClick={() => setIsDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
+                    <p className="text-xs text-gray-500 mb-3">Start tracking your expenses by adding your first transaction</p>
+                    <Button onClick={() => setIsDialogOpen(true)} size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
                       Add Expense
                     </Button>
                   </div>
@@ -757,31 +757,31 @@ export default function ExpensesPage() {
             </Card>
 
             {/* Summary Info Bar - More elegant */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-6">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">Total Expenses</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
                     </p>
                   </div>
-                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div className="h-8 w-px bg-gray-200"></div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">This Month</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       ${thisMonthExpenses.toLocaleString()}
                     </p>
                   </div>
-                  <div className="h-12 w-px bg-gray-200"></div>
+                  <div className="h-8 w-px bg-gray-200"></div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">Transactions</p>
-                    <p className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</p>
+                    <p className="text-lg font-bold text-gray-900">{filteredTransactions.length}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-gray-500">Last updated</p>
-                  <p className="text-sm text-gray-700">{new Date().toLocaleDateString()}</p>
+                  <p className="text-xs text-gray-700">{new Date().toLocaleDateString()}</p>
                 </div>
               </div>
             </div>

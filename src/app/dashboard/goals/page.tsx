@@ -216,20 +216,20 @@ export default function GoalsPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Goals</h1>
-                <p className="text-gray-600 text-sm">Set and track your financial goals</p>
+                <h1 className="text-xl font-bold text-gray-900">Goals</h1>
+                <p className="text-gray-600 text-xs">Set and track your financial goals</p>
               </div>
               <div className="flex items-center gap-2">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" onClick={() => setEditingGoal(null)}>
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-4 w-4 mr-1" />
                       Add Goal
                     </Button>
                   </DialogTrigger>
@@ -242,7 +242,7 @@ export default function GoalsPage() {
                         {editingGoal ? 'Update goal details' : 'Create a new financial goal to track your progress'}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-3">
                       <div>
                         <Label htmlFor="name" className="text-sm">Goal Name *</Label>
                         <Input
@@ -338,44 +338,44 @@ export default function GoalsPage() {
             </div>
 
             {/* Summary Cards - Compact */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">Total Goals</p>
-                      <p className="text-xl font-bold text-gray-900">{totalGoals}</p>
+                      <p className="text-lg font-bold text-gray-900">{totalGoals}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                      <Target className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <Target className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">Completed</p>
-                      <p className="text-xl font-bold text-gray-900">{completedGoals}</p>
+                      <p className="text-lg font-bold text-gray-900">{completedGoals}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                      <CheckCircle className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <CheckCircle className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">In Progress</p>
-                      <p className="text-xl font-bold text-gray-900">{inProgressGoals}</p>
+                      <p className="text-lg font-bold text-gray-900">{inProgressGoals}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
-                      <Clock className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                      <Clock className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -386,13 +386,13 @@ export default function GoalsPage() {
             <Card>
               <CardContent className="p-4">
                 {isLoading ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {[1, 2, 3].map(i => (
-                      <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredGoals.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {filteredGoals.map((goal) => {
                       const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
                       const daysRemaining = getDaysRemaining(goal.target_date)

@@ -278,17 +278,17 @@ export default function AnalyticsPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-full">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 min-h-full">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-                  <p className="text-gray-600 text-sm mt-1">Advanced insights into your financial patterns</p>
+                <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
+                  <p className="text-gray-600 text-xs mt-1">Advanced insights into your financial patterns</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                   {/* Period Selection */}
                   <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
                     {[
@@ -301,7 +301,7 @@ export default function AnalyticsPage() {
                         key={period.key}
                         variant={selectedPeriod === period.key && !customDateRange ? "default" : "ghost"}
                         size="sm"
-                        className={`h-8 px-3 text-xs transition-all ${
+                        className={`h-7 px-2 text-xs transition-all ${
                           selectedPeriod === period.key && !customDateRange ? "bg-blue-600 text-white shadow-sm" : ""
                         }`}
                         onClick={() => {
@@ -322,16 +322,16 @@ export default function AnalyticsPage() {
                         setSelectedPeriod("")
                       }
                     }}
-                    className="h-8 text-xs"
+                    className="h-7 text-xs"
                     placeholder="Custom range"
                   />
                   
-                  <Button variant="outline" size="sm" className="h-8 text-xs">
-                    <Filter className="h-3 w-3 mr-2" />
+                  <Button variant="outline" size="sm" className="h-7 text-xs">
+                    <Filter className="h-3 w-3 mr-1" />
                   Filter
                 </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-xs">
-                    <Download className="h-3 w-3 mr-2" />
+                  <Button variant="outline" size="sm" className="h-7 text-xs">
+                    <Download className="h-3 w-3 mr-1" />
                   Export
                 </Button>
               </div>
@@ -339,74 +339,74 @@ export default function AnalyticsPage() {
 
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
-                    <CardContent className="p-2">
+                    <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">Top Category</p>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
+                          <p className="text-xs font-medium text-gray-600">Top Category</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-1">
                             {analyticsData.insights.topCategory}
                           </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                          <PieChart className="h-6 w-6 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                          <PieChart className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
-                    <CardContent className="p-2">
+                    <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">Trend</p>
+                          <p className="text-xs font-medium text-gray-600">Trend</p>
                           <div className="flex items-center gap-1 mt-1">
                             {analyticsData.insights.trendDirection === 'up' ? (
-                              <ArrowUpRight className="h-4 w-4 text-green-600" />
+                              <ArrowUpRight className="h-3 w-3 text-green-600" />
                             ) : analyticsData.insights.trendDirection === 'down' ? (
-                              <ArrowDownRight className="h-4 w-4 text-red-600" />
+                              <ArrowDownRight className="h-3 w-3 text-red-600" />
                             ) : null}
-                            <span className="text-lg font-semibold text-gray-900">
+                            <span className="text-sm font-semibold text-gray-900">
                               {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
                                analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
                             </span>
                           </div>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                          <TrendingUp className="h-6 w-6 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                          <TrendingUp className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
-                    <CardContent className="p-2">
+                    <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">Daily Average</p>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
+                          <p className="text-xs font-medium text-gray-600">Daily Average</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-1">
                             ${analyticsData.insights.averageDaily.toFixed(0)}
                           </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
-                          <Activity className="h-6 w-6 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                          <Activity className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
-                    <CardContent className="p-2">
+                    <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">Monthly Projection</p>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
+                          <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-1">
                             ${analyticsData.insights.projectedMonthly.toFixed(0)}
                           </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
-                          <Target className="h-6 w-6 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                          <Target className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     </CardContent>

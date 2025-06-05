@@ -268,111 +268,120 @@ export default function CategoriesPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
-          <div className="max-w-7xl mx-auto space-y-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-                <p className="text-gray-600 text-sm">Organize your income and expense categories</p>
+                <h1 className="text-xl font-bold text-gray-900">Categories</h1>
+                <p className="text-gray-600 text-xs">Organize your income and expense categories</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" onClick={() => setEditingCategory(null)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Category
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-lg">
-                        {editingCategory ? 'Edit Category' : 'Add New Category'}
-                      </DialogTitle>
-                      <DialogDescription className="text-sm">
-                        {editingCategory ? 'Update category details' : 'Create a new category to organize your transactions'}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <div>
-                        <Label htmlFor="name" className="text-sm">Name *</Label>
-                        <Input
-                          id="name"
-                          placeholder="e.g., Groceries, Salary, etc."
-                          value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
-                          className="mt-1"
-                          required
-                        />
-                      </div>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      setEditingCategory(null)
+                      setFormData({
+                        name: "",
+                        type: "expense",
+                        color: colorOptions[0],
+                        icon: "FolderOpen"
+                      })
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Create Category
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg">
+                      {editingCategory ? 'Edit Category' : 'Add New Category'}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {editingCategory ? 'Update category details' : 'Create a new category to organize your transactions'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    <div>
+                      <Label htmlFor="name" className="text-sm">Name *</Label>
+                      <Input
+                        id="name"
+                        placeholder="e.g., Groceries, Salary, etc."
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
 
-                      <div>
-                        <Label htmlFor="type" className="text-sm">Type *</Label>
-                        <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="expense">
-                              <div className="flex items-center gap-2">
-                                <ArrowDownRight className="h-4 w-4 text-red-500" />
-                                Expense
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="income">
-                              <div className="flex items-center gap-2">
-                                <ArrowUpRight className="h-4 w-4 text-green-500" />
-                                Income
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div>
+                      <Label htmlFor="type" className="text-sm">Type *</Label>
+                      <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="expense">
+                            <div className="flex items-center gap-2">
+                              <ArrowDownRight className="h-4 w-4 text-red-500" />
+                              Expense
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="income">
+                            <div className="flex items-center gap-2">
+                              <ArrowUpRight className="h-4 w-4 text-green-500" />
+                              Income
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                      <div>
-                        <Label className="text-sm">Color *</Label>
-                        <div className="grid grid-cols-6 gap-2 mt-1">
-                          {colorOptions.map(color => (
-                            <button
-                              key={color}
-                              type="button"
-                              className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-transparent'}`}
-                              style={{ backgroundColor: color }}
-                              onClick={() => setFormData({...formData, color})}
-                            />
-                          ))}
-                        </div>
+                    <div>
+                      <Label className="text-sm">Color *</Label>
+                      <div className="grid grid-cols-6 gap-2 mt-1">
+                        {colorOptions.map(color => (
+                          <button
+                            key={color}
+                            type="button"
+                            className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-transparent'}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => setFormData({...formData, color})}
+                          />
+                        ))}
                       </div>
+                    </div>
 
-                      <div>
-                        <Label htmlFor="icon" className="text-sm">Icon</Label>
-                        <IconSelector 
-                          value={formData.icon} 
-                          onValueChange={(value) => setFormData({...formData, icon: value})}
-                          className="mt-1"
-                        />
-                      </div>
+                    <div>
+                      <Label htmlFor="icon" className="text-sm">Icon</Label>
+                      <IconSelector 
+                        value={formData.icon} 
+                        onValueChange={(value) => setFormData({...formData, icon: value})}
+                        className="mt-1"
+                      />
+                    </div>
 
-                      <DialogFooter>
-                        <Button type="button" variant="outline" size="sm" onClick={() => {
-                          setIsDialogOpen(false)
-                          setEditingCategory(null)
-                        }}>
-                          Cancel
-                        </Button>
-                        <Button type="submit" size="sm">
-                          {editingCategory ? 'Update' : 'Create'} Category
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                    <DialogFooter>
+                      <Button type="button" variant="outline" size="sm" onClick={() => {
+                        setIsDialogOpen(false)
+                        setEditingCategory(null)
+                      }}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="sm">
+                        {editingCategory ? 'Update' : 'Create'} Category
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Search and Filters - Compact */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
               <div className="lg:col-span-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -400,44 +409,44 @@ export default function CategoriesPage() {
             </div>
 
             {/* Summary Cards - Compact */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">Total Categories</p>
-                      <p className="text-xl font-bold text-gray-900">{categories.length}</p>
+                      <p className="text-lg font-bold text-gray-900">{categories.length}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                      <FolderOpen className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <FolderOpen className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">Income Categories</p>
-                      <p className="text-xl font-bold text-gray-900">{incomeCategories.length}</p>
+                      <p className="text-lg font-bold text-gray-900">{incomeCategories.length}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                      <ArrowUpRight className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <ArrowUpRight className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium text-gray-600">Expense Categories</p>
-                      <p className="text-xl font-bold text-gray-900">{expenseCategories.length}</p>
+                      <p className="text-lg font-bold text-gray-900">{expenseCategories.length}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
-                      <ArrowDownRight className="h-6 w-6 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                      <ArrowDownRight className="h-5 w-5 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -446,26 +455,26 @@ export default function CategoriesPage() {
 
             {/* Categories Grid - Compact */}
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 {isLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                     {[1, 2, 3, 4, 5, 6].map(i => (
-                      <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredCategories.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                     {filteredCategories.map((category) => (
-                      <div key={category.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
+                      <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
                             <div 
-                              className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
                               style={{ backgroundColor: category.color }}
                             >
                               <IconRenderer 
                                 iconName={category.icon} 
-                                className="h-5 w-5 text-white"
+                                className="h-4 w-4 text-white"
                                 fallbackColor="white"
                               />
                             </div>
