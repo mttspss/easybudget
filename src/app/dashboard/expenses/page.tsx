@@ -590,12 +590,12 @@ export default function ExpensesPage() {
                             className="h-4 w-4"
                           />
                         </div>
-                        <div className="col-span-2">Date</div>
-                        <div className="col-span-3">Description</div>
-                        <div className="col-span-1">Type</div>
-                        <div className="col-span-2">Category</div>
-                        <div className="col-span-2">Amount</div>
-                        <div className="col-span-1">Actions</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Date</div>
+                        <div className="col-span-3 border-l border-gray-200/40 pl-4">Description</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Type</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Category</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-4">Amount</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-4">Actions</div>
                       </div>
                     </div>
 
@@ -614,20 +614,20 @@ export default function ExpensesPage() {
                             </div>
 
                             {/* Date */}
-                            <div className="col-span-2">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
                               <span className="text-sm text-gray-600">
                                 {new Date(transaction.date).toLocaleDateString()}
                               </span>
                             </div>
 
                             {/* Description with Icon */}
-                            <div className="col-span-3">
+                            <div className="col-span-3 border-l border-gray-200/40 pl-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
                                   <IconRenderer 
                                     iconName={transaction.icon} 
-                                    className="h-4 w-4"
-                                    fallbackColor={transaction.categories?.color}
+                                    className="h-4 w-4 text-white"
+                                    fallbackColor="white"
                                   />
                                 </div>
                                 <span className="text-sm font-medium text-gray-900 truncate">
@@ -637,14 +637,14 @@ export default function ExpensesPage() {
                             </div>
 
                             {/* Type */}
-                            <div className="col-span-1">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                 Expense
                               </span>
                             </div>
 
                             {/* Category */}
-                            <div className="col-span-2">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
                                 <span className="text-sm text-gray-600 truncate">
@@ -654,14 +654,14 @@ export default function ExpensesPage() {
                             </div>
 
                             {/* Amount */}
-                            <div className="col-span-2">
+                            <div className="col-span-2 border-l border-gray-200/40 pl-4">
                               <span className="text-sm font-medium text-gray-900">
                                 -${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
 
                             {/* Actions */}
-                            <div className="col-span-1">
+                            <div className="col-span-1 border-l border-gray-200/40 pl-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

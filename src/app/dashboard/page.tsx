@@ -7,7 +7,6 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
-  Activity,
   Plus,
   BarChart3,
   Wallet,
@@ -17,20 +16,28 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  DollarSign
+  DollarSign,
+  TrendingUp
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { Badge } from "@/components/ui/badge"
 import {
-  LineChart,
-  Line,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   BarChart,
   Bar,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Area,
+  AreaChart
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 
@@ -43,6 +50,7 @@ interface DashboardStats {
   categorySpending: any[]
   monthlyTrend: any[]
   topCategories: any[]
+  balanceTrend: any[]
 }
 
 interface QuickStat {
@@ -59,6 +67,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
+  const [balancePeriod, setBalancePeriod] = useState("3months")
   const itemsPerPage = 5
 
   const fetchDashboardData = useCallback(async () => {
@@ -86,7 +95,7 @@ export default function Dashboard() {
         .gte('date', currentMonthStart.toISOString().split('T')[0])
         .order('date', { ascending: false })
 
-      // Get all transactions for total balance and recent activities
+      // Get all transactions for balance calculation
       const { data: allTransactions } = await supabase
         .from('transactions')
         .select(`
@@ -100,7 +109,6 @@ export default function Dashboard() {
         `)
         .eq('user_id', user.id)
         .order('date', { ascending: false })
-        .limit(50)
 
       // Calculate stats
       const currentIncome = (currentTransactions || [])
@@ -116,25 +124,47 @@ export default function Dashboard() {
 
       const savingsRate = currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome) * 100 : 0
 
-      // Top spending categories
-      const categoryTotals = (currentTransactions || [])
-        .filter(t => t.type === 'expense')
-        .reduce((acc, t) => {
-          const categoryName = t.categories?.name || 'Uncategorized'
-          acc[categoryName] = (acc[categoryName] || 0) + Number(t.amount)
-          return acc
-        }, {} as Record<string, number>)
+      // Calculate balance trend based on selected period
+      const periods = {
+        "1month": 1,
+        "3months": 3,
+        "6months": 6,
+        "12months": 12,
+        "alltime": 24
+      }
+      const monthsToShow = periods[balancePeriod as keyof typeof periods] || 3
 
-      const topCategories = Object.entries(categoryTotals)
-        .map(([name, amount]) => ({
-          name,
-          amount: amount as number,
-          color: (currentTransactions || []).find(t => t.categories?.name === name)?.categories?.color || '#6B7280'
-        }))
-        .sort((a, b) => (b.amount as number) - (a.amount as number))
-        .slice(0, 5)
+      // Balance trend calculation
+      const balanceTrend = []
+      let runningBalance = 0
+      
+      // Get transactions in chronological order
+      const sortedTransactions = (allTransactions || [])
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-      // Monthly trend (last 6 months)
+      for (let i = monthsToShow - 1; i >= 0; i--) {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+        
+        const monthTransactions = sortedTransactions.filter(t => {
+          const tDate = new Date(t.date)
+          return tDate >= monthStart && tDate <= monthEnd
+        })
+        
+        const monthlyBalance = monthTransactions
+          .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
+        
+        runningBalance += monthlyBalance
+        
+        balanceTrend.push({
+          month: date.toLocaleDateString('en-US', { month: 'short' }),
+          balance: runningBalance
+        })
+      }
+
+      // Monthly comparison (last 6 months for consistency)
       const monthlyTrend = []
       for (let i = 5; i >= 0; i--) {
         const date = new Date()
@@ -158,8 +188,7 @@ export default function Dashboard() {
         monthlyTrend.push({
           month: date.toLocaleDateString('en-US', { month: 'short' }),
           income,
-          expenses,
-          savings: income - expenses
+          expenses
         })
       }
 
@@ -168,17 +197,18 @@ export default function Dashboard() {
         monthlyIncome: currentIncome,
         monthlyExpenses: currentExpenses,
         savingsRate,
-        recentTransactions: allTransactions || [],
-        categorySpending: topCategories,
+        recentTransactions: allTransactions?.slice(0, 50) || [],
+        categorySpending: [],
         monthlyTrend,
-        topCategories
+        topCategories: [],
+        balanceTrend
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, balancePeriod])
 
   useEffect(() => {
     if (user) {
@@ -305,14 +335,28 @@ export default function Dashboard() {
               {/* Charts Section - 2 Charts Side by Side */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 
-                {/* Financial Trend - Line Chart */}
+                {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <div className="flex items-center gap-2">
-                      <Activity className="h-4 w-4 text-blue-600" />
-                      <CardTitle className="text-sm font-medium text-gray-900">Financial Trend</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-blue-600" />
+                        <CardTitle className="text-sm font-medium text-gray-900">Total Balance</CardTitle>
+                      </div>
+                      <Select value={balancePeriod} onValueChange={setBalancePeriod}>
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1month">1 Month</SelectItem>
+                          <SelectItem value="3months">3 Months</SelectItem>
+                          <SelectItem value="6months">6 Months</SelectItem>
+                          <SelectItem value="12months">12 Months</SelectItem>
+                          <SelectItem value="alltime">All Time</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <p className="text-xs text-gray-600">Income, expenses and balance over time</p>
+                    <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {isLoading ? (
@@ -320,7 +364,13 @@ export default function Dashboard() {
                     ) : (
                         <div className="h-48">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                              </linearGradient>
+                            </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
@@ -335,11 +385,7 @@ export default function Dashboard() {
                               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
-                              formatter={(value: any, name: string) => [
-                                `$${Number(value).toLocaleString()}`, 
-                                  name === 'savings' ? 'Net Balance' : 
-                                name === 'income' ? 'Income' : 'Expenses'
-                              ]}
+                              formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
                               labelStyle={{ color: '#374151', fontWeight: 'normal' }}
                               contentStyle={{
                                 backgroundColor: 'white',
@@ -349,10 +395,15 @@ export default function Dashboard() {
                                 fontSize: '12px'
                               }}
                             />
-                            <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 3 }} />
-                            <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} />
-                            <Line type="monotone" dataKey="savings" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', r: 3 }} />
-                            </LineChart>
+                            <Area 
+                              type="monotone" 
+                              dataKey="balance" 
+                              stroke="#3b82f6" 
+                              strokeWidth={2}
+                              fill="url(#balanceGradient)"
+                              dot={{ fill: '#3b82f6', r: 3 }}
+                            />
+                            </AreaChart>
                           </ResponsiveContainer>
                         </div>
                     )}
@@ -448,10 +499,10 @@ export default function Dashboard() {
                       <div className="px-4 py-3 border-b border-gray-200/60">
                         <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4">Description</div>
-                          <div className="col-span-2">Date</div>
-                          <div className="col-span-2">Type</div>
-                          <div className="col-span-2">Category</div>
-                          <div className="col-span-2">Amount</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Date</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Type</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Category</div>
+                          <div className="col-span-2 border-l border-gray-200/40 pl-4">Amount</div>
                         </div>
                       </div>
 
@@ -480,14 +531,14 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Date */}
-                                <div className="col-span-2">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
                                   <span className="text-sm text-gray-600">
                                     {new Date(transaction.date).toLocaleDateString()}
                                   </span>
                                 </div>
 
                                 {/* Type */}
-                                <div className="col-span-2">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
                                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                                     transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                   }`}>
@@ -496,7 +547,7 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Category */}
-                                <div className="col-span-2">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
                                   <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
                                     <span className="text-sm text-gray-600 truncate">
@@ -506,7 +557,7 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Amount */}
-                                <div className="col-span-2">
+                                <div className="col-span-2 border-l border-gray-200/40 pl-4">
                                   <span className="text-sm font-medium text-gray-900">
                                     {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
                                   </span>
