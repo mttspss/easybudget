@@ -157,9 +157,22 @@ export default function Dashboard() {
       const currentSavingsRate = currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome) * 100 : 0
       const lastMonthSavingsRate = lastMonthIncome > 0 ? ((lastMonthIncome - lastMonthExpenses) / lastMonthIncome) * 100 : 0
 
-      // Calculate percentage changes
-      const incomeChange = lastMonthIncome > 0 ? ((currentIncome - lastMonthIncome) / lastMonthIncome) * 100 : 0
-      const expenseChange = lastMonthExpenses > 0 ? ((currentExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 : 0
+      // Calculate percentage changes with proper bounds and fallbacks
+      let incomeChange = 0
+      if (lastMonthIncome > 0) {
+        incomeChange = ((currentIncome - lastMonthIncome) / lastMonthIncome) * 100
+      } else if (currentIncome > 0) {
+        incomeChange = 100 // New income appeared
+      }
+      
+      let expenseChange = 0
+      if (lastMonthExpenses > 0) {
+        expenseChange = ((currentExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
+      } else if (currentExpenses > 0) {
+        expenseChange = 100 // New expenses appeared
+      }
+      
+      // Savings rate change is already a percentage difference
       const savingsRateChange = currentSavingsRate - lastMonthSavingsRate
 
       // For balance change, compare current total with total from last month
@@ -167,7 +180,20 @@ export default function Dashboard() {
         .filter(t => new Date(t.date) <= lastMonthEnd)
         .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
       
-      const balanceChange = lastMonthBalance !== 0 ? ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100 : 0
+      let balanceChange = 0
+      if (Math.abs(lastMonthBalance) > 0) {
+        balanceChange = ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100
+      } else if (totalBalance !== 0) {
+        balanceChange = totalBalance > 0 ? 100 : -100
+      }
+
+      // Cap percentage changes to reasonable values (-200% to +200%)
+      const capPercentage = (value: number) => Math.max(-200, Math.min(200, value))
+      
+      const boundedBalanceChange = capPercentage(balanceChange)
+      const boundedIncomeChange = capPercentage(incomeChange)  
+      const boundedExpenseChange = capPercentage(expenseChange)
+      const boundedSavingsRateChange = capPercentage(savingsRateChange)
 
       // Calculate balance trend based on selected period - DAILY PROGRESSION
       const periods = {
@@ -260,10 +286,10 @@ export default function Dashboard() {
         topCategories: [],
         balanceTrend,
         // Add percentage changes
-        balanceChange,
-        incomeChange,
-        expenseChange,
-        savingsRateChange
+        balanceChange: boundedBalanceChange,
+        incomeChange: boundedIncomeChange,
+        expenseChange: boundedExpenseChange,
+        savingsRateChange: boundedSavingsRateChange
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -375,7 +401,7 @@ export default function Dashboard() {
                                 : 'bg-red-100 text-red-700 hover:bg-red-100'
                             }`}
                           >
-                            {stat.changeType === 'increase' ? '+' : ''}{stat.change}%
+                            {stat.changeType === 'increase' ? '+' : ''}{Math.abs(stat.change).toFixed(1)}%
                           </Badge>
                         </div>
                             </div>
@@ -579,12 +605,12 @@ export default function Dashboard() {
                                 {/* Description with Icon */}
                                 <div className="col-span-4">
                                   <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center" 
-                                         style={{ backgroundColor: `${transaction.categories?.color}20` }}>
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm" 
+                                         style={{ backgroundColor: transaction.categories?.color }}>
                                       <IconRenderer 
                                         iconName={transaction.icon || transaction.categories?.icon} 
-                                        className="h-4 w-4"
-                                        fallbackColor={transaction.categories?.color}
+                                        className="h-4 w-4 text-white"
+                                        fallbackColor="white"
                                       />
                                     </div>
                                     <span className="text-sm font-medium text-gray-900 truncate">
