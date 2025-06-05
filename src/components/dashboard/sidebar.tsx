@@ -72,11 +72,6 @@ const sidebarItems = [
     title: "Import CSV",
     href: "/dashboard/import",
     icon: Upload,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
   }
 ]
 
@@ -91,6 +86,10 @@ export function Sidebar() {
 
   const handlePreferences = () => {
     router.push('/dashboard/preferences')
+  }
+
+  const handleHelpSupport = () => {
+    window.open('/#faq', '_blank')
   }
 
   return (
@@ -216,7 +215,10 @@ export function Sidebar() {
                 <Settings className="mr-3 h-4 w-4 text-gray-500" />
                 Preferences
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 focus:bg-gray-50">
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handleHelpSupport}
+              >
                 <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
                 Help & Support
               </DropdownMenuItem>

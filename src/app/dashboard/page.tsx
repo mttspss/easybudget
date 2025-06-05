@@ -427,7 +427,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
                         <CardTitle className="text-sm font-medium text-gray-900">Total Balance</CardTitle>
                       </div>
@@ -493,8 +493,8 @@ export default function Dashboard() {
                               activeDot={{ r: 4, stroke: '#3b82f6', strokeWidth: 2 }}
                             />
                             </AreaChart>
-                          </ResponsiveContainer>
-                        </div>
+                        </ResponsiveContainer>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -502,7 +502,7 @@ export default function Dashboard() {
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
@@ -560,7 +560,7 @@ export default function Dashboard() {
                     )}
                   </CardContent>
                 </Card>
-                    </div>
+              </div>
 
               {/* Recent Transactions Full Width */}
               <Card className="border border-gray-200">
