@@ -349,8 +349,8 @@ export default function AnalyticsPage() {
                             {analyticsData.insights.topCategory}
                           </p>
                         </div>
-                        <div className="p-2 bg-blue-100 rounded-full">
-                          <PieChart className="h-5 w-5 text-blue-600" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                          <PieChart className="h-6 w-6 text-white" />
                         </div>
                       </div>
                     </CardContent>
@@ -371,12 +371,12 @@ export default function AnalyticsPage() {
                               {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
                                analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
                             </span>
-                    </div>
-                    </div>
-                        <div className="p-2 bg-green-100 rounded-full">
-                          <TrendingUp className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
+                          </div>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                          <TrendingUp className="h-6 w-6 text-white" />
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -389,8 +389,8 @@ export default function AnalyticsPage() {
                             ${analyticsData.insights.averageDaily.toFixed(0)}
                           </p>
                         </div>
-                        <div className="p-2 bg-purple-100 rounded-full">
-                          <Activity className="h-5 w-5 text-purple-600" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                          <Activity className="h-6 w-6 text-white" />
                         </div>
                       </div>
                     </CardContent>
@@ -405,8 +405,8 @@ export default function AnalyticsPage() {
                             ${analyticsData.insights.projectedMonthly.toFixed(0)}
                           </p>
                         </div>
-                        <div className="p-2 bg-orange-100 rounded-full">
-                          <Target className="h-5 w-5 text-orange-600" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                          <Target className="h-6 w-6 text-white" />
                         </div>
                       </div>
                     </CardContent>

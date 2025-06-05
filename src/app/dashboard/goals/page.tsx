@@ -346,8 +346,8 @@ export default function GoalsPage() {
                       <p className="text-xs font-medium text-gray-600">Total Goals</p>
                       <p className="text-xl font-bold text-gray-900">{totalGoals}</p>
                     </div>
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Target className="h-5 w-5 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <Target className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -360,8 +360,8 @@ export default function GoalsPage() {
                       <p className="text-xs font-medium text-gray-600">Completed</p>
                       <p className="text-xl font-bold text-gray-900">{completedGoals}</p>
                     </div>
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <CheckCircle className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -374,8 +374,8 @@ export default function GoalsPage() {
                       <p className="text-xs font-medium text-gray-600">In Progress</p>
                       <p className="text-xl font-bold text-gray-900">{inProgressGoals}</p>
                     </div>
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Clock className="h-5 w-5 text-orange-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                      <Clock className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>

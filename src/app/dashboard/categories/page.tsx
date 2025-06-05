@@ -408,8 +408,8 @@ export default function CategoriesPage() {
                       <p className="text-xs font-medium text-gray-600">Total Categories</p>
                       <p className="text-xl font-bold text-gray-900">{categories.length}</p>
                     </div>
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FolderOpen className="h-5 w-5 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <FolderOpen className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -422,8 +422,8 @@ export default function CategoriesPage() {
                       <p className="text-xs font-medium text-gray-600">Income Categories</p>
                       <p className="text-xl font-bold text-gray-900">{incomeCategories.length}</p>
                     </div>
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <ArrowUpRight className="h-5 w-5 text-green-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <ArrowUpRight className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -436,8 +436,8 @@ export default function CategoriesPage() {
                       <p className="text-xs font-medium text-gray-600">Expense Categories</p>
                       <p className="text-xl font-bold text-gray-900">{expenseCategories.length}</p>
                     </div>
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <ArrowDownRight className="h-5 w-5 text-red-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                      <ArrowDownRight className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -460,13 +460,13 @@ export default function CategoriesPage() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: category.color + '20' }}
+                              className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
+                              style={{ backgroundColor: category.color }}
                             >
                               <IconRenderer 
                                 iconName={category.icon} 
-                                className="h-4 w-4"
-                                fallbackColor={category.color}
+                                className="h-5 w-5 text-white"
+                                fallbackColor="white"
                               />
                             </div>
                             <div>

@@ -212,8 +212,8 @@ export default function ReportsPage() {
                           : '0'}
                       </p>
                     </div>
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                      <TrendingUp className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -230,8 +230,8 @@ export default function ReportsPage() {
                           : '0'}
                       </p>
                     </div>
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <ArrowUpDown className="h-5 w-5 text-red-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                      <ArrowUpDown className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -248,8 +248,8 @@ export default function ReportsPage() {
                           : '0'}
                       </p>
                     </div>
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                      <DollarSign className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -264,8 +264,8 @@ export default function ReportsPage() {
                         {reportData?.categoryData?.[0]?.name || 'N/A'}
                       </p>
                     </div>
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <PieChart className="h-5 w-5 text-purple-600" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                      <PieChart className="h-6 w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>

@@ -51,6 +51,10 @@ interface DashboardStats {
   monthlyTrend: any[]
   topCategories: any[]
   balanceTrend: any[]
+  balanceChange: number
+  incomeChange: number
+  expenseChange: number
+  savingsRateChange: number
 }
 
 interface QuickStat {
@@ -78,6 +82,8 @@ export default function Dashboard() {
       
       const now = new Date()
       const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
       
       // Get current month transactions
       const { data: currentTransactions } = await supabase
@@ -95,6 +101,23 @@ export default function Dashboard() {
         .gte('date', currentMonthStart.toISOString().split('T')[0])
         .order('date', { ascending: false })
 
+      // Get last month transactions for comparison
+      const { data: lastMonthTransactions } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          categories (
+            name,
+            color,
+            type,
+            icon
+          )
+        `)
+        .eq('user_id', user.id)
+        .gte('date', lastMonthStart.toISOString().split('T')[0])
+        .lte('date', lastMonthEnd.toISOString().split('T')[0])
+        .order('date', { ascending: false })
+
       // Get all transactions for balance calculation
       const { data: allTransactions } = await supabase
         .from('transactions')
@@ -110,7 +133,7 @@ export default function Dashboard() {
         .eq('user_id', user.id)
         .order('date', { ascending: false })
 
-      // Calculate stats
+      // Calculate current month stats
       const currentIncome = (currentTransactions || [])
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + Number(t.amount), 0)
@@ -119,22 +142,44 @@ export default function Dashboard() {
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 
+      // Calculate last month stats for comparison
+      const lastMonthIncome = (lastMonthTransactions || [])
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      const lastMonthExpenses = (lastMonthTransactions || [])
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
       const totalBalance = (allTransactions || [])
         .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
 
-      const savingsRate = currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome) * 100 : 0
+      const currentSavingsRate = currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome) * 100 : 0
+      const lastMonthSavingsRate = lastMonthIncome > 0 ? ((lastMonthIncome - lastMonthExpenses) / lastMonthIncome) * 100 : 0
 
-      // Calculate balance trend based on selected period
+      // Calculate percentage changes
+      const incomeChange = lastMonthIncome > 0 ? ((currentIncome - lastMonthIncome) / lastMonthIncome) * 100 : 0
+      const expenseChange = lastMonthExpenses > 0 ? ((currentExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 : 0
+      const savingsRateChange = currentSavingsRate - lastMonthSavingsRate
+
+      // For balance change, compare current total with total from last month
+      const lastMonthBalance = (allTransactions || [])
+        .filter(t => new Date(t.date) <= lastMonthEnd)
+        .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
+      
+      const balanceChange = lastMonthBalance !== 0 ? ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100 : 0
+
+      // Calculate balance trend based on selected period - DAILY PROGRESSION
       const periods = {
-        "1month": 1,
-        "3months": 3,
-        "6months": 6,
-        "12months": 12,
-        "alltime": 24
+        "1month": 30,
+        "3months": 90,
+        "6months": 180,
+        "12months": 365,
+        "alltime": 730 // 2 years max
       }
-      const monthsToShow = periods[balancePeriod as keyof typeof periods] || 3
+      const daysToShow = periods[balancePeriod as keyof typeof periods] || 90
 
-      // Balance trend calculation
+      // Balance trend calculation - DAILY
       const balanceTrend = []
       let runningBalance = 0
       
@@ -142,26 +187,38 @@ export default function Dashboard() {
       const sortedTransactions = (allTransactions || [])
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-      for (let i = monthsToShow - 1; i >= 0; i--) {
+      // Start from the oldest date we want to show
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - daysToShow)
+
+      // Calculate running balance up to start date
+      const preTransactions = sortedTransactions.filter(t => new Date(t.date) < startDate)
+      runningBalance = preTransactions.reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
+
+      // Generate daily balance points
+      for (let i = daysToShow - 1; i >= 0; i--) {
         const date = new Date()
-        date.setMonth(date.getMonth() - i)
-        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
-        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+        date.setDate(date.getDate() - i)
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
         
-        const monthTransactions = sortedTransactions.filter(t => {
+        const dayTransactions = sortedTransactions.filter(t => {
           const tDate = new Date(t.date)
-          return tDate >= monthStart && tDate <= monthEnd
+          return tDate >= dayStart && tDate <= dayEnd
         })
         
-        const monthlyBalance = monthTransactions
+        const dailyNet = dayTransactions
           .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
         
-        runningBalance += monthlyBalance
+        runningBalance += dailyNet
         
-        balanceTrend.push({
-          month: date.toLocaleDateString('en-US', { month: 'short' }),
-          balance: runningBalance
-        })
+        // Only add every 7th point for longer periods to avoid overcrowding
+        if (daysToShow <= 30 || i % Math.ceil(daysToShow / 30) === 0) {
+          balanceTrend.push({
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            balance: runningBalance
+          })
+        }
       }
 
       // Monthly comparison (last 6 months for consistency)
@@ -196,12 +253,17 @@ export default function Dashboard() {
         totalBalance,
         monthlyIncome: currentIncome,
         monthlyExpenses: currentExpenses,
-        savingsRate,
+        savingsRate: currentSavingsRate,
         recentTransactions: allTransactions?.slice(0, 50) || [],
         categorySpending: [],
         monthlyTrend,
         topCategories: [],
-        balanceTrend
+        balanceTrend,
+        // Add percentage changes
+        balanceChange,
+        incomeChange,
+        expenseChange,
+        savingsRateChange
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -232,32 +294,32 @@ export default function Dashboard() {
     {
       title: "Total Balance",
       amount: stats?.totalBalance || 0,
-      change: 12.5,
-      changeType: "increase",
+      change: stats?.balanceChange || 0,
+      changeType: (stats?.balanceChange || 0) >= 0 ? "increase" : "decrease",
       icon: Wallet,
       color: "bg-blue-500"
     },
     {
       title: "Monthly Income",
       amount: stats?.monthlyIncome || 0,
-      change: 8.2,
-      changeType: "increase",
+      change: stats?.incomeChange || 0,
+      changeType: (stats?.incomeChange || 0) >= 0 ? "increase" : "decrease",
       icon: DollarSign,
       color: "bg-green-500"
     },
     {
       title: "Monthly Expenses",
       amount: stats?.monthlyExpenses || 0,
-      change: -3.1,
-      changeType: "decrease",
+      change: stats?.expenseChange || 0,
+      changeType: (stats?.expenseChange || 0) >= 0 ? "increase" : "decrease",
       icon: CreditCard,
       color: "bg-orange-500"
     },
     {
       title: "Savings Rate",
       amount: stats?.savingsRate || 0,
-      change: 2.4,
-      changeType: "increase",
+      change: stats?.savingsRateChange || 0,
+      changeType: (stats?.savingsRateChange || 0) >= 0 ? "increase" : "decrease",
       icon: PiggyBank,
       color: "bg-purple-500"
     }
@@ -373,7 +435,7 @@ export default function Dashboard() {
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
-                              dataKey="month" 
+                              dataKey="date" 
                                 tick={{ fontSize: 10, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
@@ -401,7 +463,8 @@ export default function Dashboard() {
                               stroke="#3b82f6" 
                               strokeWidth={2}
                               fill="url(#balanceGradient)"
-                              dot={{ fill: '#3b82f6', r: 3 }}
+                              dot={false}
+                              activeDot={{ r: 4, stroke: '#3b82f6', strokeWidth: 2 }}
                             />
                             </AreaChart>
                           </ResponsiveContainer>
