@@ -17,7 +17,8 @@ import {
   Target,
   Calendar,
   CheckCircle,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -31,6 +32,7 @@ import {
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
+import confetti from 'canvas-confetti'
 
 interface Goal {
   id: string
@@ -200,6 +202,31 @@ export default function GoalsPage() {
         .eq('id', goal.id)
 
       if (error) throw error
+      
+      // Celebration confetti animation
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#22c55e', '#16a34a', '#15803d']
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#22c55e', '#16a34a', '#15803d']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
       
       toast.success('🎉 Goal completed! Congratulations!')
       fetchGoals()
@@ -427,7 +454,13 @@ export default function GoalsPage() {
                           <div key={goal.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-300 border border-gray-200">
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
-                                <h3 className="text-sm font-medium text-gray-900 mb-1">{goal.name}</h3>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h3 className="text-sm font-medium text-gray-900">{goal.name}</h3>
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    In Progress
+                                  </span>
+                                </div>
                                 {goal.description && (
                                   <p className="text-xs text-gray-600 mb-2">{goal.description}</p>
                                 )}
