@@ -15,10 +15,8 @@ import {
   Edit,
   Trash2,
   Target,
-  Calendar,
   CheckCircle,
-  Clock,
-  Loader2
+  Clock
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -241,11 +239,8 @@ export default function GoalsPage() {
     goal.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const inProgressGoals = filteredGoals.filter(g => g.current_amount < g.target_amount)
-  const completedGoalsFiltered = filteredGoals.filter(g => g.current_amount >= g.target_amount)
-
   const totalGoals = filteredGoals.length
-  const completedGoals = completedGoalsFiltered.length
+  const completedGoals = filteredGoals.filter(g => g.current_amount >= g.target_amount).length
   const inProgressGoalsCount = totalGoals - completedGoals
 
   const getProgressPercentage = (current: number, target: number) => {
@@ -432,194 +427,163 @@ export default function GoalsPage() {
               </Card>
             </div>
 
-            {/* Goals Two-Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              
-              {/* In Progress Goals Column */}
-              <Card>
-                <CardContent className="p-4">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
-                      ))}
+            {/* Goals Table */}
+            <Card className="border border-gray-200">
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <div className="p-4 space-y-2">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredGoals.length > 0 ? (
+                  <>
+                    {/* Table Header */}
+                    <div className="px-6 py-3 border-b border-gray-200/60 bg-gray-50/30">
+                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        <div className="col-span-3">Goal Name</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Status</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Progress</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Target Amount</div>
+                        <div className="col-span-2 border-l border-gray-200/40 pl-3">Due Date</div>
+                        <div className="col-span-1 border-l border-gray-200/40 pl-3">Actions</div>
+                      </div>
                     </div>
-                  ) : inProgressGoals.length > 0 ? (
-                    <div className="space-y-3">
-                      {inProgressGoals.map((goal) => {
-                        const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
-                        const daysRemaining = getDaysRemaining(goal.target_date)
-                        
-                        return (
-                          <div key={goal.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-300 border border-gray-200">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <h3 className="text-sm font-medium text-gray-900">{goal.name}</h3>
-                                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                    In Progress
+
+                    {/* Table Body */}
+                    <div className="divide-y divide-gray-100/60">
+                      {filteredGoals
+                        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                        .map((goal) => {
+                          const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
+                          const daysRemaining = getDaysRemaining(goal.target_date)
+                          const isCompleted = goal.current_amount >= goal.target_amount
+                          
+                          return (
+                            <div key={goal.id} className="px-6 py-3 hover:bg-gray-50/50 transition-colors border-l-4 border-transparent hover:border-l-blue-200">
+                              <div className="grid grid-cols-12 gap-3 items-center">
+                                {/* Goal Name */}
+                                <div className="col-span-3">
+                                  <h3 className="text-sm font-medium text-gray-900 truncate">{goal.name}</h3>
+                                  {goal.description && (
+                                    <p className="text-xs text-gray-500 truncate mt-0.5">{goal.description}</p>
+                                  )}
+                                </div>
+
+                                {/* Status */}
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  {isCompleted ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                      <CheckCircle className="h-3 w-3" />
+                                      Completed
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                      <Clock className="h-3 w-3" />
+                                      In Progress
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Progress */}
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-gray-600">${goal.current_amount.toLocaleString()}</span>
+                                      <span className="font-medium text-gray-900">{progress}%</span>
+                                    </div>
+                                    <Progress value={progress} className="h-1.5" />
+                                  </div>
+                                </div>
+
+                                {/* Target Amount */}
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    ${goal.target_amount.toLocaleString()}
                                   </span>
                                 </div>
-                                {goal.description && (
-                                  <p className="text-xs text-gray-600 mb-2">{goal.description}</p>
-                                )}
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-gray-600">
-                                      ${goal.current_amount.toLocaleString()} of ${goal.target_amount.toLocaleString()}
-                                    </span>
-                                    <span className="font-medium text-gray-900">{progress}%</span>
-                                  </div>
-                                  <Progress value={progress} className="h-2" />
-                                  {daysRemaining !== null && (
-                                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                                      <Calendar className="h-3 w-3" />
-                                      <span>
-                                        {daysRemaining > 0 
-                                          ? `${daysRemaining} days remaining`
-                                          : daysRemaining === 0 
-                                          ? 'Due today'
-                                          : `${Math.abs(daysRemaining)} days overdue`
-                                        }
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-1 ml-4">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleCompleteGoal(goal)}
-                                  className="h-8 px-2 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100 transition-all duration-300"
-                                >
-                                  <CheckCircle className="h-3 w-3 mr-1" />
-                                  Complete
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEdit(goal)}
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDelete(goal.id)}
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <h3 className="text-sm font-medium text-gray-900 mb-1">No goals in progress</h3>
-                      <p className="text-xs text-gray-500 mb-3">Create your first goal to start tracking progress</p>
-                      <Button 
-                        size="sm" 
-                        onClick={() => setIsDialogOpen(true)}
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Add Goal
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
 
-              {/* Completed Goals Column */}
-              <Card>
-                <CardContent className="p-4">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
-                      ))}
-                    </div>
-                  ) : completedGoalsFiltered.length > 0 ? (
-                    <div className="space-y-3">
-                      {completedGoalsFiltered.map((goal) => {
-                        const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
-                        const daysRemaining = getDaysRemaining(goal.target_date)
-                        
-                        return (
-                          <div key={goal.id} className="p-4 bg-green-50 rounded-lg border border-green-200 transition-all duration-300 hover:shadow-md hover:scale-105" style={{
-                            boxShadow: '0 0 0 2px rgba(34, 197, 94, 0.2)',
-                          }}>
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-sm font-medium text-gray-900">{goal.name}</h3>
-                                  <CheckCircle className="h-4 w-4 text-green-500" />
-                                </div>
-                                {goal.description && (
-                                  <p className="text-xs text-gray-600 mb-2">{goal.description}</p>
-                                )}
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-gray-600">
-                                      ${goal.current_amount.toLocaleString()} of ${goal.target_amount.toLocaleString()}
-                                    </span>
-                                    <span className="font-medium text-green-700">{progress}% ✨</span>
-                                  </div>
-                                  <Progress value={progress} className="h-2 bg-green-100" />
-                                  {daysRemaining !== null && (
-                                    <div className="flex items-center gap-1 text-xs text-green-600">
-                                      <Calendar className="h-3 w-3" />
-                                      <span>
-                                        {daysRemaining > 0 
-                                          ? `Completed with ${daysRemaining} days to spare!`
-                                          : daysRemaining === 0 
-                                          ? 'Completed on time!'
-                                          : `Completed ${Math.abs(daysRemaining)} days after deadline`
-                                        }
-                                      </span>
+                                {/* Due Date */}
+                                <div className="col-span-2 border-l border-gray-200/40 pl-3">
+                                  {goal.target_date ? (
+                                    <div className="text-xs">
+                                      <div className="text-gray-600">
+                                        {new Date(goal.target_date).toLocaleDateString()}
+                                      </div>
+                                      {daysRemaining !== null && (
+                                        <div className={`font-medium ${
+                                          isCompleted 
+                                            ? 'text-green-600' 
+                                            : daysRemaining > 0 
+                                            ? 'text-gray-600' 
+                                            : 'text-red-600'
+                                        }`}>
+                                          {isCompleted 
+                                            ? daysRemaining > 0 
+                                              ? `${daysRemaining} days early` 
+                                              : 'Completed'
+                                            : daysRemaining > 0 
+                                            ? `${daysRemaining} days left`
+                                            : `${Math.abs(daysRemaining)} days overdue`
+                                          }
+                                        </div>
+                                      )}
                                     </div>
+                                  ) : (
+                                    <span className="text-xs text-gray-400">No deadline</span>
                                   )}
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-1 ml-4">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEdit(goal)}
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDelete(goal.id)}
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
+
+                                {/* Actions */}
+                                <div className="col-span-1 border-l border-gray-200/40 pl-3">
+                                  <div className="flex items-center gap-1">
+                                    {!isCompleted && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleCompleteGoal(goal)}
+                                        className="h-7 px-2 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                      >
+                                        <CheckCircle className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEdit(goal)}
+                                      className="h-7 w-7 p-0"
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDelete(goal.id)}
+                                      className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
                     </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <CheckCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <h3 className="text-sm font-medium text-gray-900 mb-1">No completed goals</h3>
-                      <p className="text-xs text-gray-500 mb-3">Complete your goals to see them here</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No goals found</h3>
+                    <p className="text-xs text-gray-500 mb-4">Set your first financial goal to start tracking your progress</p>
+                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Goal
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>

@@ -204,7 +204,7 @@ export default function Dashboard() {
       }
       const daysToShow = periods[balancePeriod as keyof typeof periods] || 90
 
-      // Balance trend calculation - DAILY
+      // Balance trend calculation - DAILY - STARTING FROM 0
       const balanceTrend = []
       let runningBalance = 0
       
@@ -216,9 +216,16 @@ export default function Dashboard() {
       const startDate = new Date()
       startDate.setDate(startDate.getDate() - daysToShow)
 
-      // Calculate running balance up to start date
-      const preTransactions = sortedTransactions.filter(t => new Date(t.date) < startDate)
-      runningBalance = preTransactions.reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
+      // ALWAYS start from 0 balance, don't include pre-transactions
+      // This ensures the chart shows the growth from 0
+      
+      // Add initial point at 0 if we have transactions
+      if (sortedTransactions.length > 0) {
+        balanceTrend.push({
+          date: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          balance: 0
+        })
+      }
 
       // Generate daily balance points
       for (let i = daysToShow - 1; i >= 0; i--) {
@@ -227,9 +234,10 @@ export default function Dashboard() {
         const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate())
         const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
         
+        // Only count transactions from startDate onwards
         const dayTransactions = sortedTransactions.filter(t => {
           const tDate = new Date(t.date)
-          return tDate >= dayStart && tDate <= dayEnd
+          return tDate.getTime() >= Math.max(dayStart.getTime(), startDate.getTime()) && tDate.getTime() <= dayEnd.getTime()
         })
         
         const dailyNet = dayTransactions
@@ -455,7 +463,7 @@ export default function Dashboard() {
                     ) : (
                         <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 20, left: 0, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 40, left: 0, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
