@@ -453,14 +453,6 @@ export default function CategoriesPage() {
               {/* Income Categories Column */}
               <Card>
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                      <ArrowUpRight className="h-4 w-4 text-white" />
-                    </div>
-                    <h2 className="text-sm font-semibold text-gray-900">Income Categories</h2>
-                    <span className="text-xs text-gray-500">({incomeCategories.length})</span>
-                  </div>
-                  
                   {isLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map(i => (
@@ -545,14 +537,6 @@ export default function CategoriesPage() {
               {/* Expense Categories Column */}
               <Card>
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
-                      <ArrowDownRight className="h-4 w-4 text-white" />
-                    </div>
-                    <h2 className="text-sm font-semibold text-gray-900">Expense Categories</h2>
-                    <span className="text-xs text-gray-500">({expenseCategories.length})</span>
-                  </div>
-                  
                   {isLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map(i => (
