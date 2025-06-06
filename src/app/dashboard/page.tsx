@@ -455,7 +455,7 @@ export default function Dashboard() {
                     ) : (
                         <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 20, left: 20, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 20, left: 0, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -516,7 +516,7 @@ export default function Dashboard() {
                     ) : (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 20, left: 20, bottom: 0 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 20, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 

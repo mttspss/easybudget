@@ -254,12 +254,6 @@ export default function CategoriesPage() {
     }
   }
 
-  const filteredCategories = categories.filter(category => {
-    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = selectedType === "all" || category.type === selectedType
-    return matchesSearch && matchesType
-  })
-
   const incomeCategories = categories.filter(c => c.type === 'income')
   const expenseCategories = categories.filter(c => c.type === 'expense')
 
@@ -453,91 +447,193 @@ export default function CategoriesPage() {
               </Card>
             </div>
 
-            {/* Categories Grid - Compact */}
-            <Card>
-              <CardContent className="p-3">
-                {isLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {[1, 2, 3, 4, 5, 6].map(i => (
-                      <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
-                    ))}
+            {/* Categories Two-Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              
+              {/* Income Categories Column */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                      <ArrowUpRight className="h-4 w-4 text-white" />
+                    </div>
+                    <h2 className="text-sm font-semibold text-gray-900">Income Categories</h2>
+                    <span className="text-xs text-gray-500">({incomeCategories.length})</span>
                   </div>
-                ) : filteredCategories.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {filteredCategories.map((category) => (
-                      <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-                              style={{ backgroundColor: category.color }}
-                            >
-                              <IconRenderer 
-                                iconName={category.icon} 
-                                className="h-4 w-4 text-white"
-                                fallbackColor="white"
-                              />
-                            </div>
-                            <div>
-                              <h3 className="text-sm font-medium text-gray-900">{category.name}</h3>
-                              <div className="flex items-center gap-1 mt-0.5">
-                                {category.type === 'income' ? (
-                                  <ArrowUpRight className="h-3 w-3 text-green-500" />
-                                ) : (
-                                  <ArrowDownRight className="h-3 w-3 text-red-500" />
-                                )}
-                                <span className="text-xs text-gray-500 capitalize">{category.type}</span>
+                  
+                  {isLoading ? (
+                    <div className="space-y-2">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      ))}
+                    </div>
+                  ) : incomeCategories.length > 0 ? (
+                    <div className="space-y-2">
+                      {incomeCategories
+                        .filter(category => category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((category) => (
+                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-1">
+                              <div 
+                                className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+                                style={{ backgroundColor: category.color }}
+                              >
+                                <IconRenderer 
+                                  iconName={category.icon} 
+                                  className="h-4 w-4 text-white"
+                                  fallbackColor="white"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="text-sm font-medium text-gray-900">{category.name}</h3>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-xs text-gray-500">
+                                    {category.transaction_count || 0} transactions
+                                  </span>
+                                  <span className="text-xs font-medium text-[#53E489]">
+                                    ${(category.total_amount || 0).toLocaleString()}
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <MoreHorizontal className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEdit(category)}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                  onClick={() => handleDelete(category.id)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <MoreHorizontal className="h-3 w-3" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEdit(category)}>
-                                <Edit className="h-3 w-3 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                onClick={() => handleDelete(category.id)}
-                                className="text-red-600"
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <ArrowUpRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <h3 className="text-sm font-medium text-gray-900 mb-1">No income categories</h3>
+                      <p className="text-xs text-gray-500 mb-3">Create categories for your income sources</p>
+                      <Button 
+                        size="sm" 
+                        onClick={() => {
+                          setFormData({...formData, type: 'income'})
+                          setIsDialogOpen(true)
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add Income Category
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Expense Categories Column */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
+                      <ArrowDownRight className="h-4 w-4 text-white" />
+                    </div>
+                    <h2 className="text-sm font-semibold text-gray-900">Expense Categories</h2>
+                    <span className="text-xs text-gray-500">({expenseCategories.length})</span>
+                  </div>
+                  
+                  {isLoading ? (
+                    <div className="space-y-2">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                      ))}
+                    </div>
+                  ) : expenseCategories.length > 0 ? (
+                    <div className="space-y-2">
+                      {expenseCategories
+                        .filter(category => category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((category) => (
+                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-1">
+                              <div 
+                                className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+                                style={{ backgroundColor: category.color }}
                               >
-                                <Trash2 className="h-3 w-3 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-gray-500">Transactions:</span>
-                            <span className="font-medium ml-1">{category.transaction_count || 0}</span>
+                                <IconRenderer 
+                                  iconName={category.icon} 
+                                  className="h-4 w-4 text-white"
+                                  fallbackColor="white"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="text-sm font-medium text-gray-900">{category.name}</h3>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-xs text-gray-500">
+                                    {category.transaction_count || 0} transactions
+                                  </span>
+                                  <span className="text-xs font-medium text-[#EF0465]">
+                                    ${(category.total_amount || 0).toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <MoreHorizontal className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEdit(category)}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                  onClick={() => handleDelete(category.id)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                          <div>
-                            <span className="text-gray-500">Total:</span>
-                            <span className="font-medium ml-1">${(category.total_amount || 0).toFixed(0)}</span>
-                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">No categories found</h3>
-                    <p className="text-xs text-gray-500 mb-4">Create your first category to start organizing your transactions</p>
-                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Category
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <ArrowDownRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <h3 className="text-sm font-medium text-gray-900 mb-1">No expense categories</h3>
+                      <p className="text-xs text-gray-500 mb-3">Create categories for your expenses</p>
+                      <Button 
+                        size="sm"
+                        onClick={() => {
+                          setFormData({...formData, type: 'expense'})
+                          setIsDialogOpen(true)
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add Expense Category
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>
