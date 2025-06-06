@@ -244,7 +244,7 @@ export default function LandingPage() {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden">
-                  <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
+                  <Image src="/newicon.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
               </div>
                 <span className="text-2xl font-semibold">
                   <span className="text-black">easybudget</span>
@@ -861,7 +861,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
-                  <Image src="/mainlogo.svg" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+                  <Image src="/newicon.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xl font-bold">
                   <span className="text-slate-900">easybudget</span>

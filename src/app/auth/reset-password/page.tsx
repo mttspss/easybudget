@@ -73,11 +73,11 @@ export default function ResetPasswordPage() {
           <div className="text-center mb-6">
             <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Image 
-                src="/mainlogo.svg" 
+                src="/newicon.png" 
                 alt="EasyBudget Logo" 
                 width={64} 
                 height={64} 
-                className="w-16 h-16 object-contain" 
+                className="w-full h-full object-contain" 
               />
             </div>
             
