@@ -421,34 +421,34 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
                 {/* Total Balance Trend - Clean Area Chart */}
-                <Card>
-                  <CardHeader className="pb-0 px-3 pt-2 border-b border-gray-100">
-                    <div className="flex items-center justify-between">
+                <Card className="relative">
+                  {/* Overlay Header */}
+                  <div className="absolute top-2 left-3 right-3 z-10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-blue-600" />
-                        <CardTitle className="text-xs font-medium text-gray-900">Total Balance</CardTitle>
-                      </div>
-                      <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                        <SelectTrigger className="w-20 h-5 text-xs border-0 bg-gray-50">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1month">1M</SelectItem>
-                          <SelectItem value="3months">3M</SelectItem>
-                          <SelectItem value="6months">6M</SelectItem>
-                          <SelectItem value="12months">1Y</SelectItem>
-                          <SelectItem value="alltime">All</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs font-medium text-gray-900 bg-white/80 backdrop-blur-sm px-2 py-1 rounded">Total Balance</span>
                     </div>
-                  </CardHeader>
+                    <Select value={balancePeriod} onValueChange={setBalancePeriod}>
+                      <SelectTrigger className="w-28 h-6 text-xs bg-white/80 backdrop-blur-sm border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1month">1 Month</SelectItem>
+                        <SelectItem value="3months">3 Months</SelectItem>
+                        <SelectItem value="6months">6 Months</SelectItem>
+                        <SelectItem value="12months">12 Months</SelectItem>
+                        <SelectItem value="alltime">All Time</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
                   <CardContent className="p-0">
                     {isLoading ? (
                         <div className="h-52 bg-gray-100 animate-pulse" />
                     ) : (
                         <div className="h-52">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 40, right: 20, left: 20, bottom: 20 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -496,20 +496,20 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Monthly Comparison - Bar Chart */}
-                <Card>
-                  <CardHeader className="pb-0 px-3 pt-2 border-b border-gray-100">
-                        <div className="flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-indigo-600" />
-                      <CardTitle className="text-xs font-medium text-gray-900">Monthly Comparison</CardTitle>
-                    </div>
-                  </CardHeader>
+                <Card className="relative">
+                  {/* Overlay Header */}
+                  <div className="absolute top-2 left-3 right-3 z-10 flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-indigo-600" />
+                    <span className="text-xs font-medium text-gray-900 bg-white/80 backdrop-blur-sm px-2 py-1 rounded">Monthly Comparison</span>
+                  </div>
+                  
                   <CardContent className="p-0">
                     {isLoading ? (
                       <div className="h-52 bg-gray-100 animate-pulse" />
                     ) : (
                       <div className="h-52">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 40, right: 20, left: 20, bottom: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
