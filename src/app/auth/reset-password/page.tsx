@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
           <div className="text-center mb-6">
             <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Image 
-                src="/newicon.png" 
+                src="/newicon1.png" 
                 alt="EasyBudget Logo" 
                 width={64} 
                 height={64} 
@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 placeholder="New Password" 
-                className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm pr-10" 
+                className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#60ea8b] focus:ring-[#60ea8b]/20 shadow-sm text-sm pr-10" 
                 required 
               />
               <button
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword} 
                 onChange={(e) => setConfirmPassword(e.target.value)} 
                 placeholder="Confirm New Password" 
-                className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm pr-10" 
+                className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#60ea8b] focus:ring-[#60ea8b]/20 shadow-sm text-sm pr-10" 
                 required 
               />
               <button

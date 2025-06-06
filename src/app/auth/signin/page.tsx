@@ -84,7 +84,7 @@ export default function SignInPage() {
             <div className="text-center mb-6">
               <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Image 
-                  src="/newicon.png" 
+                  src="/newicon1.png" 
                   alt="EasyBudget Logo" 
                   width={64} 
                   height={64} 
@@ -103,7 +103,7 @@ export default function SignInPage() {
                   value={resetEmail} 
                   onChange={(e) => setResetEmail(e.target.value)} 
                   placeholder="Email" 
-                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#60ea8b] focus:ring-[#60ea8b]/20 shadow-sm text-sm" 
                   required 
                 />
               </div>
@@ -143,7 +143,7 @@ export default function SignInPage() {
           <div className="text-center mb-6">
             <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Image 
-                src="/newicon.png" 
+                src="/newicon1.png" 
                 alt="EasyBudget Logo" 
                 width={64} 
                 height={64} 
@@ -154,7 +154,7 @@ export default function SignInPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
               Welcome to{" "}
               <span className="text-gray-900">easybudget</span>
-              <span className="text-green-400">.ing</span>
+              <span style={{color: '#60ea8b'}}>.ing</span>
             </h1>
             <p className="text-gray-600 text-sm">Sign in to your account</p>
           </div>
@@ -195,7 +195,7 @@ export default function SignInPage() {
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                   placeholder="Email" 
-                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#60ea8b] focus:ring-[#60ea8b]/20 shadow-sm text-sm" 
                   required 
                 />
               </div>
@@ -206,7 +206,7 @@ export default function SignInPage() {
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
                   placeholder="Password" 
-                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#7aff01] focus:ring-[#7aff01]/20 shadow-sm text-sm pr-10" 
+                  className="h-10 bg-white/80 backdrop-blur-sm border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#60ea8b] focus:ring-[#60ea8b]/20 shadow-sm text-sm pr-10" 
                   required 
                 />
                 <button
@@ -231,7 +231,8 @@ export default function SignInPage() {
             <div className="text-center">
               <button
                 onClick={() => setShowResetForm(true)}
-                className="text-[#7aff01] hover:text-[#9eff31] text-sm font-medium"
+                className="hover:opacity-80 text-sm font-medium"
+                style={{color: '#60ea8b'}}
               >
                 Forgot your password?
               </button>
@@ -241,7 +242,7 @@ export default function SignInPage() {
             <div className="text-center space-y-3">
               <p className="text-gray-600 text-sm">
                 Don&apos;t have an account?{" "}
-                <Link href="/auth/register" className="text-[#7aff01] hover:text-[#9eff31] font-medium">
+                <Link href="/auth/register" className="hover:opacity-80 font-medium" style={{color: '#60ea8b'}}>
                   Sign up for free
                 </Link>
               </p>

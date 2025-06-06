@@ -99,12 +99,12 @@ export function Sidebar() {
         <Link href="/" className="block">
           <div className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <Image src="/newicon.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+              <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="text-lg font-bold">
                 <span className="text-black">easybudget</span>
-                <span className="text-green-400">.ing</span>
+                <span style={{color: '#60ea8b'}}>.ing</span>
               </span>
             </div>
           </div>

@@ -244,11 +244,11 @@ export default function LandingPage() {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden">
-                  <Image src="/newicon.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
+                  <Image src="/newicon1.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
               </div>
                 <span className="text-2xl font-semibold">
                   <span className="text-black">easybudget</span>
-                  <span className="text-green-400">.ing</span>
+                  <span style={{color: '#60ea8b'}}>.ing</span>
                 </span>
             </div>
 
@@ -266,7 +266,8 @@ export default function LandingPage() {
                     <Button 
                       variant="ghost" 
                       onClick={() => router.push('/dashboard')} 
-                      className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] hover:from-[#6aef00] hover:to-[#8aef21] text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
+                      style={{backgroundColor: '#60ea8b'}}
+                      className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
                     >
                       Dashboard
                     </Button>
@@ -329,7 +330,8 @@ export default function LandingPage() {
                     <Button 
                       variant="ghost" 
                       onClick={() => router.push('/auth/signin')} 
-                      className="bg-gradient-to-r from-[#7aff01] to-[#9eff31] hover:from-[#6aef00] hover:to-[#8aef21] text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
+                      style={{backgroundColor: '#60ea8b'}}
+                      className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
                     >
                     Sign In
                   </Button>
@@ -392,7 +394,7 @@ export default function LandingPage() {
                 
                 <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                   Stop Managing Money in
-                  <span className="block text-green-400"> 
+                  <span className="block" style={{color: '#60ea8b'}}> 
                     Spreadsheets
                   </span>
             </h1>
@@ -726,7 +728,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 Start Your Financial 
-                <span className="block text-green-400">
+                <span className="block" style={{color: '#60ea8b'}}>
                   Transformation Today
                 </span>
             </h2>
@@ -861,11 +863,11 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
-                  <Image src="/newicon.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+                  <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xl font-bold">
                   <span className="text-slate-900">easybudget</span>
-                  <span className="text-green-400">.ing</span>
+                  <span style={{color: '#60ea8b'}}>.ing</span>
                 </span>
               </div>
               
