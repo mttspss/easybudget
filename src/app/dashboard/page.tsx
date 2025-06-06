@@ -461,7 +461,7 @@ export default function Dashboard() {
                     {isLoading ? (
                         <div className="h-64 bg-gray-100 animate-pulse" />
                     ) : (
-                        <div className="h-64">
+                        <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
                             <defs>
@@ -470,7 +470,7 @@ export default function Dashboard() {
                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02}/>
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="2 2" stroke="#d1d5db" strokeWidth={1} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="date" 
                               tick={{ fontSize: 12, fill: '#64748b' }}

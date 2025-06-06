@@ -429,8 +429,8 @@ export default function GoalsPage() {
             </div>
 
             {/* Goals Table */}
-            <Card className="border border-gray-200">
-              <CardContent className="p-0">
+            <Card className="border border-gray-200 overflow-hidden">
+              <CardContent className="p-0 m-0">
                 {isLoading ? (
                   <div className="p-4 space-y-2">
                     {[1, 2, 3, 4, 5].map(i => (
@@ -440,7 +440,7 @@ export default function GoalsPage() {
                 ) : filteredGoals.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="px-4 py-3 border-b border-gray-200/60 bg-gray-50/30 rounded-t-lg">
+                    <div className="px-4 py-3 border-b border-gray-200/60 bg-gray-50/30">
                       <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-3">Goal Name</div>
                         <div className="col-span-2 border-l border-gray-200/40 pl-3">Status</div>
