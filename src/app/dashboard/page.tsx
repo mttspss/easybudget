@@ -20,7 +20,6 @@ import {
   TrendingUp
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -384,32 +383,30 @@ export default function Dashboard() {
             {/* Quick Stats - More Compact */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {quickStats.map((stat, index) => (
-                <Card key={index} className="relative overflow-hidden">
-                  <CardContent className="p-3">
+                <Card key={index} className="relative overflow-hidden border-0 shadow-sm">
+                  <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                        <p className="text-xs font-medium text-gray-600">{stat.title}</p>
-                        <div className="flex items-baseline gap-2 mt-1">
-                          <span className="text-xl font-bold text-gray-900">
+                        <p className="text-xs font-medium text-gray-500 mb-1">{stat.title}</p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
                               </span>
-                          <Badge 
-                            variant={stat.changeType === 'increase' ? 'default' : 'secondary'} 
-                            className={`text-xs py-0.5 px-1.5 ${
+                          <div className={`flex items-center text-xs font-medium ${
                               stat.changeType === 'increase' 
-                                ? 'bg-emerald-50 text-[#00C896] border-emerald-100 hover:bg-emerald-50' 
-                                : 'bg-pink-50 text-[#EF4B99] border-pink-100 hover:bg-pink-50'
-                            }`}
-                          >
-                            {stat.changeType === 'increase' ? '+' : ''}{Math.abs(stat.change).toFixed(1)}%
-                          </Badge>
+                                ? 'text-[#53E489]' 
+                                : 'text-[#EF0465]'
+                            }`}>
+                            <span className="mr-1">{stat.changeType === 'increase' ? '↗' : '↘'}</span>
+                            {Math.abs(stat.change).toFixed(1)}%
+                          </div>
                         </div>
                             </div>
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ml-3">
-                        {stat.title === "Total Balance" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm"><Wallet className="h-5 w-5 text-white" /></div>}
-                        {stat.title === "Monthly Income" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm"><DollarSign className="h-5 w-5 text-white" /></div>}
-                        {stat.title === "Monthly Expenses" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center shadow-sm"><CreditCard className="h-5 w-5 text-white" /></div>}
-                        {stat.title === "Savings Rate" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm"><PiggyBank className="h-5 w-5 text-white" /></div>}
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center ml-3">
+                        {stat.title === "Total Balance" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"><Wallet className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Monthly Income" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center"><DollarSign className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Monthly Expenses" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center"><CreditCard className="h-6 w-6 text-white" /></div>}
+                        {stat.title === "Savings Rate" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"><PiggyBank className="h-6 w-6 text-white" /></div>}
                           </div>
                         </div>
                       </CardContent>
@@ -425,14 +422,14 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-4 pt-3">
+                  <CardHeader className="pb-1 px-3 pt-2">
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
                         <CardTitle className="text-sm font-medium text-gray-900">Total Balance</CardTitle>
                       </div>
                       <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                        <SelectTrigger className="w-28 h-7 text-xs">
+                        <SelectTrigger className="w-28 h-6 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -446,13 +443,13 @@ export default function Dashboard() {
                     </div>
                     <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-4 pb-3">
+                  <CardContent className="pt-0 px-1 pb-1">
                     {isLoading ? (
-                        <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+                        <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                        <div className="h-32">
+                        <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -501,20 +498,20 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-4 pt-3">
+                  <CardHeader className="pb-1 px-3 pt-2">
                         <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
                     <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-4 pb-3">
+                  <CardContent className="pt-0 px-1 pb-1">
                     {isLoading ? (
-                      <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                      <div className="h-32">
+                      <div className="h-40">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
@@ -544,12 +541,12 @@ export default function Dashboard() {
                             />
                             <defs>
                               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#00C896" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#00C896" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#53E489" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#53E489" stopOpacity={0.3}/>
                               </linearGradient>
                               <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#EF4B99" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#EF4B99" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#EF0465" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#EF0465" stopOpacity={0.3}/>
                               </linearGradient>
                             </defs>
                             <Bar dataKey="income" fill="url(#incomeGradient)" radius={[2, 2, 0, 0]} />
@@ -629,7 +626,7 @@ export default function Dashboard() {
                                 {/* Type */}
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                                    transaction.type === 'income' ? 'bg-emerald-50 text-[#00C896] border border-emerald-100' : 'bg-pink-50 text-[#EF4B99] border border-pink-100'
+                                    transaction.type === 'income' ? 'bg-emerald-50 text-[#53E489] border border-emerald-100' : 'bg-pink-50 text-[#EF0465] border border-pink-100'
                                   }`}>
                                     {transaction.type === 'income' ? 'Income' : 'Expense'}
                                   </span>
@@ -648,7 +645,7 @@ export default function Dashboard() {
                                 {/* Amount */}
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <span className={`text-sm font-medium ${
-                                    transaction.type === 'income' ? 'text-[#00C896]' : 'text-[#EF4B99]'
+                                    transaction.type === 'income' ? 'text-[#53E489]' : 'text-[#EF0465]'
                                   }`}>
                                     {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
                                   </span>
