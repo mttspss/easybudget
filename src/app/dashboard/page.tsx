@@ -465,16 +465,12 @@ export default function Dashboard() {
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
                             <defs>
-                              <linearGradient id="balanceGradientPositive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#53E489" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#53E489" stopOpacity={0.05}/>
-                              </linearGradient>
-                              <linearGradient id="balanceGradientNegative" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#EF0465" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#EF0465" stopOpacity={0.05}/>
+                              <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02}/>
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                            <CartesianGrid strokeDasharray="2 2" stroke="#d1d5db" strokeWidth={1} />
                             <XAxis 
                               dataKey="date" 
                               tick={{ fontSize: 12, fill: '#64748b' }}
@@ -503,13 +499,13 @@ export default function Dashboard() {
                             <Area 
                               type="linear" 
                               dataKey="balance" 
-                              stroke={(stats?.balanceTrend?.[stats.balanceTrend.length - 1]?.balance || 0) >= 0 ? "#53E489" : "#EF0465"}
+                              stroke="#3b82f6"
                               strokeWidth={2}
-                              fill={(stats?.balanceTrend?.[stats.balanceTrend.length - 1]?.balance || 0) >= 0 ? "url(#balanceGradientPositive)" : "url(#balanceGradientNegative)"}
+                              fill="url(#balanceGradient)"
                               dot={false}
                               activeDot={{ 
                                 r: 4, 
-                                stroke: (stats?.balanceTrend?.[stats.balanceTrend.length - 1]?.balance || 0) >= 0 ? "#53E489" : "#EF0465", 
+                                stroke: '#3b82f6', 
                                 strokeWidth: 2, 
                                 fill: 'white' 
                               }}
