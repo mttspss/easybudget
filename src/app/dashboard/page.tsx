@@ -422,34 +422,33 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-3 pt-2">
+                  <CardHeader className="pb-0 px-3 pt-2 border-b border-gray-100">
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
-                        <CardTitle className="text-sm font-medium text-gray-900">Total Balance</CardTitle>
+                        <CardTitle className="text-xs font-medium text-gray-900">Total Balance</CardTitle>
                       </div>
                       <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                        <SelectTrigger className="w-28 h-6 text-xs">
+                        <SelectTrigger className="w-20 h-5 text-xs border-0 bg-gray-50">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1month">1 Month</SelectItem>
-                          <SelectItem value="3months">3 Months</SelectItem>
-                          <SelectItem value="6months">6 Months</SelectItem>
-                          <SelectItem value="12months">12 Months</SelectItem>
-                          <SelectItem value="alltime">All Time</SelectItem>
+                          <SelectItem value="1month">1M</SelectItem>
+                          <SelectItem value="3months">3M</SelectItem>
+                          <SelectItem value="6months">6M</SelectItem>
+                          <SelectItem value="12months">1Y</SelectItem>
+                          <SelectItem value="alltime">All</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-1 pb-1">
+                  <CardContent className="p-0">
                     {isLoading ? (
-                        <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
+                        <div className="h-52 bg-gray-100 animate-pulse" />
                     ) : (
-                        <div className="h-40">
+                        <div className="h-52">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -498,20 +497,19 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader className="pb-1 px-3 pt-2">
+                  <CardHeader className="pb-0 px-3 pt-2 border-b border-gray-100">
                         <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
-                      <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
+                      <CardTitle className="text-xs font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
-                    <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
-                  <CardContent className="pt-0 px-1 pb-1">
+                  <CardContent className="p-0">
                     {isLoading ? (
-                      <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-52 bg-gray-100 animate-pulse" />
                     ) : (
-                      <div className="h-40">
+                      <div className="h-52">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
