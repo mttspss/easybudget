@@ -387,28 +387,28 @@ export default function Dashboard() {
                 <Card key={index} className="relative overflow-hidden">
                   <CardContent className="p-3">
                         <div className="flex items-center justify-between">
-                          <div>
+                          <div className="flex-1">
                         <p className="text-xs font-medium text-gray-600">{stat.title}</p>
-                        <div className="flex items-baseline gap-1 mt-0.5">
-                          <span className="text-lg font-bold text-gray-900">
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className="text-xl font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
                               </span>
                           <Badge 
                             variant={stat.changeType === 'increase' ? 'default' : 'secondary'} 
-                            className={`text-xs py-0 px-1 ${
+                            className={`text-xs py-0.5 px-1.5 ${
                               stat.changeType === 'increase' 
-                                ? 'bg-green-100 text-green-700 hover:bg-green-100' 
-                                : 'bg-red-100 text-red-700 hover:bg-red-100'
+                                ? 'bg-emerald-50 text-[#00C896] border-emerald-100 hover:bg-emerald-50' 
+                                : 'bg-pink-50 text-[#EF4B99] border-pink-100 hover:bg-pink-50'
                             }`}
                           >
                             {stat.changeType === 'increase' ? '+' : ''}{Math.abs(stat.change).toFixed(1)}%
                           </Badge>
                         </div>
                             </div>
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ml-3">
                         {stat.title === "Total Balance" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm"><Wallet className="h-5 w-5 text-white" /></div>}
-                        {stat.title === "Monthly Income" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm"><DollarSign className="h-5 w-5 text-white" /></div>}
-                        {stat.title === "Monthly Expenses" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm"><CreditCard className="h-5 w-5 text-white" /></div>}
+                        {stat.title === "Monthly Income" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm"><DollarSign className="h-5 w-5 text-white" /></div>}
+                        {stat.title === "Monthly Expenses" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center shadow-sm"><CreditCard className="h-5 w-5 text-white" /></div>}
                         {stat.title === "Savings Rate" && <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm"><PiggyBank className="h-5 w-5 text-white" /></div>}
                           </div>
                         </div>
@@ -425,7 +425,7 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader className="pb-0 px-3 pt-2">
+                  <CardHeader className="pb-1 px-4 pt-3">
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-600" />
@@ -446,17 +446,17 @@ export default function Dashboard() {
                     </div>
                     <p className="text-xs text-gray-600">Balance progression over time</p>
                   </CardHeader>
-                  <CardContent className="pt-1 px-2 pb-2">
+                  <CardContent className="pt-0 px-4 pb-3">
                     {isLoading ? (
-                        <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
+                        <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                        <div className="h-40">
+                        <div className="h-32">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02}/>
                               </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -484,13 +484,13 @@ export default function Dashboard() {
                               }}
                             />
                             <Area 
-                              type="monotone" 
+                              type="linear" 
                               dataKey="balance" 
                               stroke="#3b82f6" 
-                              strokeWidth={2}
+                              strokeWidth={1.5}
                               fill="url(#balanceGradient)"
                               dot={false}
-                              activeDot={{ r: 4, stroke: '#3b82f6', strokeWidth: 2 }}
+                              activeDot={{ r: 3, stroke: '#3b82f6', strokeWidth: 2, fill: 'white' }}
                             />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -501,20 +501,20 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader className="pb-0 px-3 pt-2">
+                  <CardHeader className="pb-1 px-4 pt-3">
                         <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-indigo-600" />
                       <CardTitle className="text-sm font-medium text-gray-900">Monthly Comparison</CardTitle>
                     </div>
                     <p className="text-xs text-gray-600">Income vs expenses comparison</p>
                   </CardHeader>
-                  <CardContent className="pt-1 px-2 pb-2">
+                  <CardContent className="pt-0 px-4 pb-3">
                     {isLoading ? (
-                      <div className="h-40 bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
                     ) : (
-                      <div className="h-40">
+                      <div className="h-32">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
@@ -544,16 +544,16 @@ export default function Dashboard() {
                             />
                             <defs>
                               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#00C896" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#00C896" stopOpacity={0.3}/>
                               </linearGradient>
                               <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#EF4B99" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#EF4B99" stopOpacity={0.3}/>
                               </linearGradient>
                             </defs>
-                            <Bar dataKey="income" fill="url(#incomeGradient)" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="income" fill="url(#incomeGradient)" radius={[2, 2, 0, 0]} />
+                            <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[2, 2, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -564,7 +564,7 @@ export default function Dashboard() {
 
               {/* Recent Transactions Full Width */}
               <Card className="border border-gray-200">
-                <CardHeader className="pb-0 px-3 pt-2">
+                <CardHeader className="pb-1 px-4 pt-3">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-blue-600" />
                     Recent Transactions
@@ -577,7 +577,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="p-0">
                   {isLoading ? (
-                    <div className="p-3 space-y-2">
+                    <div className="p-4 space-y-2">
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                         <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                       ))}
@@ -585,7 +585,7 @@ export default function Dashboard() {
                   ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
                     <>
                       {/* Table Header */}
-                      <div className="px-3 py-2 border-b border-gray-200/60">
+                      <div className="px-4 py-2 border-b border-gray-200/60 bg-gray-50/30">
                         <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4">Description</div>
                           <div className="col-span-2 border-l border-gray-200/40 pl-3">Date</div>
@@ -600,7 +600,7 @@ export default function Dashboard() {
                         {stats.recentTransactions
                           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                           .map((transaction, index) => (
-                            <div key={index} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                            <div key={index} className="px-4 py-2.5 hover:bg-gray-50/50 transition-colors">
                               <div className="grid grid-cols-12 gap-3 items-center">
                                 {/* Description with Icon */}
                                 <div className="col-span-4">
@@ -629,7 +629,7 @@ export default function Dashboard() {
                                 {/* Type */}
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                                    transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                    transaction.type === 'income' ? 'bg-emerald-50 text-[#00C896] border border-emerald-100' : 'bg-pink-50 text-[#EF4B99] border border-pink-100'
                                   }`}>
                                     {transaction.type === 'income' ? 'Income' : 'Expense'}
                                   </span>
@@ -647,7 +647,9 @@ export default function Dashboard() {
 
                                 {/* Amount */}
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
-                                  <span className="text-sm font-medium text-gray-900">
+                                  <span className={`text-sm font-medium ${
+                                    transaction.type === 'income' ? 'text-[#00C896]' : 'text-[#EF4B99]'
+                                  }`}>
                                     {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
                                   </span>
                                 </div>
