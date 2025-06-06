@@ -384,7 +384,14 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {quickStats.map((stat, index) => (
                 <Card key={index} className="relative overflow-hidden border-0 shadow-sm">
-                  <CardContent className="p-4">
+                  {/* Subtle gradient overlay based on icon color */}
+                  <div className="absolute inset-0 opacity-5">
+                    {stat.title === "Total Balance" && <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600"></div>}
+                    {stat.title === "Monthly Income" && <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-600"></div>}
+                    {stat.title === "Monthly Expenses" && <div className="w-full h-full bg-gradient-to-br from-pink-500 to-pink-600"></div>}
+                    {stat.title === "Savings Rate" && <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600"></div>}
+                  </div>
+                  <CardContent className="p-4 relative">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                         <p className="text-xs font-medium text-gray-500 mb-1">{stat.title}</p>
@@ -423,13 +430,13 @@ export default function Dashboard() {
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card className="relative">
                   {/* Overlay Header */}
-                  <div className="absolute top-2 left-3 right-3 z-10 flex items-center justify-between">
+                  <div className="absolute top-3 left-4 right-4 z-10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-blue-600" />
-                      <span className="text-xs font-medium text-gray-900 bg-white/80 backdrop-blur-sm px-2 py-1 rounded">Total Balance</span>
+                      <TrendingUp className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-900 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">Total Balance</span>
                     </div>
                     <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                      <SelectTrigger className="w-28 h-6 text-xs bg-white/80 backdrop-blur-sm border-gray-200">
+                      <SelectTrigger className="w-32 h-8 text-sm bg-white/90 backdrop-blur-sm border-gray-200 shadow-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -444,11 +451,11 @@ export default function Dashboard() {
                   
                   <CardContent className="p-0">
                     {isLoading ? (
-                        <div className="h-52 bg-gray-100 animate-pulse" />
+                        <div className="h-64 bg-gray-100 animate-pulse" />
                     ) : (
-                        <div className="h-52">
+                        <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 40, right: 20, left: 20, bottom: 20 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 10, left: 0, bottom: 10 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -458,12 +465,12 @@ export default function Dashboard() {
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="date" 
-                                tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                                tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
@@ -498,27 +505,27 @@ export default function Dashboard() {
                 {/* Monthly Comparison - Bar Chart */}
                 <Card className="relative">
                   {/* Overlay Header */}
-                  <div className="absolute top-2 left-3 right-3 z-10 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-indigo-600" />
-                    <span className="text-xs font-medium text-gray-900 bg-white/80 backdrop-blur-sm px-2 py-1 rounded">Monthly Comparison</span>
+                  <div className="absolute top-3 left-4 right-4 z-10 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-indigo-600" />
+                    <span className="text-sm font-medium text-gray-900 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">Monthly Comparison</span>
                   </div>
                   
                   <CardContent className="p-0">
                     {isLoading ? (
-                      <div className="h-52 bg-gray-100 animate-pulse" />
+                      <div className="h-64 bg-gray-100 animate-pulse" />
                     ) : (
-                      <div className="h-52">
+                      <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 40, right: 20, left: 20, bottom: 20 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 10, left: 0, bottom: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 10, fill: '#64748b' }}
+                              tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
@@ -580,7 +587,7 @@ export default function Dashboard() {
                   ) : stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
                     <>
                       {/* Table Header */}
-                      <div className="px-4 py-2 border-b border-gray-200/60 bg-gray-50/30">
+                      <div className="px-6 py-2 border-b border-gray-200/60 bg-gray-50/30">
                         <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4">Description</div>
                           <div className="col-span-2 border-l border-gray-200/40 pl-3">Date</div>
@@ -595,7 +602,7 @@ export default function Dashboard() {
                         {stats.recentTransactions
                           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                           .map((transaction, index) => (
-                            <div key={index} className="px-4 py-2.5 hover:bg-gray-50/50 transition-colors">
+                            <div key={index} className="px-6 py-2.5 hover:bg-gray-50/50 transition-colors border-l-4 border-transparent hover:border-l-blue-200">
                               <div className="grid grid-cols-12 gap-3 items-center">
                                 {/* Description with Icon */}
                                 <div className="col-span-4">
@@ -654,7 +661,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Pagination - Always visible */}
-                      <div className="border-t border-gray-200/60 px-3 py-2 bg-white">
+                      <div className="border-t border-gray-200/60 px-6 py-2 bg-white">
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-gray-600">
                             Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stats.recentTransactions.length)} of {stats.recentTransactions.length} results

@@ -664,7 +664,7 @@ export default function IncomePage() {
 
                             {/* Amount */}
                             <div className="col-span-2 border-l border-gray-200/40 pl-3">
-                              <span className="text-sm font-medium text-gray-900">
+                              <span className="text-sm font-medium text-[#53E489]">
                                 +${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
