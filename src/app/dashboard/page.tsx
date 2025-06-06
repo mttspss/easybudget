@@ -436,7 +436,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
                 {/* Total Balance Trend - Clean Area Chart */}
-                <Card className="relative">
+                <Card className="relative overflow-hidden">
                   {/* Simple Overlay Header */}
                   <div className="absolute top-3 left-4 right-4 z-10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -457,9 +457,9 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   
-                  <CardContent className="p-0">
+                  <CardContent className="p-0 m-0">
                     {isLoading ? (
-                        <div className="h-64 bg-gray-100 animate-pulse" />
+                        <div className="h-80 bg-gray-100 animate-pulse" />
                     ) : (
                         <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
@@ -518,18 +518,18 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Monthly Comparison - Bar Chart */}
-                <Card className="relative">
+                <Card className="relative overflow-hidden">
                   {/* Simple Overlay Header */}
                   <div className="absolute top-3 left-4 right-4 z-10 flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-indigo-600" />
                     <span className="text-sm font-medium text-gray-900">Monthly Comparison</span>
                   </div>
                   
-                  <CardContent className="p-0">
+                  <CardContent className="p-0 m-0">
                     {isLoading ? (
-                      <div className="h-64 bg-gray-100 animate-pulse" />
+                      <div className="h-80 bg-gray-100 animate-pulse" />
                     ) : (
-                      <div className="h-64">
+                      <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 20, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
