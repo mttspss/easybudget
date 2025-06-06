@@ -452,8 +452,8 @@ export default function CategoriesPage() {
               
               {/* Income Categories Column */}
               <Card>
-                <CardContent className="p-2 pt-3">
-                  <div className="flex items-center gap-2 mb-3 px-2">
+                <CardContent className="p-2 pt-1">
+                  <div className="flex items-center gap-2 mb-2 px-2">
                     <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                       <ArrowUpRight className="h-4 w-4 text-white" />
                     </div>
@@ -544,8 +544,8 @@ export default function CategoriesPage() {
 
               {/* Expense Categories Column */}
               <Card>
-                <CardContent className="p-2 pt-3">
-                  <div className="flex items-center gap-2 mb-3 px-2">
+                <CardContent className="p-2 pt-1">
+                  <div className="flex items-center gap-2 mb-2 px-2">
                     <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
                       <ArrowDownRight className="h-4 w-4 text-white" />
                     </div>

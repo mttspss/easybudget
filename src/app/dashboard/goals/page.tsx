@@ -49,6 +49,7 @@ export default function GoalsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -439,7 +440,7 @@ export default function GoalsPage() {
                 ) : filteredGoals.length > 0 ? (
                   <>
                     {/* Table Header */}
-                    <div className="px-6 py-3 border-b border-gray-200/60 bg-gray-50/30">
+                    <div className="px-4 py-2 border-b border-gray-200/60 bg-gray-50/30">
                       <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-3">Goal Name</div>
                         <div className="col-span-2 border-l border-gray-200/40 pl-3">Status</div>
@@ -454,13 +455,14 @@ export default function GoalsPage() {
                     <div className="divide-y divide-gray-100/60">
                       {filteredGoals
                         .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                        .slice((currentPage - 1) * 8, currentPage * 8)
                         .map((goal) => {
                           const progress = getProgressPercentage(goal.current_amount, goal.target_amount)
                           const daysRemaining = getDaysRemaining(goal.target_date)
                           const isCompleted = goal.current_amount >= goal.target_amount
                           
                           return (
-                            <div key={goal.id} className="px-6 py-3 hover:bg-gray-50/50 transition-colors border-l-4 border-transparent hover:border-l-blue-200">
+                            <div key={goal.id} className="px-4 py-3 hover:bg-gray-50/50 transition-colors border-l-4 border-transparent hover:border-l-blue-200">
                               <div className="grid grid-cols-12 gap-3 items-center">
                                 {/* Goal Name */}
                                 <div className="col-span-3">
@@ -536,13 +538,14 @@ export default function GoalsPage() {
 
                                 {/* Actions */}
                                 <div className="col-span-1 border-l border-gray-200/40 pl-3">
-                                  <div className="flex items-center gap-1">
+                                  <div className="flex items-center gap-0.5">
                                     {!isCompleted && (
                                       <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => handleCompleteGoal(goal)}
-                                        className="h-7 px-2 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                        className="h-6 w-6 p-0 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                        title="Complete Goal"
                                       >
                                         <CheckCircle className="h-3 w-3" />
                                       </Button>
@@ -551,7 +554,8 @@ export default function GoalsPage() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleEdit(goal)}
-                                      className="h-7 w-7 p-0"
+                                      className="h-6 w-6 p-0"
+                                      title="Edit Goal"
                                     >
                                       <Edit className="h-3 w-3" />
                                     </Button>
@@ -559,7 +563,8 @@ export default function GoalsPage() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleDelete(goal.id)}
-                                      className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      title="Delete Goal"
                                     >
                                       <Trash2 className="h-3 w-3" />
                                     </Button>
@@ -570,6 +575,59 @@ export default function GoalsPage() {
                           )
                         })}
                     </div>
+
+                    {/* Pagination - Only show if more than 8 goals */}
+                    {filteredGoals.length > 8 && (
+                      <div className="border-t border-gray-200/60 px-4 py-2 bg-white">
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-gray-600">
+                            Showing {((currentPage - 1) * 8) + 1} to {Math.min(currentPage * 8, filteredGoals.length)} of {filteredGoals.length} goals
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className="h-7 px-2"
+                            >
+                              Previous
+                            </Button>
+                            
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1">
+                              {Array.from({ length: Math.min(Math.ceil(filteredGoals.length / 8), 5) }, (_, i) => {
+                                const pageNum = i + 1;
+                                return (
+                                  <Button
+                                    key={pageNum}
+                                    variant={currentPage === pageNum ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className="h-7 w-7 text-xs"
+                                  >
+                                    {pageNum}
+                                  </Button>
+                                );
+                              })}
+                              {Math.ceil(filteredGoals.length / 8) > 5 && (
+                                <span className="text-xs text-gray-600 px-1">...</span>
+                              )}
+                            </div>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage >= Math.ceil(filteredGoals.length / 8)}
+                              className="h-7 px-2"
+                            >
+                              Next
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="text-center py-8">
