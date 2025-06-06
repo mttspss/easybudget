@@ -395,17 +395,17 @@ export default function Dashboard() {
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                         <p className="text-xs font-medium text-gray-500 mb-1">{stat.title}</p>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-1">
                           <span className="text-2xl font-bold text-gray-900">
                             {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
-                              </span>
+                          </span>
                           <div className={`flex items-center text-xs font-medium ${
                               stat.changeType === 'increase' 
                                 ? 'text-[#53E489]' 
                                 : 'text-[#EF0465]'
                             }`}>
                             <span className="mr-1">{stat.changeType === 'increase' ? '↗' : '↘'}</span>
-                            {Math.abs(stat.change).toFixed(1)}%
+                            {Math.abs(stat.change).toFixed(1)}% from last month
                           </div>
                         </div>
                             </div>
@@ -429,11 +429,11 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card className="relative">
-                  {/* Overlay Header */}
+                  {/* Simple Overlay Header */}
                   <div className="absolute top-3 left-4 right-4 z-10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-gray-900 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">Total Balance</span>
+                      <span className="text-sm font-medium text-gray-900">Total Balance</span>
                     </div>
                     <Select value={balancePeriod} onValueChange={setBalancePeriod}>
                       <SelectTrigger className="w-32 h-8 text-sm bg-white/90 backdrop-blur-sm border-gray-200 shadow-sm">
@@ -455,7 +455,7 @@ export default function Dashboard() {
                     ) : (
                         <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 10, left: 0, bottom: 10 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 20, left: 20, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
@@ -504,10 +504,10 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card className="relative">
-                  {/* Overlay Header */}
+                  {/* Simple Overlay Header */}
                   <div className="absolute top-3 left-4 right-4 z-10 flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-indigo-600" />
-                    <span className="text-sm font-medium text-gray-900 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">Monthly Comparison</span>
+                    <span className="text-sm font-medium text-gray-900">Monthly Comparison</span>
                   </div>
                   
                   <CardContent className="p-0">
@@ -516,7 +516,7 @@ export default function Dashboard() {
                     ) : (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 10, left: 0, bottom: 10 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 20, left: 20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                             <XAxis 
                               dataKey="month" 
