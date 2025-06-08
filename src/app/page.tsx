@@ -408,9 +408,14 @@ export default function LandingPage() {
 
             {/* Right Column - Content */}
             <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-gray-900 leading-tight">
-                100% accuracy from the first import.
-              </h2>
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold" style={{color: '#60ea8b'}}>
+                  The Spreadsheet Killer
+                </h3>
+                <h2 className="text-4xl font-bold text-gray-900 leading-tight">
+                  100% accuracy from the first import.
+                </h2>
+              </div>
               
               <p className="text-xl text-gray-600 leading-relaxed">
                 easybudget.ing was trained to understand any bank statement format. No more manual sorting. We do the heavy lifting so you can focus on your goals.
