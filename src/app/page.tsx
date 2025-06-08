@@ -309,97 +309,41 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6">
-            <span className="text-gray-500 text-sm">Over 2,847+ professionals trust EasyBudget</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Making financial management so simple,<br />
-            it feels like magic.
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button 
-              onClick={() => router.push('/auth/register')} 
-              style={{
-                fontFamily: 'inherit',
-                fontSize: '18px',
-                background: `linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)`,
-                color: 'white',
-                padding: '0.8em 1.2em',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: 'none',
-                borderRadius: '25px',
-                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-                transition: 'all 0.3s',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.2)';
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = 'scale(0.95)';
-                e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.2)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
-              }}
-            >
-              Start Now
-            </button>
-            <button 
-              onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-              style={{
-                fontFamily: 'inherit',
-                fontSize: '18px',
-                background: 'white',
-                color: '#374151',
-                padding: '0.8em 1.2em',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '2px solid #d1d5db',
-                borderRadius: '25px',
-                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
-                e.currentTarget.style.background = '#f9fafb';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.1)';
-                e.currentTarget.style.background = 'white';
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = 'scale(0.95)';
-                e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.1)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
-              }}
-            >
-              Watch Demo
-            </button>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col items-center justify-center text-center mb-16">
+            <a className="text-[#777] font-medium text-[14px] px-[12px] py-[4px] bg-[#FFF] rounded-full shadow mb-4">
+              Over 2,847+ professionals trust EasyBudget
+            </a>
+            
+            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
+              <span className="hidden md:block">Making financial management so simple,{'\n'}it feels like magic.</span>
+              <span className="block md:hidden">Making financial management so simple, it feels like magic.</span>
+            </h1>
+            
+            <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
+              <span className="hidden md:block">Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
+              <span className="block md:hidden">Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
+            </p>
+            
+            <div className="flex gap-2 mt-4">
+              <button 
+                onClick={() => router.push('/auth/register')} 
+                className="text-white text-[16px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
+                style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
+              >
+                Start Now
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </button>
+              <button 
+                onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
+                className="bg-white text-[#333] text-[16px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+              >
+                Watch Demo
+              </button>
+            </div>
           </div>
 
           <div className="text-center text-gray-500 text-sm">
