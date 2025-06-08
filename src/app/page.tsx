@@ -24,7 +24,8 @@ import {
   Activity,
   User,
   TrendingUp,
-  Home
+  Home,
+  ArrowRight
 } from "lucide-react"
 
 export default function LandingPage() {
@@ -314,24 +315,25 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Stop Managing Money in{" "}
-            <span style={{color: '#60ea8b'}}>Spreadsheets</span>
+            Financial clarity, magically simple.
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Get complete financial visibility and control in one professional dashboard
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               onClick={() => router.push('/auth/register')} 
-              className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
+              style={{backgroundColor: '#60ea8b'}}
+              className="hover:opacity-90 text-gray-900 font-medium px-6 py-3 text-base rounded-xl transition-all shadow-sm"
             >
               Start Now
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button 
               variant="outline"
-              className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-xl transition-all"
               onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
             >
               Watch Demo
@@ -340,6 +342,91 @@ export default function LandingPage() {
 
           <div className="text-center text-gray-500 text-sm">
             2,847+ finance professionals already using EasyBudget
+          </div>
+        </div>
+      </section>
+
+      {/* Transaction Transformation Section */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Column - Visual */}
+            <div className="relative">
+              <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
+                {/* Before State - Messy Transactions */}
+                <div className="mb-8">
+                  <h4 className="text-sm font-medium text-gray-500 mb-4">Before - Raw Bank Data</h4>
+                  <div className="space-y-3">
+                    {[
+                      { desc: "AMZN MKTP US*2K4LK8901", amount: "-$23.47", raw: true },
+                      { desc: "SQ *COFFEE SHOP NYC", amount: "-$8.99", raw: true },
+                      { desc: "PAYPAL *NETFLIX", amount: "-$15.99", raw: true },
+                      { desc: "WHOLEFDS #123 NYC", amount: "-$127.84", raw: true }
+                    ].map((tx, i) => (
+                      <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-sm text-gray-500 font-mono truncate">{tx.desc}</div>
+                        <div className="text-sm font-medium text-gray-900">{tx.amount}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Arrow */}
+                <div className="flex justify-center mb-8">
+                  <div className="flex items-center">
+                    <div className="w-12 h-0.5 bg-gray-300"></div>
+                    <ArrowRight className="h-5 w-5 text-gray-400 mx-2" />
+                    <div className="w-12 h-0.5 bg-gray-300"></div>
+                  </div>
+                </div>
+
+                {/* After State - Clean Categorized */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-4">After - Automatically Categorized</h4>
+                  <div className="space-y-3">
+                    {[
+                      { desc: "Amazon Purchase", amount: "-$23.47", category: "Shopping", icon: "🛒", color: "bg-blue-50 border-blue-200" },
+                      { desc: "Coffee Shop", amount: "-$8.99", category: "Food & Dining", icon: "☕", color: "bg-orange-50 border-orange-200" },
+                      { desc: "Netflix Subscription", amount: "-$15.99", category: "Entertainment", icon: "🎬", color: "bg-purple-50 border-purple-200" },
+                      { desc: "Whole Foods", amount: "-$127.84", category: "Groceries", icon: "🛒", color: "bg-green-50 border-green-200" }
+                    ].map((tx, i) => (
+                      <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${tx.color}`}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">{tx.icon}</span>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{tx.desc}</div>
+                            <div className="text-xs text-gray-500">{tx.category}</div>
+                          </div>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">{tx.amount}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Content */}
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold text-gray-900 leading-tight">
+                100% accuracy from the first import.
+              </h2>
+              
+              <p className="text-xl text-gray-600 leading-relaxed">
+                easybudget.ing was trained to understand any bank statement format. No more manual sorting. We do the heavy lifting so you can focus on your goals.
+              </p>
+
+              <div className="flex items-center space-x-4 pt-4">
+                <div className="flex items-center space-x-2">
+                  <Check className="w-5 h-5 text-green-600" />
+                  <span className="text-sm text-gray-600 font-medium">Works with 10,000+ banks</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Check className="w-5 h-5 text-green-600" />
+                  <span className="text-sm text-gray-600 font-medium">AI-powered categorization</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -543,13 +630,15 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={() => router.push('/auth/register')} 
-                className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
+                style={{backgroundColor: '#60ea8b'}}
+                className="hover:opacity-90 text-gray-900 font-medium px-6 py-3 text-base rounded-xl transition-all shadow-sm"
               >
                 Start Now
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
                 variant="outline" 
-                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
+                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-xl transition-all"
                 onClick={() => window.open('mailto:sales@easybudget.ing')}
               >
                 Talk to Sales
