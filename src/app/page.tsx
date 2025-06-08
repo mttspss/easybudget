@@ -315,7 +315,8 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Financial clarity, magically simple.
+            Making financial management so simple,<br />
+            it feels like magic.
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -708,8 +709,8 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Legal</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
+                <li><a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
               </ul>
