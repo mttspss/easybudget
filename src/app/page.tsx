@@ -451,48 +451,48 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits/Features */}
-      <section id="benefits" className="py-20 relative bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <section id="benefits" className="py-12 relative bg-gradient-to-br from-gray-50 via-white to-gray-100">
         <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-6">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-4">
               <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500"></div>
               <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Features</span>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
               Everything You Need to Take
               <span className="block" style={{color: '#60ea8b'}}>
                 Control of Your Finances
               </span>
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Stop juggling multiple apps and spreadsheets. Get complete financial visibility and insights in one place.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
-              <div key={index} className="group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2">
-                <div className="w-14 h-14 bg-gradient-to-br from-gray-50 to-white rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <benefit.icon className="w-7 h-7 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
+              <div key={index} className="group p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60 transition-all duration-300 hover:scale-105 hover:-translate-y-1">
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <benefit.icon className="w-6 h-6 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-gray-900 transition-colors duration-300">{benefit.title}</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">{benefit.title}</h3>
                 <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{benefit.desc}</p>
                 
                 {/* Subtle accent line */}
-                <div className="mt-6 w-12 h-1 bg-gradient-to-r from-blue-500 to-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="mt-4 w-12 h-1 bg-gradient-to-r from-blue-500 to-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
             ))}
           </div>
           
           {/* Bottom CTA */}
-          <div className="text-center mt-16">
-            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-8 py-4 rounded-2xl shadow-lg border border-gray-200/50">
+          <div className="text-center mt-10">
+            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-gray-200/50">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-sm font-bold text-gray-700">Over 2,847+ professionals already using EasyBudget</span>
               </div>
               <button 
                 onClick={() => router.push('/auth/register')} 
-                className="text-white text-sm font-bold px-6 py-2 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+                className="text-white text-sm font-bold px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
                 style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
               >
                 Join Now
@@ -572,56 +572,56 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 relative bg-gradient-to-br from-white via-gray-50 to-white">
+      <section id="pricing" className="py-12 relative bg-gradient-to-br from-white via-gray-50 to-white">
         <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-6">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-4">
               <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></div>
               <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Pricing</span>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
               Choose Your
               <span className="block" style={{color: '#60ea8b'}}>
                 Perfect Plan
               </span>
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
           </div>
-          <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
-              <div key={index} className={`group rounded-2xl p-8 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-2 ${plan.popular ? 'border-slate-900 shadow-2xl shadow-slate-900/20 scale-105 ring-2 ring-slate-900' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`}>
+              <div key={index} className={`group rounded-2xl p-6 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-slate-900 shadow-2xl shadow-slate-900/20 scale-105 ring-2 ring-slate-900' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`}>
                 {plan.popular && (
-                  <div className="text-center mb-6">
-                    <span className="bg-gradient-to-r from-slate-900 to-slate-700 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                  <div className="text-center mb-4">
+                    <span className="bg-gradient-to-r from-slate-900 to-slate-700 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                       ✨ Most Popular
                     </span>
                   </div>
                 )}
-                <div className="text-center mb-8">
-                  <div className="text-sm text-slate-600 font-bold mb-3 uppercase tracking-wider">
+                <div className="text-center mb-6">
+                  <div className="text-sm text-slate-600 font-bold mb-2 uppercase tracking-wider">
                     {plan.highlight}
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
-                    {plan.price !== "Custom" && <span className="text-slate-600 text-lg">/month</span>}
+                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
+                  <div className="mb-3">
+                    <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
+                    {plan.price !== "Custom" && <span className="text-slate-600">/month</span>}
                   </div>
                   <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{plan.desc}</p>
                 </div>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-green-600" />
+                      <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 text-green-600" />
                       </div>
-                      <span className="text-slate-700 leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{feature}</span>
+                      <span className="text-slate-700 text-sm leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full py-3 font-bold text-lg transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
+                  className={`w-full py-2 font-bold transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => plan.price === "Custom" ? window.open('mailto:sales@easybudget.ing') : router.push('/auth/register')}
                 >
@@ -629,14 +629,14 @@ export default function LandingPage() {
                 </Button>
                 
                 {/* Subtle accent line */}
-                <div className="mt-6 w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="mt-4 w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
             ))}
           </div>
           
           {/* Bottom trust indicators */}
-          <div className="text-center mt-16">
-            <div className="inline-flex items-center gap-6 bg-white/60 backdrop-blur-sm px-8 py-4 rounded-2xl shadow-lg border border-gray-200/50">
+          <div className="text-center mt-10">
+            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-gray-200/50">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-sm font-bold text-gray-700">Trusted by 2,847+ professionals</span>
