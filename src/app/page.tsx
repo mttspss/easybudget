@@ -243,9 +243,10 @@ export default function LandingPage() {
                 <Button 
                   variant="ghost" 
                   onClick={() => router.push('/dashboard')} 
-                  className="text-gray-600 hover:text-gray-900"
+                  style={{backgroundColor: '#60ea8b'}}
+                  className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
                 >
-                  Go to app
+                  Dashboard
                 </Button>
                 <Button 
                   onClick={() => signOut()}
@@ -262,7 +263,13 @@ export default function LandingPage() {
                   onClick={() => router.push('/auth/signin')} 
                   className="text-gray-600 hover:text-gray-900"
                 >
-                  Sign in with Google
+                  Sign In
+                </Button>
+                <Button 
+                  onClick={() => router.push('/auth/register')} 
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-2 rounded-lg"
+                >
+                  Sign Up
                 </Button>
               </>
             )}
@@ -284,11 +291,14 @@ export default function LandingPage() {
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
                 {user ? (
                   <>
-                    <Button variant="ghost" onClick={() => router.push('/dashboard')}>Go to app</Button>
+                    <Button variant="ghost" onClick={() => router.push('/dashboard')}>Dashboard</Button>
                     <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
                   </>
                 ) : (
-                  <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign in with Google</Button>
+                  <>
+                    <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
+                    <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
+                  </>
                 )}
               </div>
             </div>
