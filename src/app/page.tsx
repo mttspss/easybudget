@@ -324,21 +324,82 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button 
+            <button 
               onClick={() => router.push('/auth/register')} 
-              style={{backgroundColor: '#60ea8b'}}
-              className="hover:opacity-90 text-gray-900 font-bold px-12 py-6 text-xl rounded-xl transition-all shadow-lg"
+              style={{
+                fontFamily: 'inherit',
+                fontSize: '18px',
+                background: `linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)`,
+                color: 'white',
+                padding: '0.8em 1.2em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                borderRadius: '25px',
+                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.3s',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.2)';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.2)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
+              }}
             >
               Start Now
-              <ArrowRight className="ml-2 h-6 w-6" />
-            </Button>
-            <Button 
-              variant="outline"
-              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-12 py-6 text-xl rounded-xl transition-all"
+            </button>
+            <button 
               onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
+              style={{
+                fontFamily: 'inherit',
+                fontSize: '18px',
+                background: 'white',
+                color: '#374151',
+                padding: '0.8em 1.2em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid #d1d5db',
+                borderRadius: '25px',
+                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.background = '#f9fafb';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.background = 'white';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.1)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
+              }}
             >
               Watch Demo
-            </Button>
+            </button>
           </div>
 
           <div className="text-center text-gray-500 text-sm">
@@ -634,21 +695,82 @@ export default function LandingPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
+              <button 
                 onClick={() => router.push('/auth/register')} 
-                style={{backgroundColor: '#60ea8b'}}
-                className="hover:opacity-90 text-gray-900 font-bold px-8 py-4 text-lg rounded-xl transition-all shadow-lg"
+                style={{
+                  fontFamily: 'inherit',
+                  fontSize: '18px',
+                  background: `linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)`,
+                  color: 'white',
+                  padding: '0.8em 1.2em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  borderRadius: '25px',
+                  boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.2)';
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                  e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.2)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
+                }}
               >
                 Start Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-4 text-lg rounded-xl transition-all"
+              </button>
+              <button 
                 onClick={() => window.open('mailto:sales@easybudget.ing')}
+                style={{
+                  fontFamily: 'inherit',
+                  fontSize: '18px',
+                  background: 'white',
+                  color: '#374151',
+                  padding: '0.8em 1.2em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #d1d5db',
+                  borderRadius: '25px',
+                  boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
+                  e.currentTarget.style.background = '#f9fafb';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.background = 'white';
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                  e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
+                }}
               >
                 Talk to Sales
-              </Button>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
