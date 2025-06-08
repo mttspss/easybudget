@@ -20,7 +20,8 @@ import {
   User,
   LogOut,
   HelpCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  ArrowLeft
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -94,26 +95,25 @@ export function Sidebar() {
 
   return (
     <div className="w-64 flex flex-col">
-      {/* Logo - Now clickable */}
+      {/* Logo with back arrow */}
       <div className="p-4">
-        <Link href="/" className="block">
-          <div className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
-            <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <ArrowLeft className="h-4 w-4 text-gray-600" />
+            <div className="w-6 h-6 rounded-md overflow-hidden">
+              <Image src="/newicon1.png" alt="EasyBudget Logo" width={24} height={24} className="w-full h-full object-contain" />
             </div>
-            <div>
-              <span className="text-lg font-bold">
-                <span className="text-black">easybudget</span>
-                <span style={{color: '#60ea8b'}}>.ing</span>
-              </span>
-            </div>
-          </div>
-        </Link>
+            <span className="text-base font-semibold">
+              <span className="text-gray-900">easybudget</span>
+              <span style={{color: '#60ea8b'}}>.ing</span>
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-4">
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -121,17 +121,17 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group",
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-normal rounded-lg transition-all duration-150 group",
                   isActive
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:bg-white/50 hover:text-gray-900"
+                    ? "bg-gray-100 text-gray-900 border border-gray-200"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
                 <item.icon className={cn(
-                  "h-5 w-5 transition-colors",
-                  isActive ? "text-gray-900" : "text-gray-500 group-hover:text-gray-700"
+                  "h-4 w-4 transition-colors",
+                  isActive ? "text-gray-700" : "text-gray-500 group-hover:text-gray-600"
                 )} />
-                <span className="font-medium">{item.title}</span>
+                <span>{item.title}</span>
               </Link>
             )
           })}

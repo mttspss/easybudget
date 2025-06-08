@@ -409,16 +409,16 @@ export default function LandingPage() {
                   onClick={() => router.push('/auth/register')} 
                   className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
                 >
-                  Get Started Now
+                  Start Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   variant="outline"
-                  className="border-2 border-slate-300 text-slate-700 hover:bg-white/50 backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-xl shadow-sm hover:shadow-md transition-all"
+                  className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-xl shadow-sm hover:shadow-md transition-all"
                   onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
                 >
                   <Play className="mr-2 h-5 w-5" />
-                  Watch Tutorial
+                  Watch Demo
                 </Button>
               </div>
 
@@ -743,7 +743,7 @@ export default function LandingPage() {
                 onClick={() => router.push('/auth/register')} 
                 className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-                Get Started Free
+                Start Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
