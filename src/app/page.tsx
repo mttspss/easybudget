@@ -7,7 +7,6 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
-  ArrowRight, 
   Check, 
   Shield, 
   Target,
@@ -17,7 +16,6 @@ import {
   Upload,
   Twitter,
   Linkedin,
-  Play,
   BarChart3,
   Mail,
   Database,
@@ -407,17 +405,15 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   onClick={() => router.push('/auth/register')} 
-                  className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
                 >
                   Start Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   variant="outline"
-                  className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-xl shadow-sm hover:shadow-md transition-all"
+                  className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
                   onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
                 >
-                  <Play className="mr-2 h-5 w-5" />
                   Watch Demo
                 </Button>
               </div>
@@ -741,14 +737,13 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={() => router.push('/auth/register')} 
-                className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
               >
                 Start Now
-                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
                 variant="outline" 
-                className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 py-4 text-lg rounded-xl shadow-sm hover:shadow-md transition-all"
+                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
                 onClick={() => window.open('mailto:sales@easybudget.ing')}
               >
                 Talk to Sales

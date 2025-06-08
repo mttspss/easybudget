@@ -113,7 +113,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-4">
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -121,15 +121,15 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-normal rounded-lg transition-all duration-150 group",
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group",
                   isActive
-                    ? "bg-gray-100 text-gray-900 border border-gray-200"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:bg-white hover:text-gray-900"
                 )}
               >
                 <item.icon className={cn(
                   "h-4 w-4 transition-colors",
-                  isActive ? "text-gray-700" : "text-gray-500 group-hover:text-gray-600"
+                  isActive ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900"
                 )} />
                 <span>{item.title}</span>
               </Link>
