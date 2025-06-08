@@ -323,10 +323,9 @@ export default function LandingPage() {
               Over 2,847+ professionals trust EasyBudget
             </a>
             
-            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px] md:font-['TikTok_Display_Bold']">
-              <span className="hidden md:block">Automate budgeting that drives
-financial success</span>
-              <span className="block md:hidden">Automate budgeting that drives financial success</span>
+            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
+              <span className="hidden md:block">Making money management{'\n'}so simple,{'\n'}it feels magic.</span>
+              <span className="block md:hidden">Making money management so simple, it feels magic.</span>
             </h1>
             
             <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
@@ -337,7 +336,7 @@ financial success</span>
             <div className="flex gap-2 mt-12">
               <button 
                 onClick={() => router.push('/auth/register')} 
-                className="text-white text-[16px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
+                className="text-white text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
                 style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
               >
                 Start Now
@@ -348,7 +347,7 @@ financial success</span>
               </button>
               <button 
                 onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                className="bg-white text-[#333] text-[16px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+                className="bg-white text-[#333] text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-90 transition-opacity inline-flex items-center gap-2"
               >
                 Watch Demo
               </button>
