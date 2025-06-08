@@ -326,14 +326,14 @@ export default function LandingPage() {
             <Button 
               onClick={() => router.push('/auth/register')} 
               style={{backgroundColor: '#60ea8b'}}
-              className="hover:opacity-90 text-gray-900 font-medium px-6 py-3 text-base rounded-xl transition-all shadow-sm"
+              className="hover:opacity-90 text-gray-900 font-bold px-8 py-4 text-lg rounded-xl transition-all shadow-lg"
             >
               Start Now
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               variant="outline"
-              className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-xl transition-all"
+              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-4 text-lg rounded-xl transition-all"
               onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
             >
               Watch Demo
@@ -631,14 +631,14 @@ export default function LandingPage() {
               <Button 
                 onClick={() => router.push('/auth/register')} 
                 style={{backgroundColor: '#60ea8b'}}
-                className="hover:opacity-90 text-gray-900 font-medium px-6 py-3 text-base rounded-xl transition-all shadow-sm"
+                className="hover:opacity-90 text-gray-900 font-bold px-8 py-4 text-lg rounded-xl transition-all shadow-lg"
               >
                 Start Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
                 variant="outline" 
-                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-xl transition-all"
+                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-4 text-lg rounded-xl transition-all"
                 onClick={() => window.open('mailto:sales@easybudget.ing')}
               >
                 Talk to Sales
