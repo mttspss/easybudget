@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   description: "Stop managing money in spreadsheets. Get complete financial visibility and insights in one professional dashboard.",
   icons: {
     icon: [
-      { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon.png', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon1.png', type: 'image/png' },
+      { url: '/favicon1.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon1.png', type: 'image/png', sizes: '16x16' },
     ],
-    apple: '/favicon.png',
+    apple: '/favicon1.png',
   },
 };
 
