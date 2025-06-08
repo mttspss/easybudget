@@ -482,23 +482,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          
-          {/* Bottom CTA */}
-          <div className="text-center mt-10">
-            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-gray-200/50">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-sm font-bold text-gray-700">Over 2,847+ professionals already using EasyBudget</span>
-              </div>
-              <button 
-                onClick={() => router.push('/auth/register')} 
-                className="text-white text-sm font-bold px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
-                style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
-              >
-                Join Now
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -591,10 +574,10 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
-              <div key={index} className={`group rounded-2xl p-6 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-slate-900 shadow-2xl shadow-slate-900/20 scale-105 ring-2 ring-slate-900' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`}>
+              <div key={index} className={`group rounded-2xl p-6 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-2xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
                 {plan.popular && (
                   <div className="text-center mb-4">
-                    <span className="bg-gradient-to-r from-slate-900 to-slate-700 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                    <span className="text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
                       ✨ Most Popular
                     </span>
                   </div>
@@ -621,7 +604,8 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full py-2 font-bold transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
+                  className={`w-full py-3 px-4 rounded-full mb-6 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
+                  style={plan.popular ? {background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'} : {}}
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => plan.price === "Custom" ? window.open('mailto:sales@easybudget.ing') : router.push('/auth/register')}
                 >
@@ -629,29 +613,9 @@ export default function LandingPage() {
                 </Button>
                 
                 {/* Subtle accent line */}
-                <div className="mt-4 w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className={`w-16 h-1 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${plan.popular ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}></div>
               </div>
             ))}
-          </div>
-          
-          {/* Bottom trust indicators */}
-          <div className="text-center mt-10">
-            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-gray-200/50">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-sm font-bold text-gray-700">Trusted by 2,847+ professionals</span>
-              </div>
-              <div className="h-4 w-px bg-gray-300"></div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-bold text-gray-700">SOC 2 Certified</span>
-              </div>
-              <div className="h-4 w-px bg-gray-300"></div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-bold text-gray-700">Cancel Anytime</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
