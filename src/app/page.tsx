@@ -227,8 +227,8 @@ export default function LandingPage() {
               <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-semibold">
-              <span className="text-black">easybudget</span>
-              <span style={{color: '#60ea8b'}}>.ing</span>
+              <span className="text-black font-bold">easybudget</span>
+              <span style={{color: '#60ea8b'}} className="font-bold">.ing</span>
             </span>
           </div>
 
@@ -324,8 +324,8 @@ export default function LandingPage() {
             </a>
             
             <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
-              <span className="hidden md:block">Making financial management{'\n'}so simple,{'\n'}it feels like magic.</span>
-              <span className="block md:hidden">Making financial management so simple, it feels like magic.</span>
+              <span className="hidden md:block">Making money management{'\n'}so simple,{'\n'}it feels magic.</span>
+              <span className="block md:hidden">Making money management so simple, it feels magic.</span>
             </h1>
             
             <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
