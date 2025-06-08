@@ -323,9 +323,10 @@ export default function LandingPage() {
               Over 2,847+ professionals trust EasyBudget
             </a>
             
-            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
-              <span className="hidden md:block">Making money management{'\n'}so simple,{'\n'}it feels magic.</span>
-              <span className="block md:hidden">Making money management so simple, it feels magic.</span>
+            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px] md:font-['TikTok_Display_Bold']">
+              <span className="hidden md:block">Automate budgeting that drives
+financial success</span>
+              <span className="block md:hidden">Automate budgeting that drives financial success</span>
             </h1>
             
             <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
