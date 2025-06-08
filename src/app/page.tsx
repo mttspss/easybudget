@@ -326,14 +326,14 @@ export default function LandingPage() {
             <Button 
               onClick={() => router.push('/auth/register')} 
               style={{backgroundColor: '#60ea8b'}}
-              className="hover:opacity-90 text-gray-900 font-bold px-8 py-4 text-lg rounded-xl transition-all shadow-lg"
+              className="hover:opacity-90 text-gray-900 font-bold px-12 py-6 text-xl rounded-xl transition-all shadow-lg"
             >
               Start Now
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-6 w-6" />
             </Button>
             <Button 
               variant="outline"
-              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-4 text-lg rounded-xl transition-all"
+              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-12 py-6 text-xl rounded-xl transition-all"
               onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
             >
               Watch Demo
