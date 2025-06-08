@@ -121,20 +121,17 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group",
                   isActive
-                    ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:bg-white/50 hover:text-gray-900"
                 )}
               >
                 <item.icon className={cn(
-                  "h-4 w-4",
-                  isActive ? "text-blue-600" : "text-gray-500"
+                  "h-5 w-5 transition-colors",
+                  isActive ? "text-gray-900" : "text-gray-500 group-hover:text-gray-700"
                 )} />
-                <span>{item.title}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                )}
+                <span className="font-medium">{item.title}</span>
               </Link>
             )
           })}
