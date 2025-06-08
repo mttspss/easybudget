@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Linkedin, Twitter } from "lucide-react"
 
 export default function PrivacyPolicyPage() {
   const router = useRouter()
@@ -180,6 +180,105 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative border-t border-gray-200 py-16">
+        <div className="relative max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-4 gap-8 mb-12">
+            {/* Product */}
+            <div>
+              <h4 className="font-bold text-slate-900 mb-6">Product</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="/#benefits" className="hover:text-slate-900 transition-colors">Features</a></li>
+                <li><a href="/#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Integrations</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">API Documentation</a></li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="font-bold text-slate-900 mb-6">Company</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Contact</a></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-bold text-slate-900 mb-6">Legal</h4>
+              <ul className="space-y-4 text-slate-600">
+                <li><a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="font-bold text-slate-900 mb-6">Contact Us</h4>
+              <div className="space-y-4">
+                <p className="text-slate-600">
+                  Questions about our privacy practices?
+                </p>
+                <div className="space-y-2 text-slate-600">
+                  <p>
+                    <strong>Email:</strong> privacy@easybudget.ing
+                  </p>
+                  <p>
+                    <strong>Support:</strong> hello@easybudget.ing
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => router.push('/')} 
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium"
+                >
+                  Back to Homepage
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-lg overflow-hidden">
+                  <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
+                </div>
+                <span className="text-xl font-bold">
+                  <span className="text-slate-900">easybudget</span>
+                  <span style={{color: '#60ea8b'}}>.ing</span>
+                </span>
+              </div>
+              
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-4">
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    <Twitter className="w-5 h-5" />
+                  </a>
+                </div>
+                <span className="text-slate-600">
+                  hello@easybudget.ing
+                </span>
+              </div>
+            </div>
+            
+            <div className="text-center mt-8">
+              <p className="text-slate-500">
+                © 2024 EasyBudget. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 
