@@ -262,7 +262,8 @@ export default function LandingPage() {
                 <Button 
                   variant="ghost" 
                   onClick={() => router.push('/auth/signin')} 
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-900 font-medium px-6 py-2 rounded-lg border-2 shadow-md hover:opacity-90 transition-all"
+                  style={{borderColor: '#60ea8b'}}
                 >
                   Sign In
                 </Button>
@@ -297,7 +298,14 @@ export default function LandingPage() {
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => router.push('/auth/signin')}
+                      className="border-2 shadow-md hover:opacity-90 transition-all"
+                      style={{borderColor: '#60ea8b'}}
+                    >
+                      Sign In
+                    </Button>
                     <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
                   </>
                 )}
@@ -316,13 +324,13 @@ export default function LandingPage() {
             </a>
             
             <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
-              <span className="hidden md:block">Making financial management so simple,{'\n'}it feels like magic.</span>
+              <span className="hidden md:block">Making financial management{'\n'}so simple,{'\n'}it feels like magic.</span>
               <span className="block md:hidden">Making financial management so simple, it feels like magic.</span>
             </h1>
             
             <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
-              <span className="hidden md:block">Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
-              <span className="block md:hidden">Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
+              <span className="hidden md:block">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
+              <span className="block md:hidden">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
             </p>
             
             <div className="flex gap-2 mt-4">
