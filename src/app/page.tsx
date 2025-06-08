@@ -451,26 +451,53 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits/Features */}
-      <section id="benefits" className="py-12 relative">
+      <section id="benefits" className="py-20 relative bg-gradient-to-br from-gray-50 via-white to-gray-100">
         <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Everything You Need to Take Control of Your Finances
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-6">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500"></div>
+              <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Features</span>
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+              Everything You Need to Take
+              <span className="block" style={{color: '#60ea8b'}}>
+                Control of Your Finances
+              </span>
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Stop juggling multiple apps and spreadsheets. Get complete financial visibility and insights in one place.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <div key={index} className="p-6 rounded-lg bg-white/60 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
-                  <benefit.icon className="w-5 h-5 text-slate-600" />
+              <div key={index} className="group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2">
+                <div className="w-14 h-14 bg-gradient-to-br from-gray-50 to-white rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <benefit.icon className="w-7 h-7 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">{benefit.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{benefit.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-gray-900 transition-colors duration-300">{benefit.title}</h3>
+                <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{benefit.desc}</p>
+                
+                {/* Subtle accent line */}
+                <div className="mt-6 w-12 h-1 bg-gradient-to-r from-blue-500 to-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
             ))}
+          </div>
+          
+          {/* Bottom CTA */}
+          <div className="text-center mt-16">
+            <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm px-8 py-4 rounded-2xl shadow-lg border border-gray-200/50">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="text-sm font-bold text-gray-700">Over 2,847+ professionals already using EasyBudget</span>
+              </div>
+              <button 
+                onClick={() => router.push('/auth/register')} 
+                className="text-white text-sm font-bold px-6 py-2 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+                style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
+              >
+                Join Now
+              </button>
+            </div>
           </div>
         </div>
       </section>
