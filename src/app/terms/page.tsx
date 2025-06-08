@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Linkedin, Twitter } from "lucide-react"
 
@@ -249,8 +250,8 @@ export default function TermsOfServicePage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Product</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="/#benefits" className="hover:text-slate-900 transition-colors">Features</a></li>
-                <li><a href="/#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
+                <li><Link href="/#benefits" className="hover:text-slate-900 transition-colors">Features</Link></li>
+                <li><Link href="/#pricing" className="hover:text-slate-900 transition-colors">Pricing</Link></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Integrations</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">API Documentation</a></li>
