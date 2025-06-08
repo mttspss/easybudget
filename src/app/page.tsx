@@ -409,7 +409,7 @@ export default function LandingPage() {
             {/* Right Column - Content */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold" style={{color: '#60ea8b'}}>
+                <h3 className="text-4xl font-bold underline" style={{color: '#60ea8b'}}>
                   The Spreadsheet Killer
                 </h3>
                 <h2 className="text-4xl font-bold text-gray-900 leading-tight">
