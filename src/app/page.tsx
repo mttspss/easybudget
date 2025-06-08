@@ -316,7 +316,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-6">
+      <section className="py-40 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center mb-16">
             <a className="text-[#777] font-medium text-[14px] px-[12px] py-[4px] bg-[#FFF] rounded-full shadow mb-4">
@@ -333,7 +333,7 @@ export default function LandingPage() {
               <span className="block md:hidden">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
             </p>
             
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-12">
               <button 
                 onClick={() => router.push('/auth/register')} 
                 className="text-white text-[16px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
