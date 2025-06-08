@@ -23,9 +23,6 @@ import {
   Lock,
   Activity,
   User,
-  Settings,
-  HelpCircle,
-  LogOut,
   TrendingUp,
   Home
 } from "lucide-react"
@@ -34,7 +31,6 @@ export default function LandingPage() {
   const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const [email, setEmail] = useState("")
   const router = useRouter()
 
@@ -220,323 +216,123 @@ export default function LandingPage() {
     router.push(`/auth/register?email=${encodeURIComponent(email)}`)
   }
 
-  const handleUserDropdown = () => {
-    setUserDropdownOpen(!userDropdownOpen)
-  }
-
-  const handleSignOut = () => {
-    signOut()
-    setUserDropdownOpen(false)
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
-      {/* Subtle patterns for entire page */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(122,255,1,0.1),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.8),transparent_50%)]"></div>
-      
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white/70 backdrop-blur-md border border-gray-200/50 rounded-2xl shadow-lg px-6 py-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-lg overflow-hidden">
-                  <Image src="/newicon1.png" alt="EasyBudget Logo" width={40} height={40} className="w-full h-full object-contain" />
-              </div>
-                <span className="text-2xl font-semibold">
-                  <span className="text-black">easybudget</span>
-                  <span style={{color: '#60ea8b'}}>.ing</span>
-                </span>
+    <div className="min-h-screen bg-white">
+      {/* Simple Navbar */}
+      <nav className="py-4 px-6">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
             </div>
+            <span className="text-xl font-semibold">
+              <span className="text-black">easybudget</span>
+              <span style={{color: '#60ea8b'}}>.ing</span>
+            </span>
+          </div>
 
-            <div className="hidden md:flex items-center space-x-8">
-                <a href="#benefits" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Features</a>
-                <a href="#journey" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Solutions</a>
-                <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">How it Works</a>
-                <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Pricing</a>
-                <a href="#faq" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">FAQ</a>
-              </div>
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+            <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+            <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+          </div>
 
-              <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => router.push('/dashboard')} 
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Go to app
+                </Button>
+                <Button 
+                  onClick={() => signOut()}
+                  className="text-gray-600 hover:text-gray-900"
+                  variant="ghost"
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => router.push('/auth/signin')} 
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Sign in with Google
+                </Button>
+              </>
+            )}
+          </div>
+
+          <div className="md:hidden">
+            <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden pt-4 border-t border-gray-200 mt-3">
+            <div className="flex flex-col space-y-4">
+              <a href="#benefits" className="text-gray-600 hover:text-gray-900 px-2 py-1">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-2 py-1">Pricing</a>
+              <a href="#faq" className="text-gray-600 hover:text-gray-900 px-2 py-1">FAQ</a>
+              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
                 {user ? (
                   <>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => router.push('/dashboard')} 
-                      style={{backgroundColor: '#60ea8b'}}
-                      className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
-                    >
-                      Dashboard
-                    </Button>
-                    <div className="relative">
-                      <button
-                        onClick={handleUserDropdown}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
-                      >
-                        <div className="text-right hidden sm:block">
-                          <div className="text-sm font-semibold text-slate-900">
-                            {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
-                  </div>
-                          <div className="text-xs text-slate-500">Free Plan</div>
-                </div>
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm bg-gradient-to-br from-blue-500 to-blue-600">
-                          {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
-                        </div>
-                      </button>
-                      {userDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                          <div className="px-4 py-3 border-b border-gray-100">
-                            <div className="font-medium text-slate-900">{user?.user_metadata?.full_name || user?.email}</div>
-                            <div className="text-sm text-slate-500">Free Plan</div>
-                    </div>
-                          <div className="py-1">
-                            <button 
-                              className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
-                              onClick={() => router.push('/dashboard/profile')}
-                            >
-                              <User className="w-4 h-4 mr-3" />
-                              Profile Settings
-                            </button>
-                            <button 
-                              className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50"
-                              onClick={() => router.push('/dashboard/preferences')}
-                            >
-                              <Settings className="w-4 h-4 mr-3" />
-                              Preferences
-                            </button>
-                            <button className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-gray-50">
-                              <HelpCircle className="w-4 h-4 mr-3" />
-                              Help & Support
-                            </button>
-                            <div className="border-t border-gray-100 mt-1 pt-1">
-                              <button 
-                                onClick={handleSignOut}
-                                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                              >
-                                <LogOut className="w-4 h-4 mr-3" />
-                                Sign out
-                              </button>
-                  </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <Button variant="ghost" onClick={() => router.push('/dashboard')}>Go to app</Button>
+                    <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
                   </>
-              ) : (
-                <>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => router.push('/auth/signin')} 
-                      style={{backgroundColor: '#60ea8b'}}
-                      className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
-                    >
-                    Sign In
-                  </Button>
-                    <Button 
-                      onClick={() => router.push('/auth/register')} 
-                      className="bg-slate-900 hover:bg-slate-800 text-white font-medium px-6 py-2 rounded-lg"
-                    >
-                      Sign Up
-                  </Button>
-                </>
-              )}
-            </div>
-
-            <div className="md:hidden">
-                <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
-          </div>
-
-          {mobileMenuOpen && (
-              <div className="md:hidden pt-4 border-t border-gray-200 mt-3">
-              <div className="flex flex-col space-y-4">
-                  <a href="#benefits" className="text-slate-600 hover:text-slate-900 px-2 py-1">Features</a>
-                  <a href="#journey" className="text-slate-600 hover:text-slate-900 px-2 py-1">Solutions</a>
-                  <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 px-2 py-1">How it Works</a>
-                  <a href="#pricing" className="text-slate-600 hover:text-slate-900 px-2 py-1">Pricing</a>
-                  <a href="#faq" className="text-slate-600 hover:text-slate-900 px-2 py-1">FAQ</a>
-                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                    {user ? (
-                      <>
-                        <Button variant="ghost" onClick={() => router.push('/dashboard')}>Dashboard</Button>
-                        <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
-                    </>
-                  ) : (
-                    <>
-                        <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign In</Button>
-                        <Button onClick={() => router.push('/auth/register')} className="bg-slate-900 hover:bg-slate-800">Sign Up</Button>
-                    </>
-                  )}
-                </div>
+                ) : (
+                  <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Sign in with Google</Button>
+                )}
               </div>
             </div>
-          )}
           </div>
-        </div>
+        )}
       </nav>
 
-      {/* Hero */}
-      <section className="py-16 relative">        
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                {/* Badge */}
-                <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-slate-700 text-sm font-medium shadow-sm">
-                  <Database className="w-4 h-4 mr-2 text-[#6fb01a]" />
-                  Multiple Accounts, One Dashboard
-              </div>
-                
-                <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
-                  Stop Managing Money in
-                  <span className="block" style={{color: '#60ea8b'}}> 
-                    Spreadsheets
-                  </span>
-            </h1>
-            
-                <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
-                  Get a complete view of your finances in one place. Track expenses, predict cash flow, and generate reports automatically.
-            </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  onClick={() => router.push('/auth/register')} 
-                  className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
-                >
-                  Start Now
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
-                  onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                >
-                  Watch Demo
-                </Button>
-              </div>
-
-              <div className="flex items-center space-x-6 pt-4">
-              <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-slate-600 font-medium">SOC 2 Certified</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-slate-600 font-medium">Bank-Level Security</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                  <Database className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm text-slate-600 font-medium">10K+ Banks</span>
-              </div>
-            </div>
-
-              {/* Social Proof */}
-              <div className="flex items-center space-x-4 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex -space-x-2">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">JD</div>
-                  <div className="w-10 h-10 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">SM</div>
-                  <div className="w-10 h-10 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">AL</div>
-                  <div className="w-10 h-10 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">MR</div>
-                  <div className="w-10 h-10 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold">TB</div>
+      {/* Hero Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-6">
+            <span className="text-gray-500 text-sm">Over 2,847+ professionals trust EasyBudget</span>
           </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center space-x-1 mb-1">
-                    {[1,2,3,4,5].map((star) => (
-                      <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                      </svg>
-                    ))}
-        </div>
-                  <span className="text-sm font-medium text-slate-700">2,847+ finance professionals trust easybudget</span>
-          </div>
-                </div>
-                </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Stop Managing Money in{" "}
+            <span style={{color: '#60ea8b'}}>Spreadsheets</span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Get complete financial visibility and control in one professional dashboard
+          </p>
 
-            {/* Professional Dashboard Mock-up */}
-            <div className="relative">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-                {/* Browser Chrome */}
-                <div className="flex items-center space-x-2 px-4 py-3 bg-white/90 backdrop-blur-sm border-b border-gray-200">
-                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <div className="ml-4 text-xs text-gray-500 font-mono">easybudget.ing/dashboard</div>
-                </div>
-                
-                {/* Dashboard Content */}
-                <div className="p-6 space-y-6">
-                  {/* Header */}
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-slate-900">Financial Overview</h3>
-                    <div className="text-xs text-slate-500 bg-gray-100 px-2 py-1 rounded-md">Live</div>
-                </div>
-                  
-                  {/* KPI Cards */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-[#6fb01a]/10 to-[#85c926]/5 rounded-xl p-4 border border-[#6fb01a]/20">
-                      <div className="text-xs text-slate-600 mb-1 font-medium">Total Assets</div>
-                      <div className="text-2xl font-bold text-slate-900">$127,340</div>
-                      <div className="text-xs text-green-600 font-semibold">+12.4%</div>
-                </div>
-                    <div className="bg-slate-50 rounded-xl p-4 border border-gray-200">
-                      <div className="text-xs text-slate-600 mb-1 font-medium">Monthly Spend</div>
-                      <div className="text-2xl font-bold text-slate-900">$4,890</div>
-                      <div className="text-xs text-red-600 font-semibold">+3.2%</div>
-                </div>
-                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                      <div className="text-xs text-slate-600 mb-1 font-medium">Savings Rate</div>
-                      <div className="text-2xl font-bold text-slate-900">28.5%</div>
-                      <div className="text-xs text-green-600 font-semibold">+2.1%</div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <Button 
+              onClick={() => router.push('/auth/register')} 
+              className="bg-black hover:bg-gray-900 text-white font-medium px-6 py-3 text-base rounded-lg transition-all"
+            >
+              Start Now
+            </Button>
+            <Button 
+              variant="outline"
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-3 text-base rounded-lg transition-all"
+              onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
+            >
+              Watch Demo
+            </Button>
+          </div>
+
+          <div className="text-center text-gray-500 text-sm">
+            2,847+ finance professionals already using EasyBudget
           </div>
         </div>
-
-                  {/* Chart Area */}
-                  <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 h-28 flex items-center justify-center border border-gray-200">
-                    <div className="space-y-2 w-full">
-                      <div className="flex justify-between text-xs text-slate-500 font-medium">
-                        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-           </div>
-                      <div className="h-16 bg-gradient-to-t from-slate-200 to-slate-100 rounded-lg flex items-end justify-around px-2">
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '60%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '80%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '45%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '90%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '70%'}}></div>
-                        <div className="w-8 bg-gradient-to-t from-[#6fb01a] to-[#85c926] rounded-t-md" style={{height: '85%'}}></div>
-                 </div>
-               </div>
-                 </div>
-                  
-                  {/* Transaction List */}
-                  <div className="space-y-3">
-                    <div className="text-sm font-bold text-slate-900">Recent Transactions</div>
-                    <div className="space-y-3">
-                      {[
-                        { desc: "Salary Deposit", amount: "+$5,200", cat: "Income", color: "bg-green-50 border-green-200" },
-                        { desc: "Rent Payment", amount: "-$1,800", cat: "Housing", color: "bg-red-50 border-red-200" },
-                        { desc: "Grocery Store", amount: "-$156", cat: "Food", color: "bg-orange-50 border-orange-200" }
-                      ].map((tx, i) => (
-                        <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${tx.color}`}>
-                          <div>
-                            <div className="font-semibold text-slate-900 text-sm">{tx.desc}</div>
-                            <div className="text-xs text-slate-500">{tx.cat}</div>
-                 </div>
-                          <div className={`font-bold text-sm ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-slate-900'}`}>
-                            {tx.amount}
-               </div>
-           </div>
-                      ))}
-         </div>
-               </div>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
-       </section>
+      </section>
 
       {/* Benefits/Features */}
       <section id="benefits" className="py-12 relative">
@@ -554,10 +350,10 @@ export default function LandingPage() {
               <div key={index} className="p-6 rounded-lg bg-white/60 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
                 <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
                   <benefit.icon className="w-5 h-5 text-slate-600" />
-              </div>
+                </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">{benefit.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{benefit.desc}</p>
-            </div>
+              </div>
             ))}
           </div>
         </div>
@@ -580,7 +376,7 @@ export default function LandingPage() {
                 <div className="text-center mb-6">
                   <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
                     <type.icon className="w-6 h-6" />
-                </div>
+                  </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
                   <p className="text-slate-600 leading-relaxed">{type.desc}</p>
                 </div>
@@ -592,10 +388,10 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                </div>
+              </div>
             ))}
-                </div>
-                </div>
+          </div>
+        </div>
       </section>
 
       {/* How It Works */}
@@ -608,14 +404,14 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Get up and running in minutes with our simple 3-step process
             </p>
-              </div>
+          </div>
           <div className="grid lg:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="text-center">
                 <div className="relative mb-6">
                   <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-lg font-bold text-white">{index + 1}</span>
-                </div>
+                  </div>
                   {index < 2 && (
                     <div className="hidden lg:block absolute top-6 left-full w-full h-px bg-slate-200"></div>
                   )}
@@ -626,10 +422,10 @@ export default function LandingPage() {
                   <p className="text-slate-600 leading-relaxed">{step.desc}</p>
                   <p className="text-sm text-slate-500 font-medium">{step.detail}</p>
                 </div>
-                </div>
+              </div>
             ))}
-                </div>
-                </div>
+          </div>
+        </div>
       </section>
 
       {/* Pricing */}
@@ -642,7 +438,7 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
-                </div>
+          </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
               <div key={index} className={`rounded-xl p-6 border transition-all hover:shadow-lg bg-white/70 backdrop-blur-sm ${plan.popular ? 'border-slate-900 shadow-md scale-105 ring-2 ring-slate-900' : 'border-gray-200 hover:border-gray-300'}`}>
@@ -651,17 +447,17 @@ export default function LandingPage() {
                     <span className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Most Popular
                     </span>
-                </div>
+                  </div>
                 )}
                 <div className="text-center mb-6">
                   <div className="text-sm text-slate-600 font-medium mb-2">
                     {plan.highlight}
-                </div>
+                  </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{plan.name}</h3>
                   <div className="mb-3">
                     <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
                     {plan.price !== "Custom" && <span className="text-slate-600">/month</span>}
-                </div>
+                  </div>
                   <p className="text-slate-600">{plan.desc}</p>
                 </div>
                 <ul className="space-y-3 mb-6">
@@ -679,7 +475,7 @@ export default function LandingPage() {
                 >
                   {plan.cta}
                 </Button>
-          </div>
+              </div>
             ))}
           </div>
         </div>
@@ -727,11 +523,11 @@ export default function LandingPage() {
                 <span className="block" style={{color: '#60ea8b'}}>
                   Transformation Today
                 </span>
-            </h2>
+              </h2>
               <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
                 Join 2,847+ professionals who have simplified their financial management. 
                 Get complete visibility and control over your money in minutes.
-            </p>
+              </p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -754,27 +550,27 @@ export default function LandingPage() {
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                   <Check className="w-6 h-6 text-green-600" />
-              </div>
+                </div>
                 <span className="font-semibold text-slate-900">No Setup Fees</span>
                 <span className="text-sm text-slate-600">Start immediately</span>
               </div>
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                   <Shield className="w-6 h-6 text-blue-600" />
-              </div>
+                </div>
                 <span className="font-semibold text-slate-900">Bank-Level Security</span>
                 <span className="text-sm text-slate-600">SOC 2 certified</span>
-            </div>
+              </div>
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                   <Target className="w-6 h-6 text-purple-600" />
-          </div>
+                </div>
                 <span className="font-semibold text-slate-900">Cancel Anytime</span>
                 <span className="text-sm text-slate-600">No long-term commitment</span>
-        </div>
-                </div>
               </div>
             </div>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
@@ -813,7 +609,7 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
               </ul>
-          </div>
+            </div>
 
             {/* Contact */}
             <div>
