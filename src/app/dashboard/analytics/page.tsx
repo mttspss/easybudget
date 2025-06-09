@@ -36,6 +36,7 @@ import {
   ReferenceLine,
   Brush
 } from 'recharts'
+import { IconRenderer } from "@/components/ui/icon-renderer"
 
 interface AnalyticsData {
   monthlyTrends: any[]
@@ -369,110 +370,116 @@ export default function AnalyticsPage() {
 
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-                  <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Top Category</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-1">
-                            {analyticsData.insights.topCategory}
-                          </p>
-                        </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                          <PieChart className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Trend</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            {analyticsData.insights.trendDirection === 'up' ? (
-                              <ArrowUpRight className="h-3 w-3 text-green-600" />
-                            ) : analyticsData.insights.trendDirection === 'down' ? (
-                              <ArrowDownRight className="h-3 w-3 text-red-600" />
-                            ) : null}
-                            <span className="text-sm font-semibold text-gray-900">
-                              {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
-                               analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
-                            </span>
+                <div className="space-y-3">
+                  {/* First Row - Primary Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Top Category</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {analyticsData.insights.topCategory}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                            <PieChart className="h-5 w-5 text-white" />
                           </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                          <TrendingUp className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Daily Average</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-1">
-                            ${analyticsData.insights.averageDaily.toFixed(0)}
-                          </p>
+                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Trend</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {analyticsData.insights.trendDirection === 'up' ? (
+                                <ArrowUpRight className="h-3 w-3 text-green-600" />
+                              ) : analyticsData.insights.trendDirection === 'down' ? (
+                                <ArrowDownRight className="h-3 w-3 text-red-600" />
+                              ) : null}
+                              <span className="text-sm font-semibold text-gray-900">
+                                {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
+                                 analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                            <TrendingUp className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
-                          <Activity className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-1">
-                            ${analyticsData.insights.projectedMonthly.toFixed(0)}
-                          </p>
+                    <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Daily Average</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              ${analyticsData.insights.averageDaily.toFixed(0)}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                            <Activity className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
-                          <Target className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </div>
 
-                  <Card className="bg-gradient-to-br from-teal-50/50 via-white to-white border border-teal-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-1">
-                            ${analyticsData.insights.avgMonthlyIncome.toLocaleString()}
-                          </p>
+                  {/* Second Row - Financial Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              ${analyticsData.insights.projectedMonthly.toFixed(0)}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                            <Target className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
-                          <TrendingUp className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30">
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-1">
-                            ${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}
-                          </p>
+                    <Card className="bg-gradient-to-br from-teal-50/50 via-white to-white border border-teal-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              ${analyticsData.insights.avgMonthlyIncome.toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
+                            <TrendingUp className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
-                          <ArrowDownRight className="h-5 w-5 text-white" />
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              ${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                            <ArrowDownRight className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               )}
 
@@ -787,7 +794,16 @@ export default function AnalyticsPage() {
                         <div key={index} className="px-2 py-2 hover:bg-gray-50/50 transition-colors">
                           <div className="grid grid-cols-12 gap-3 items-center">
                             <div className="col-span-4">
-                              <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
+                                  <IconRenderer 
+                                    iconName={transaction.icon} 
+                                    className="h-3 w-3 text-white"
+                                    fallbackColor="white"
+                                  />
+                                </div>
+                                <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
+                              </div>
                             </div>
                             <div className="col-span-2">
                               <span className="text-xs text-gray-600">
