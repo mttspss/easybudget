@@ -437,7 +437,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Daily Average</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              ${analyticsData.insights.averageDaily.toFixed(0)}
+                              {userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
@@ -456,7 +456,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              ${analyticsData.insights.projectedMonthly.toFixed(0)}
+                              {userCurrency ? formatCurrency(analyticsData.insights.projectedMonthly, userCurrency) : `€${analyticsData.insights.projectedMonthly.toFixed(0)}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
@@ -472,7 +472,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              ${analyticsData.insights.avgMonthlyIncome.toLocaleString()}
+                              {userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyIncome, userCurrency) : `€${analyticsData.insights.avgMonthlyIncome.toLocaleString()}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
@@ -488,7 +488,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              ${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}
+                              {userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyExpenses, userCurrency) : `€${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
