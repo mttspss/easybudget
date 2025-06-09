@@ -93,6 +93,15 @@ export default function ExpensesPage() {
   })
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
+    open: boolean
+    type: 'single' | 'multiple'
+    transactionId?: string
+    transactionCount?: number
+  }>({
+    open: false,
+    type: 'single'
+  })
   const itemsPerPage = 10
   
   // Form state
@@ -250,21 +259,48 @@ export default function ExpensesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this transaction?')) return
+    setDeleteConfirmDialog({
+      open: true,
+      type: 'single',
+      transactionId: id
+    })
+  }
 
+  const handleBulkDelete = () => {
+    if (selectedItems.size === 0) return
+    setDeleteConfirmDialog({
+      open: true,
+      type: 'multiple',
+      transactionCount: selectedItems.size
+    })
+  }
+
+  const confirmDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id)
+      if (deleteConfirmDialog.type === 'single' && deleteConfirmDialog.transactionId) {
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('id', deleteConfirmDialog.transactionId)
 
-      if (error) throw error
+        if (error) throw error
+        toast.success('Expense deleted successfully!')
+      } else if (deleteConfirmDialog.type === 'multiple') {
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .in('id', Array.from(selectedItems))
+
+        if (error) throw error
+        toast.success(`${selectedItems.size} expense transactions deleted successfully!`)
+        setSelectedItems(new Set())
+      }
       
-      toast.success('Expense deleted successfully!')
+      setDeleteConfirmDialog({ open: false, type: 'single' })
       fetchData()
     } catch (error: any) {
-      console.error('Error deleting transaction:', error)
-      toast.error(`Error deleting transaction: ${error.message || 'Please try again.'}`)
+      console.error('Error deleting transaction(s):', error)
+      toast.error(`Error deleting transaction(s): ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -358,6 +394,17 @@ export default function ExpensesPage() {
                 <p className="text-gray-600 text-xs">Track and manage your expense transactions</p>
               </div>
               <div className="flex items-center gap-2">
+                {selectedItems.size > 0 && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete Selected ({selectedItems.size})
+                  </Button>
+                )}
                 <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-1" />
                   Export
@@ -798,6 +845,41 @@ export default function ExpensesPage() {
           </div>
         </main>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg">
+              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : 'Delete Multiple Transactions'}
+            </DialogTitle>
+            <DialogDescription className="text-sm">
+              {deleteConfirmDialog.type === 'single' 
+                ? 'Are you sure you want to delete this expense transaction? This action cannot be undone.'
+                : `Are you sure you want to delete ${deleteConfirmDialog.transactionCount} expense transactions? This action cannot be undone.`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setDeleteConfirmDialog({ open: false, type: 'single' })}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              size="sm"
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : `Delete ${deleteConfirmDialog.transactionCount} Transactions`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

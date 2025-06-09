@@ -96,6 +96,15 @@ export default function IncomePage() {
   })
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
+    open: boolean
+    type: 'single' | 'multiple'
+    transactionId?: string
+    transactionCount?: number
+  }>({
+    open: false,
+    type: 'single'
+  })
   const itemsPerPage = 10
   
   // Form state
@@ -253,21 +262,48 @@ export default function IncomePage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this transaction?')) return
+    setDeleteConfirmDialog({
+      open: true,
+      type: 'single',
+      transactionId: id
+    })
+  }
 
+  const handleBulkDelete = () => {
+    if (selectedItems.size === 0) return
+    setDeleteConfirmDialog({
+      open: true,
+      type: 'multiple',
+      transactionCount: selectedItems.size
+    })
+  }
+
+  const confirmDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id)
+      if (deleteConfirmDialog.type === 'single' && deleteConfirmDialog.transactionId) {
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('id', deleteConfirmDialog.transactionId)
 
-      if (error) throw error
+        if (error) throw error
+        toast.success('Income deleted successfully!')
+      } else if (deleteConfirmDialog.type === 'multiple') {
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .in('id', Array.from(selectedItems))
+
+        if (error) throw error
+        toast.success(`${selectedItems.size} income transactions deleted successfully!`)
+        setSelectedItems(new Set())
+      }
       
-      toast.success('Income deleted successfully!')
+      setDeleteConfirmDialog({ open: false, type: 'single' })
       fetchData()
     } catch (error: any) {
-      console.error('Error deleting transaction:', error)
-      toast.error(`Error deleting transaction: ${error.message || 'Please try again.'}`)
+      console.error('Error deleting transaction(s):', error)
+      toast.error(`Error deleting transaction(s): ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -360,125 +396,138 @@ export default function IncomePage() {
                 <h1 className="text-xl font-bold text-gray-900">Income</h1>
                 <p className="text-gray-600 text-xs">Track and manage your income sources</p>
               </div>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
+              <div className="flex items-center gap-2">
+                {selectedItems.size > 0 && (
                   <Button 
+                    variant="outline" 
                     size="sm"
-                    onClick={() => {
-                      setEditingTransaction(null)
-                      setFormData({
-                        amount: "",
-                        description: "",
-                        date: new Date().toISOString().split('T')[0],
-                        category_id: "",
-                        icon: "FileText"
-                      })
-                    }}
+                    onClick={handleBulkDelete}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Income
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete Selected ({selectedItems.size})
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg">
-                      {editingTransaction ? 'Edit Income' : 'Add New Income'}
-                    </DialogTitle>
-                    <DialogDescription className="text-sm">
-                      {editingTransaction ? 'Update income details' : 'Add a new income to track your earnings'}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="amount" className="text-sm">Amount *</Label>
-                        <Input
-                          id="amount"
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={formData.amount}
-                          onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                          className="mt-1"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="date" className="text-sm">Date *</Label>
-                        <Input
-                          id="date"
-                          type="date"
-                          value={formData.date}
-                          onChange={(e) => setFormData({...formData, date: e.target.value})}
-                          className="mt-1"
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="description" className="text-sm">Description *</Label>
-                      <Input
-                        id="description"
-                        placeholder="e.g., Salary from Company XYZ"
-                        value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        className="mt-1"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="category" className="text-sm">Category *</Label>
-                      <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-6 h-6 rounded-lg flex items-center justify-center"
-                                  style={{ backgroundColor: category.color }}
-                                >
-                                  <IconRenderer 
-                                    iconName={category.icon} 
-                                    className="h-3 w-3 text-white"
-                                    fallbackColor="white"
-                                  />
-                                </div>
-                                {category.name}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="icon" className="text-sm">Icon</Label>
-                      <IconSelector 
-                        value={formData.icon} 
-                        onValueChange={(value) => setFormData({...formData, icon: value})}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <DialogFooter>
-                      <Button type="button" variant="outline" size="sm" onClick={() => {
-                        setIsDialogOpen(false)
+                )}
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
                         setEditingTransaction(null)
-                      }}>
-                        Cancel
-                      </Button>
-                      <Button type="submit" size="sm">
-                        {editingTransaction ? 'Update' : 'Add'} Income
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                        setFormData({
+                          amount: "",
+                          description: "",
+                          date: new Date().toISOString().split('T')[0],
+                          category_id: "",
+                          icon: "FileText"
+                        })
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Income
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg">
+                        {editingTransaction ? 'Edit Income' : 'Add New Income'}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm">
+                        {editingTransaction ? 'Update income details' : 'Add a new income to track your earnings'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="amount" className="text-sm">Amount *</Label>
+                          <Input
+                            id="amount"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={formData.amount}
+                            onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="date" className="text-sm">Date *</Label>
+                          <Input
+                            id="date"
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => setFormData({...formData, date: e.target.value})}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="description" className="text-sm">Description *</Label>
+                        <Input
+                          id="description"
+                          placeholder="e.g., Salary from Company XYZ"
+                          value={formData.description}
+                          onChange={(e) => setFormData({...formData, description: e.target.value})}
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="category" className="text-sm">Category *</Label>
+                        <Select value={formData.category_id} onValueChange={(value) => setFormData({...formData, category_id: value})}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-6 h-6 rounded-lg flex items-center justify-center"
+                                    style={{ backgroundColor: category.color }}
+                                  >
+                                    <IconRenderer 
+                                      iconName={category.icon} 
+                                      className="h-3 w-3 text-white"
+                                      fallbackColor="white"
+                                    />
+                                  </div>
+                                  {category.name}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="icon" className="text-sm">Icon</Label>
+                        <IconSelector 
+                          value={formData.icon} 
+                          onValueChange={(value) => setFormData({...formData, icon: value})}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" variant="outline" size="sm" onClick={() => {
+                          setIsDialogOpen(false)
+                          setEditingTransaction(null)
+                        }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" size="sm">
+                          {editingTransaction ? 'Update' : 'Add'} Income
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             {/* Stats and Search - Improved */}
@@ -807,6 +856,41 @@ export default function IncomePage() {
           </div>
         </main>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg">
+              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : 'Delete Multiple Transactions'}
+            </DialogTitle>
+            <DialogDescription className="text-sm">
+              {deleteConfirmDialog.type === 'single' 
+                ? 'Are you sure you want to delete this income transaction? This action cannot be undone.'
+                : `Are you sure you want to delete ${deleteConfirmDialog.transactionCount} income transactions? This action cannot be undone.`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setDeleteConfirmDialog({ open: false, type: 'single' })}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              size="sm"
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : `Delete ${deleteConfirmDialog.transactionCount} Transactions`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 
