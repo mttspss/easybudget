@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { createDefaultCategories } from "@/lib/default-categories"
+import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 
 interface ParsedTransaction {
   id: string
@@ -107,6 +108,8 @@ export default function ImportPage() {
     type: 'expense' as 'income' | 'expense'
   })
 
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
+
   const fetchCategories = useCallback(async () => {
     if (!user) return
     
@@ -148,6 +151,22 @@ export default function ImportPage() {
       fetchCategories()
     }
   }, [user, fetchCategories])
+
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
 
   if (loading) {
     return (
@@ -995,7 +1014,7 @@ export default function ImportPage() {
                                           ? 'bg-green-100 text-green-700' 
                                           : 'bg-red-100 text-red-700'
                                       }`}>
-                                        {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                                        {transaction.type === 'income' ? '+' : '-'}{userCurrency ? formatCurrency(transaction.amount, userCurrency).replace(/^[+\-]/, '') : `€${transaction.amount.toFixed(2)}`}
                                       </span>
                                       <span className="text-sm text-gray-600">{transaction.date}</span>
                                     </div>

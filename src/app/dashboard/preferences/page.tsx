@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { toast } from "sonner"
 import { 
   Globe,
   Bell,
@@ -96,10 +97,23 @@ export default function PreferencesPage() {
       
       if (error) throw error
       
-      alert("Preferences saved successfully!")
+      // Clear currency cache to force refresh
+      if (typeof window !== 'undefined') {
+        // Force currency cache refresh
+        const { getUserCurrency } = await import('@/lib/currency')
+        await getUserCurrency(user.id)
+      }
+      
+      toast.success("Preferences saved successfully!", {
+        description: "Your changes have been applied.",
+        duration: 3000,
+      })
     } catch (error) {
       console.error("Error saving preferences:", error)
-      alert("Error saving preferences. Please try again.")
+      toast.error("Failed to save preferences", {
+        description: "Please try again later.",
+        duration: 4000,
+      })
     } finally {
       setIsUpdating(false)
     }

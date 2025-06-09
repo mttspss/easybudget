@@ -54,6 +54,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
+import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 
 interface Transaction {
   id: string
@@ -112,6 +113,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
     open: false,
     newCategoryId: ""
   })
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   const itemsPerPage = 10
   
   // Form state
@@ -129,6 +131,22 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
       setSelectedCategory(initialCategory)
     }
   }, [initialCategory])
+
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
 
   const fetchData = useCallback(async () => {
     if (!user) return
@@ -770,7 +788,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
                             {/* Amount */}
                             <div className="col-span-2 border-l border-gray-200/40 pl-3">
                               <span className="text-sm font-medium text-gray-600">
-                                -${Number(transaction.amount).toFixed(2)}
+                                -{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toFixed(2)}`}
                               </span>
                             </div>
 
@@ -877,14 +895,14 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">Total Expenses</p>
                     <p className="text-lg font-bold text-gray-900">
-                      ${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}
+                      {userCurrency ? formatCurrency(filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0), userCurrency) : `€${filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}`}
                     </p>
                   </div>
                   <div className="h-8 w-px bg-gray-200"></div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">This Month</p>
                     <p className="text-lg font-bold text-gray-900">
-                      ${thisMonthExpenses.toLocaleString()}
+                      {userCurrency ? formatCurrency(thisMonthExpenses, userCurrency) : `€${thisMonthExpenses.toLocaleString()}`}
                     </p>
                   </div>
                   <div className="h-8 w-px bg-gray-200"></div>

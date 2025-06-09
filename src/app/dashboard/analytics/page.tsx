@@ -763,98 +763,100 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Top Expenses/Income Table */}
-            <Card className="border border-gray-200">
-              <CardHeader className="pb-1 px-2 pt-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-sm">
-                    <BarChart3 className="h-4 w-4 text-orange-600" />
-                    {topTransactionType === 'expenses' ? 'Top Expenses' : 'Top Income'}
-                  </CardTitle>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setTopTransactionType('expenses')}
-                      className="text-xs px-2 py-1 h-7"
-                    >
-                      Expenses
-                    </Button>
-                    <Button
-                      variant={topTransactionType === 'income' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setTopTransactionType('income')}
-                      className="text-xs px-2 py-1 h-7"
-                    >
-                      Income
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <div className="p-3 space-y-2">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
-                    ))}
-                  </div>
-                ) : (analyticsData?.topExpenses && analyticsData.topExpenses.length > 0) || (analyticsData?.topIncome && analyticsData.topIncome.length > 0) ? (
-                  <>
-                    <div className="px-2 py-2 border-b border-gray-200/60">
-                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        <div className="col-span-4">Description</div>
-                        <div className="col-span-2">Date</div>
-                        <div className="col-span-3">Category</div>
-                        <div className="col-span-3">Amount</div>
-                      </div>
+            <div className="mt-6">
+              <Card className="border border-gray-200">
+                <CardHeader className="pb-2 px-4 pt-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <BarChart3 className="h-5 w-5 text-orange-600" />
+                      {topTransactionType === 'expenses' ? 'Top Expenses' : 'Top Income'}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTopTransactionType('expenses')}
+                        className="text-sm px-3 py-2 h-8"
+                      >
+                        Expenses
+                      </Button>
+                      <Button
+                        variant={topTransactionType === 'income' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTopTransactionType('income')}
+                        className="text-sm px-3 py-2 h-8"
+                      >
+                        Income
+                      </Button>
                     </div>
-                    <div className="divide-y divide-gray-100/60">
-                      {(topTransactionType === 'expenses' ? analyticsData?.topExpenses : analyticsData?.topIncome)?.slice(0, 10).map((transaction, index) => (
-                        <div key={index} className="px-2 py-2 hover:bg-gray-50/50 transition-colors">
-                          <div className="grid grid-cols-12 gap-3 items-center">
-                            <div className="col-span-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: transaction.categories?.color }}>
-                                  <IconRenderer 
-                                    iconName={transaction.icon} 
-                                    className="h-3 w-3 text-white"
-                                    fallbackColor="white"
-                                  />
-                                </div>
-                                <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
-                              </div>
-                            </div>
-                            <div className="col-span-2">
-                              <span className="text-xs text-gray-600">
-                                {new Date(transaction.date).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <div className="col-span-3">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
-                                <span className="text-xs text-gray-600">{transaction.categories?.name}</span>
-                              </div>
-                            </div>
-                            <div className="col-span-3">
-                              <span className={`text-sm font-medium ${
-                                topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
-                              }`}>
-                                {topTransactionType === 'expenses' ? '-' : '+'}{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toLocaleString()}`}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="p-4 space-y-2">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                       ))}
                     </div>
-                  </>
-                ) : (
-                  <div className="text-center py-6">
-                    <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">No {topTransactionType} data</h3>
-                    <p className="text-xs text-gray-500">Add some {topTransactionType} to see analytics</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  ) : (analyticsData?.topExpenses && analyticsData.topExpenses.length > 0) || (analyticsData?.topIncome && analyticsData.topIncome.length > 0) ? (
+                    <>
+                      <div className="px-4 py-3 border-b border-gray-200/60 bg-gray-50/30">
+                        <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          <div className="col-span-4 flex items-center">Description</div>
+                          <div className="col-span-2 flex items-center">Date</div>
+                          <div className="col-span-3 flex items-center">Category</div>
+                          <div className="col-span-3 flex items-center justify-end">Amount</div>
+                        </div>
+                      </div>
+                      <div className="divide-y divide-gray-100/60">
+                        {(topTransactionType === 'expenses' ? analyticsData?.topExpenses : analyticsData?.topIncome)?.slice(0, 10).map((transaction, index) => (
+                          <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
+                            <div className="grid grid-cols-12 gap-4 items-center">
+                              <div className="col-span-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm" style={{ backgroundColor: transaction.categories?.color }}>
+                                    <IconRenderer 
+                                      iconName={transaction.icon} 
+                                      className="h-4 w-4 text-white"
+                                      fallbackColor="white"
+                                    />
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900 truncate">{transaction.description}</span>
+                                </div>
+                              </div>
+                              <div className="col-span-2 flex items-center">
+                                <span className="text-sm text-gray-600">
+                                  {new Date(transaction.date).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="col-span-3 flex items-center">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                  <span className="text-sm text-gray-600 truncate">{transaction.categories?.name}</span>
+                                </div>
+                              </div>
+                              <div className="col-span-3 flex items-center justify-end">
+                                <span className={`text-sm font-semibold ${
+                                  topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  {topTransactionType === 'expenses' ? '-' : '+'}{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toLocaleString()}`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-sm font-medium text-gray-900 mb-1">No {topTransactionType} data</h3>
+                      <p className="text-sm text-gray-500">Add some {topTransactionType} to see analytics</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
 
           </div>
         </main>

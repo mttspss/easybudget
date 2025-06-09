@@ -46,6 +46,7 @@ import { toast } from "sonner"
 import { createDefaultCategories } from "@/lib/default-categories"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
+import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 
 interface Category {
   id: string
@@ -70,6 +71,7 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState<string>("all")
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -146,6 +148,22 @@ export default function CategoriesPage() {
       fetchCategories()
     }
   }, [user, fetchCategories])
+
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
 
   if (loading) {
     return (
@@ -496,7 +514,7 @@ export default function CategoriesPage() {
                                     {category.transaction_count || 0} transactions
                                   </span>
                                   <span className="text-xs font-medium text-[#53E489]">
-                                    ${(category.total_amount || 0).toLocaleString()}
+                                    {userCurrency ? formatCurrency(category.total_amount || 0, userCurrency) : `€${(category.total_amount || 0).toLocaleString()}`}
                                   </span>
                                 </div>
                               </div>
@@ -592,7 +610,7 @@ export default function CategoriesPage() {
                                     {category.transaction_count || 0} transactions
                                   </span>
                                   <span className="text-xs font-medium text-[#EF0465]">
-                                    ${(category.total_amount || 0).toLocaleString()}
+                                    {userCurrency ? formatCurrency(category.total_amount || 0, userCurrency) : `€${(category.total_amount || 0).toLocaleString()}`}
                                   </span>
                                 </div>
                               </div>

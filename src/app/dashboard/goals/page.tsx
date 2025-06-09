@@ -31,6 +31,7 @@ import {
 import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 import confetti from 'canvas-confetti'
+import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 
 interface Goal {
   id: string
@@ -50,6 +51,7 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -85,6 +87,22 @@ export default function GoalsPage() {
       fetchGoals()
     }
   }, [user, fetchGoals])
+
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
 
   if (loading) {
     return (
@@ -491,7 +509,7 @@ export default function GoalsPage() {
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <div className="space-y-1">
                                     <div className="flex items-center justify-between text-xs">
-                                      <span className="text-gray-600">${goal.current_amount.toLocaleString()}</span>
+                                      <span className="text-gray-600">{userCurrency ? formatCurrency(goal.current_amount, userCurrency) : `€${goal.current_amount.toLocaleString()}`}</span>
                                       <span className="font-medium text-gray-900">{progress}%</span>
                                     </div>
                                     <Progress value={progress} className="h-1.5" />
@@ -501,7 +519,7 @@ export default function GoalsPage() {
                                 {/* Target Amount */}
                                 <div className="col-span-2 border-l border-gray-200/40 pl-3">
                                   <span className="text-sm font-medium text-gray-900">
-                                    ${goal.target_amount.toLocaleString()}
+                                    {userCurrency ? formatCurrency(goal.target_amount, userCurrency) : `€${goal.target_amount.toLocaleString()}`}
                                   </span>
                                 </div>
 
