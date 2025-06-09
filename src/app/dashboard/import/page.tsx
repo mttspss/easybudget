@@ -398,8 +398,11 @@ export default function ImportPage() {
       const typeStr = row[columnMapping.type || '']
 
       let amount = 0
+      let isNegative = false
       if (amountStr) {
         const cleanAmount = amountStr.toString().replace(/[,$\s]/g, '')
+        // Check if the original amount was negative
+        isNegative = cleanAmount.startsWith('-')
         const parsed = parseFloat(cleanAmount)
         if (!isNaN(parsed)) {
           amount = Math.abs(parsed)
@@ -421,8 +424,15 @@ export default function ImportPage() {
         if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit')) {
           type = 'income'
         }
-      } else if (amountStr && amountStr.toString().startsWith('+')) {
-        type = 'income'
+      } else {
+        // If no type column, determine based on amount sign
+        // Positive amounts or amounts with "+" are income
+        // Negative amounts or amounts with "-" are expenses
+        if (amountStr && (amountStr.toString().startsWith('+') || !isNegative)) {
+          type = 'income'
+        } else if (isNegative) {
+          type = 'expense'
+        }
       }
 
       const { category: suggestedCategory, confidence } = suggestCategory(description)
@@ -457,7 +467,6 @@ export default function ImportPage() {
       const validTransactions = importState.parsedTransactions.filter(t => t.errors.length === 0)
       let imported = 0
       let skipped = 0
-      let duplicates = 0
 
       console.log(`Processing ${validTransactions.length} valid transactions`)
 
@@ -471,103 +480,80 @@ export default function ImportPage() {
           type: transaction.type
         })
         
-        // Check for duplicates
-        const { data: existing, error: checkError } = await supabase
-          .from('transactions')
-          .select('id, description, amount, date')
-          .eq('user_id', user.id)
-          .eq('description', transaction.description)
-          .eq('amount', transaction.amount)
-          .eq('date', transaction.date)
-          .limit(1)
+        // No duplicate checking - insert all transactions
+        let categoryId = null
+        if (transaction.category_id) {
+          categoryId = transaction.category_id
+        } else if (transaction.suggested_category) {
+          const category = importState.categories.find(c => c.name === transaction.suggested_category)
+          categoryId = category?.id || null
+        }
 
-        if (checkError) {
-          console.error('Error checking duplicates:', checkError)
+        // If still no category, assign a default one based on type
+        if (!categoryId) {
+          const defaultCategory = importState.categories.find(c => 
+            c.type === transaction.type && 
+            (c.name === 'Other Expenses' || c.name === 'Other Income' || c.name === 'Uncategorized')
+          ) || importState.categories.find(c => c.type === transaction.type)
+          
+          categoryId = defaultCategory?.id || null
+        }
+
+        // Skip transaction if we still don't have a category
+        if (!categoryId) {
+          console.error('No category available for transaction:', transaction.description)
           skipped++
           continue
         }
 
-        if (existing && existing.length > 0) {
-          console.log(`Duplicate found:`, existing[0])
-          duplicates++
+        console.log(`Inserting transaction with category:`, categoryId)
+
+        const transactionData = {
+          user_id: user.id,
+          description: transaction.description,
+          amount: transaction.amount,
+          date: transaction.date,
+          type: transaction.type,
+          category_id: categoryId
+        }
+
+        console.log('Transaction data to insert:', transactionData)
+
+        const { data: insertedData, error } = await supabase
+          .from('transactions')
+          .insert(transactionData)
+          .select()
+
+        if (error) {
+          console.error('Error inserting transaction:', error)
+          console.error('Error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          })
+          console.error('Transaction data that failed:', transactionData)
+          skipped++
         } else {
-          let categoryId = null
-          if (transaction.category_id) {
-            categoryId = transaction.category_id
-          } else if (transaction.suggested_category) {
-            const category = importState.categories.find(c => c.name === transaction.suggested_category)
-            categoryId = category?.id || null
-          }
-
-          // If still no category, assign a default one based on type
-          if (!categoryId) {
-            const defaultCategory = importState.categories.find(c => 
-              c.type === transaction.type && 
-              (c.name === 'Other Expenses' || c.name === 'Other Income' || c.name === 'Uncategorized')
-            ) || importState.categories.find(c => c.type === transaction.type)
-            
-            categoryId = defaultCategory?.id || null
-          }
-
-          // Skip transaction if we still don't have a category
-          if (!categoryId) {
-            console.error('No category available for transaction:', transaction.description)
-            skipped++
-            continue
-          }
-
-          console.log(`Inserting transaction with category:`, categoryId)
-
-          const transactionData = {
-            user_id: user.id,
-            description: transaction.description,
-            amount: transaction.amount,
-            date: transaction.date,
-            type: transaction.type,
-            category_id: categoryId
-          }
-
-          console.log('Transaction data to insert:', transactionData)
-
-          const { data: insertedData, error } = await supabase
-            .from('transactions')
-            .insert(transactionData)
-            .select()
-
-          if (error) {
-            console.error('Error inserting transaction:', error)
-            console.error('Error details:', {
-              message: error.message,
-              details: error.details,
-              hint: error.hint,
-              code: error.code
-            })
-            console.error('Transaction data that failed:', transactionData)
-            skipped++
-          } else {
-            console.log('Transaction inserted successfully:', insertedData)
-            imported++
-          }
+          console.log('Transaction inserted successfully:', insertedData)
+          imported++
         }
 
         const progress = ((i + 1) / validTransactions.length) * 100
         setImportState(prev => ({ ...prev, progress }))
       }
 
-      console.log(`Import completed: ${imported} imported, ${duplicates} duplicates, ${skipped} skipped`)
+      console.log(`Import completed: ${imported} imported, ${skipped} skipped`)
 
       setImportState(prev => ({
         ...prev,
         step: 'complete',
         importedCount: imported,
-        skippedCount: skipped,
-        duplicateCount: duplicates
+        skippedCount: skipped
       }))
 
       if (imported > 0) {
         toast.success(`Import completed! ${imported} transactions imported.`)
-      } else if (duplicates > 0) {
-        toast.warning(`No new transactions imported. ${duplicates} duplicates found.`)
       } else {
         toast.error(`Import failed. ${skipped} transactions had errors.`)
       }
@@ -1124,10 +1110,6 @@ export default function ImportPage() {
                         <div className="text-center">
                           <p className="text-2xl font-bold text-green-600">{importState.importedCount}</p>
                           <p className="text-xs text-gray-600">Imported</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-yellow-600">{importState.duplicateCount}</p>
-                          <p className="text-xs text-gray-600">Duplicates</p>
                         </div>
                         <div className="text-center">
                           <p className="text-2xl font-bold text-red-600">{importState.skippedCount}</p>

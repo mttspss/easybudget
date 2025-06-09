@@ -472,7 +472,11 @@ export default function CategoriesPage() {
                       {incomeCategories
                         .filter(category => category.name.toLowerCase().includes(searchTerm.toLowerCase()))
                         .map((category) => (
-                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 cursor-pointer" onClick={() => {
+                          if (category.transaction_count && category.transaction_count > 0) {
+                            window.location.href = `/dashboard/${category.type === 'income' ? 'income' : 'expenses'}?category=${category.id}`
+                          }
+                        }}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 flex-1">
                               <div 
@@ -564,7 +568,11 @@ export default function CategoriesPage() {
                       {expenseCategories
                         .filter(category => category.name.toLowerCase().includes(searchTerm.toLowerCase()))
                         .map((category) => (
-                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <div key={category.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 cursor-pointer" onClick={() => {
+                          if (category.transaction_count && category.transaction_count > 0) {
+                            window.location.href = `/dashboard/${category.type === 'income' ? 'income' : 'expenses'}?category=${category.id}`
+                          }
+                        }}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 flex-1">
                               <div 

@@ -3,6 +3,7 @@
 import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -80,6 +81,7 @@ interface Category {
 
 export default function IncomePage() {
   const { user, loading } = useAuth()
+  const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -104,6 +106,14 @@ export default function IncomePage() {
     category_id: "",
     icon: "FileText"
   })
+
+  // Check for category parameter in URL
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam) {
+      setSelectedCategory(categoryParam)
+    }
+  }, [searchParams])
 
   const fetchData = useCallback(async () => {
     if (!user) return
@@ -664,7 +674,7 @@ export default function IncomePage() {
 
                             {/* Amount */}
                             <div className="col-span-2 border-l border-gray-200/40 pl-3">
-                              <span className="text-sm font-medium text-[#53E489]">
+                              <span className="text-sm font-medium text-gray-600">
                                 +${Number(transaction.amount).toFixed(2)}
                               </span>
                             </div>
