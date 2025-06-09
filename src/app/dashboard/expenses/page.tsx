@@ -21,7 +21,7 @@ import {
   ChevronRight,
   Calendar
 } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import {
   Dialog,
   DialogContent,
@@ -76,9 +76,12 @@ interface Category {
   icon?: string
 }
 
-export default function ExpensesPage() {
+interface ExpensesPageProps {
+  initialCategory?: string
+}
+
+function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
   const { user, loading } = useAuth()
-  const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -113,13 +116,12 @@ export default function ExpensesPage() {
     icon: "FileText"
   })
 
-  // Check for category parameter in URL
+  // Set initial category from prop
   useEffect(() => {
-    const categoryParam = searchParams.get('category')
-    if (categoryParam) {
-      setSelectedCategory(categoryParam)
+    if (initialCategory) {
+      setSelectedCategory(initialCategory)
     }
-  }, [searchParams])
+  }, [initialCategory])
 
   const fetchData = useCallback(async () => {
     if (!user) return
@@ -881,5 +883,22 @@ export default function ExpensesPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function ExpensesPageWrapper() {
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+  
+  return <ExpensesPageContent initialCategory={categoryParam || undefined} />
+}
+
+export default function ExpensesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+    </div>}>
+      <ExpensesPageWrapper />
+    </Suspense>
   )
 } 

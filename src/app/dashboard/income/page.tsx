@@ -20,7 +20,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import {
   Dialog,
   DialogContent,
@@ -79,9 +79,12 @@ interface Category {
   icon?: string
 }
 
-export default function IncomePage() {
+interface IncomePageProps {
+  initialCategory?: string
+}
+
+function IncomePageContent({ initialCategory }: IncomePageProps) {
   const { user, loading } = useAuth()
-  const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -116,13 +119,12 @@ export default function IncomePage() {
     icon: "FileText"
   })
 
-  // Check for category parameter in URL
+  // Set initial category from prop
   useEffect(() => {
-    const categoryParam = searchParams.get('category')
-    if (categoryParam) {
-      setSelectedCategory(categoryParam)
+    if (initialCategory) {
+      setSelectedCategory(initialCategory)
     }
-  }, [searchParams])
+  }, [initialCategory])
 
   const fetchData = useCallback(async () => {
     if (!user) return
@@ -892,5 +894,22 @@ export default function IncomePage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function IncomePageWrapper() {
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+  
+  return <IncomePageContent initialCategory={categoryParam || undefined} />
+}
+
+export default function IncomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+    </div>}>
+      <IncomePageWrapper />
+    </Suspense>
   )
 } 
