@@ -20,7 +20,8 @@ import {
   LogOut,
   HelpCircle,
   MoreHorizontal,
-  ArrowLeft
+  ArrowLeft,
+  FileText
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -220,6 +221,13 @@ export function Sidebar() {
               >
                 <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
                 Help & Support
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={() => window.open('/changelog', '_blank')}
+              >
+                <FileText className="mr-3 h-4 w-4 text-gray-500" />
+                Changelog
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-100" />
               <DropdownMenuItem 

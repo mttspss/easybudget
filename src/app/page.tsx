@@ -237,6 +237,7 @@ export default function LandingPage() {
             <a href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
             <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+            <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors">Changelog</a>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -291,6 +292,7 @@ export default function LandingPage() {
               <a href="#benefits" className="text-gray-600 hover:text-gray-900 px-2 py-1">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-2 py-1">Pricing</a>
               <a href="#faq" className="text-gray-600 hover:text-gray-900 px-2 py-1">FAQ</a>
+              <a href="/changelog" className="text-gray-600 hover:text-gray-900 px-2 py-1">Changelog</a>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
                 {user ? (
                   <>
@@ -806,6 +808,7 @@ export default function LandingPage() {
               <ul className="space-y-4 text-slate-600">
                 <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="/changelog" className="hover:text-slate-900 transition-colors">Changelog</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Contact</a></li>
               </ul>

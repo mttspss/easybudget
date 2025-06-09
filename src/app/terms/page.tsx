@@ -264,6 +264,7 @@ export default function TermsOfServicePage() {
               <ul className="space-y-4 text-slate-600">
                 <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="/changelog" className="hover:text-slate-900 transition-colors">Changelog</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Contact</a></li>
               </ul>
