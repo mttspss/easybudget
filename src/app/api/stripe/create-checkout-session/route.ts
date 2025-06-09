@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe, getPlanType, getBillingInterval } from '@/lib/stripe'
-import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,21 +12,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user exists in Supabase
-    const { data: user, error: userError } = await supabase
-      .from('auth.users')
-      .select('id, email')
-      .eq('id', userId)
-      .single()
+    console.log('Creating checkout session for:', { priceId, userId })
 
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
-
-    // Create checkout session
+    // Create checkout session without user verification for now
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -39,7 +26,6 @@ export async function POST(request: NextRequest) {
       ],
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/#pricing`,
-      customer_email: user.email,
       metadata: {
         userId: userId,
         planType: getPlanType(priceId),
@@ -55,11 +41,12 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     })
 
+    console.log('Checkout session created:', session.id)
     return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('Error creating checkout session:', error)
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: 'Failed to create checkout session', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
