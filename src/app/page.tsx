@@ -220,8 +220,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Simple Navbar */}
-      <nav className="py-4 px-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+      <nav className="py-6 px-6">
+        <div className="w-full flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
               <Image src="/newicon1.png" alt="EasyBudget Logo" width={32} height={32} className="w-full h-full object-contain" />
@@ -316,24 +316,24 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-40 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center justify-center text-center mb-16">
-            <a className="text-[#777] font-medium text-[14px] px-[12px] py-[4px] bg-[#FFF] rounded-full shadow mb-4">
-              Over 2,847+ professionals trust EasyBudget
+          <div className="flex flex-col items-center justify-center text-center mb-12">
+            <a className="text-[#777] font-medium text-[14px] px-[12px] py-[4px] bg-[#FFF] rounded-full shadow mb-6">
+              All Your Finances in One Dashboard
             </a>
             
-            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-4 leading-[42px] md:leading-[52px]">
+            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-6 leading-[42px] md:leading-[52px]">
               <span className="hidden md:block">Making money management{'\n'}so simple,{'\n'}it feels magic.</span>
               <span className="block md:hidden">Making money management so simple, it feels magic.</span>
             </h1>
             
-            <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-2">
+            <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-8">
               <span className="hidden md:block">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
               <span className="block md:hidden">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
             </p>
             
-            <div className="flex gap-2 mt-12">
+            <div className="flex gap-2">
               <button 
                 onClick={() => router.push('/auth/register')} 
                 className="text-white text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
