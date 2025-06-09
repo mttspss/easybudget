@@ -335,11 +335,11 @@ export default function LandingPage() {
             
             <div className="flex gap-2">
               <button 
-                onClick={() => router.push('/auth/register')} 
+                onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
                 className="text-white text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
                 style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
               >
-                Start Now
+                {user ? 'Dashboard' : 'Start Now'}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>
@@ -671,16 +671,17 @@ export default function LandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
-                onClick={() => router.push('/auth/register')} 
+                onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')}
                 style={{
                   fontFamily: 'inherit',
                   fontSize: '18px',
-                  background: `linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)`,
+                  background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)',
                   color: 'white',
                   padding: '0.8em 1.2em',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  gap: '8px',
                   border: 'none',
                   borderRadius: '25px',
                   boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
@@ -705,7 +706,11 @@ export default function LandingPage() {
                   e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
                 }}
               >
-                Start Now
+                {user ? 'Dashboard' : 'Start Now'}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
               </button>
               <button 
                 onClick={() => window.open('mailto:sales@easybudget.ing')}
