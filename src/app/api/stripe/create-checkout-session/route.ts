@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/#pricing`,
+      success_url: `https://easybudget.ing/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://easybudget.ing/#pricing`,
       metadata: {
         userId: userId,
         planType: getPlanType(priceId),
