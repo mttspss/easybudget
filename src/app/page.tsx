@@ -220,7 +220,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Simple Navbar */}
-      <nav className="py-6 px-6">
+      <nav className="px-6 py-4">
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
