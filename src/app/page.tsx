@@ -673,6 +673,13 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
               <div key={index} className={`group rounded-2xl p-6 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-2xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
+                {billingInterval === 'yearly' && (
+                  <div className="text-center mb-3">
+                    <span className="text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
+                      🔥 {plan.planType === 'starter' ? 'SAVE $18' : plan.planType === 'pro' ? 'SAVE $58' : 'SAVE $198'}
+                    </span>
+                  </div>
+                )}
                 {plan.popular && (
                   <div className="text-center mb-4">
                     <span className="text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
@@ -685,10 +692,38 @@ export default function LandingPage() {
                     {plan.highlight}
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
-                  <div className="mb-3">
-                    <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
-                    {plan.price !== "Custom" && <span className="text-slate-600">/month</span>}
-                  </div>
+                  
+                  {billingInterval === 'yearly' ? (
+                    <div className="mb-4">
+                      {/* Yearly Pricing Display */}
+                      <div className="relative">
+                        {/* Original monthly price crossed out */}
+                        <div className="text-sm text-slate-500 mb-1">
+                          <span className="line-through">{plan.planType === 'starter' ? '$168/year' : plan.planType === 'pro' ? '$348/year' : '$588/year'}</span>
+                          <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                            {plan.planType === 'starter' ? 'Save $18' : plan.planType === 'pro' ? 'Save $58' : 'Save $198'}
+                          </span>
+                        </div>
+                        {/* New yearly price */}
+                        <div className="flex items-baseline justify-center">
+                          <span className="text-3xl font-bold text-slate-900">{plan.yearlyPrice}</span>
+                          <span className="text-slate-600 ml-1">/year</span>
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          billed yearly • {plan.planType === 'starter' ? '1 month' : plan.planType === 'pro' ? '2 months' : '4 months'} free
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-4">
+                      {/* Monthly Pricing Display */}
+                      <div className="flex items-baseline justify-center">
+                        <span className="text-3xl font-bold text-slate-900">{plan.monthlyPrice}</span>
+                        <span className="text-slate-600 ml-1">/month</span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">billed monthly</div>
+                    </div>
+                  )}
                   <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{plan.desc}</p>
                 </div>
                 <ul className="space-y-3 mb-6">
