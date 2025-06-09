@@ -157,22 +157,20 @@ export default function PreferencesPage() {
   ]
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Simplified Header */}
-        <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-          <div className="flex items-center h-full px-6">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">Preferences</h1>
-              <p className="text-sm text-gray-600">Customize your app experience</p>
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Preferences</h1>
+                <p className="text-gray-600 text-xs">Customize your app experience</p>
+              </div>
             </div>
-          </div>
-        </header>
-        
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
 
             {/* Regional Settings */}
             <Card className="bg-white border-0 shadow-sm">

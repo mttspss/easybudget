@@ -5,12 +5,12 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import { Header } from "@/components/dashboard/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { toast } from "sonner"
 import { 
   User,
   Shield,
@@ -53,11 +53,16 @@ export default function ProfilePage() {
       
       if (error) throw error
       
-      // Show success message
-      alert("Profile updated successfully!")
+      toast.success("Profile updated successfully!", {
+        description: "Your profile information has been saved.",
+        duration: 3000,
+      })
     } catch (error) {
       console.error("Error updating profile:", error)
-      alert("Error updating profile. Please try again.")
+      toast.error("Error updating profile", {
+        description: "Please try again later.",
+        duration: 4000,
+      })
     } finally {
       setIsUpdating(false)
     }
@@ -65,12 +70,18 @@ export default function ProfilePage() {
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      alert("New passwords don't match!")
+      toast.error("Passwords don't match", {
+        description: "Please make sure both password fields match.",
+        duration: 4000,
+      })
       return
     }
     
     if (newPassword.length < 6) {
-      alert("Password must be at least 6 characters long!")
+      toast.error("Password too short", {
+        description: "Password must be at least 6 characters long.",
+        duration: 4000,
+      })
       return
     }
 
@@ -84,30 +95,34 @@ export default function ProfilePage() {
       
       setNewPassword("")
       setConfirmPassword("")
-      alert("Password updated successfully!")
+      toast.success("Password updated successfully!", {
+        description: "Your password has been changed.",
+        duration: 3000,
+      })
     } catch (error) {
       console.error("Error updating password:", error)
-      alert("Error updating password. Please try again.")
+      toast.error("Error updating password", {
+        description: "Please try again later.",
+        duration: 4000,
+      })
     } finally {
       setIsUpdating(false)
     }
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-                <p className="text-gray-600 mt-1">Manage your account information and security</p>
+                <h1 className="text-xl font-bold text-gray-900">Profile Settings</h1>
+                <p className="text-gray-600 text-xs">Manage your account information and security</p>
               </div>
             </div>
 
