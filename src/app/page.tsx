@@ -137,10 +137,10 @@ export default function LandingPage() {
 
   const plans = [
     {
-      name: "Professional", 
-      price: billingInterval === 'monthly' ? "$29" : "$290", 
-      yearlyPrice: "$290",
-      monthlyPrice: "$29",
+      name: "Starter", 
+      price: billingInterval === 'monthly' ? "$14" : "$150", 
+      yearlyPrice: "$150",
+      monthlyPrice: "$14",
       desc: "Perfect for individuals and small businesses",
       highlight: "Individual & Small Business",
       features: [
@@ -150,14 +150,14 @@ export default function LandingPage() {
         "Goal tracking and forecasting",
         "Email support"
       ],
-      cta: isCreatingCheckout === 'starter' ? "Processing..." : "Get Professional",
+      cta: isCreatingCheckout === 'starter' ? "Processing..." : "Get Starter",
       planType: 'starter' as const
     },
     {
-      name: "Business", 
-      price: billingInterval === 'monthly' ? "$89" : "$890", 
-      yearlyPrice: "$890",
-      monthlyPrice: "$89",
+      name: "Pro", 
+      price: billingInterval === 'monthly' ? "$29" : "$290", 
+      yearlyPrice: "$290",
+      monthlyPrice: "$29",
       desc: "Best for growing teams and multiple users",
       highlight: "Most Popular",
       popular: true,
@@ -169,18 +169,18 @@ export default function LandingPage() {
         "Priority support",
         "Custom categorization rules"
       ],
-      cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Business",
+      cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Pro",
       planType: 'pro' as const
     },
     {
-      name: "Enterprise", 
-      price: "Custom", 
-      yearlyPrice: "Custom",
-      monthlyPrice: "Custom",
+      name: "Growth", 
+      price: billingInterval === 'monthly' ? "$49" : "$390", 
+      yearlyPrice: "$390",
+      monthlyPrice: "$49",
       desc: "For large organizations with custom needs",
       highlight: "Large Organizations",
       features: [
-        "Everything in Business",
+        "Everything in Pro",
         "Unlimited users",
         "Dedicated account manager",
         "Custom integrations",
@@ -188,7 +188,7 @@ export default function LandingPage() {
         "On-premise deployment options",
         "Advanced security features"
       ],
-      cta: "Contact Sales",
+      cta: isCreatingCheckout === 'growth' ? "Processing..." : "Get Growth",
       planType: 'growth' as const
     }
   ]
@@ -242,11 +242,6 @@ export default function LandingPage() {
   const handleCheckout = async (planType: 'starter' | 'pro' | 'growth') => {
     if (!user) {
       router.push('/auth/register')
-      return
-    }
-
-    if (planType === 'growth') {
-      window.open('mailto:sales@easybudget.ing')
       return
     }
 
@@ -670,7 +665,7 @@ export default function LandingPage() {
               </span>
               {billingInterval === 'yearly' && (
                 <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                  Save 17%
+                  Up to 4 months free
                 </span>
               )}
             </div>
