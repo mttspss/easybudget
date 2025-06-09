@@ -12,7 +12,6 @@ import {
   ArrowDownRight,
   PieChart,
   Target,
-  FileText,
   TrendingUp,
   Upload,
   Settings,
@@ -34,6 +33,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const sidebarItems = [
+  {
+    title: "Import CSV",
+    href: "/dashboard/import",
+    icon: Upload,
+    prominent: true,
+  },
   {
     title: "Overview",
     href: "/dashboard",
@@ -60,19 +65,9 @@ const sidebarItems = [
     icon: Target,
   },
   {
-    title: "Reports",
-    href: "/dashboard/reports",
-    icon: FileText,
-  },
-  {
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: TrendingUp,
-  },
-  {
-    title: "Import CSV",
-    href: "/dashboard/import",
-    icon: Upload,
   }
 ]
 
@@ -116,6 +111,7 @@ export function Sidebar() {
         <div className="space-y-1">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href
+            const isProminent = item.prominent
             return (
               <Link
                 key={item.href}
@@ -123,15 +119,21 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group",
                   isActive
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:bg-white hover:text-gray-900"
+                    ? isProminent 
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                      : "bg-white text-gray-900 shadow-sm"
+                    : isProminent
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md"
+                      : "text-gray-600 hover:bg-white hover:text-gray-900"
                 )}
               >
                 <item.icon className={cn(
                   "h-4 w-4 transition-colors",
-                  isActive ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900"
+                  isActive
+                    ? isProminent ? "text-white" : "text-gray-900"
+                    : isProminent ? "text-white" : "text-gray-500 group-hover:text-gray-900"
                 )} />
-                <span>{item.title}</span>
+                <span className={isProminent ? "font-semibold" : ""}>{item.title}</span>
               </Link>
             )
           })}

@@ -42,11 +42,15 @@ interface AnalyticsData {
   categoryBreakdown: any[]
   weeklyPatterns: any[]
   comparisonData: any[]
+  topExpenses: any[]
+  topIncome: any[]
   insights: {
     topCategory: string
     trendDirection: 'up' | 'down' | 'stable'
     averageDaily: number
     projectedMonthly: number
+    avgMonthlyIncome: number
+    avgMonthlyExpenses: number
   }
 }
 
@@ -60,6 +64,7 @@ export default function AnalyticsPage() {
   const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined)
   const [activeChart, setActiveChart] = useState<'trends' | 'categories' | 'patterns'>('trends')
   const [drillDownData, setDrillDownData] = useState<any>(null)
+  const [topTransactionType, setTopTransactionType] = useState<'expenses' | 'income'>('expenses')
 
   const fetchAnalyticsData = useCallback(async () => {
     if (!user) return
@@ -205,16 +210,41 @@ export default function AnalyticsPage() {
 
       const projectedMonthly = averageDaily * 30
 
+      // Top expenses
+      const topExpenses = transactions
+        .filter(t => t.type === 'expense')
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .slice(0, 10)
+
+      // Top income
+      const topIncome = transactions
+        .filter(t => t.type === 'income')
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .slice(0, 10)
+
+      // Calculate average monthly income and expenses
+      const avgMonthlyIncome = monthlyTrends.length > 0 
+        ? Math.round(monthlyTrends.reduce((sum, m) => sum + m.income, 0) / monthlyTrends.length)
+        : 0
+      
+      const avgMonthlyExpenses = monthlyTrends.length > 0 
+        ? Math.round(monthlyTrends.reduce((sum, m) => sum + m.expenses, 0) / monthlyTrends.length)
+        : 0
+
       setAnalyticsData({
         monthlyTrends,
         categoryBreakdown,
         weeklyPatterns,
         comparisonData: monthlyTrends.slice(-6), // Last 6 months for comparison
+        topExpenses,
+        topIncome,
         insights: {
           topCategory,
           trendDirection,
           averageDaily,
-          projectedMonthly
+          projectedMonthly,
+          avgMonthlyIncome,
+          avgMonthlyExpenses
         }
       })
     } catch (error) {
@@ -339,7 +369,7 @@ export default function AnalyticsPage() {
 
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                   <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
                     <CardContent className="p-3">
                       <div className="flex items-center justify-between">
@@ -407,6 +437,38 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
                           <Target className="h-5 w-5 text-white" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-teal-50/50 via-white to-white border border-teal-200/30">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-1">
+                            ${analyticsData.insights.avgMonthlyIncome.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
+                          <TrendingUp className="h-5 w-5 text-white" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-1">
+                            ${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                          <ArrowDownRight className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     </CardContent>
@@ -674,6 +736,92 @@ export default function AnalyticsPage() {
               </div>
 
             </div>
+
+            {/* Top Expenses/Income Table */}
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-1 px-2 pt-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <BarChart3 className="h-4 w-4 text-orange-600" />
+                    {topTransactionType === 'expenses' ? 'Top Expenses' : 'Top Income'}
+                  </CardTitle>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTopTransactionType('expenses')}
+                      className="text-xs px-2 py-1 h-7"
+                    >
+                      Expenses
+                    </Button>
+                    <Button
+                      variant={topTransactionType === 'income' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTopTransactionType('income')}
+                      className="text-xs px-2 py-1 h-7"
+                    >
+                      Income
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <div className="p-3 space-y-2">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : (analyticsData?.topExpenses && analyticsData.topExpenses.length > 0) || (analyticsData?.topIncome && analyticsData.topIncome.length > 0) ? (
+                  <>
+                    <div className="px-2 py-2 border-b border-gray-200/60">
+                      <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        <div className="col-span-4">Description</div>
+                        <div className="col-span-2">Date</div>
+                        <div className="col-span-3">Category</div>
+                        <div className="col-span-3">Amount</div>
+                      </div>
+                    </div>
+                    <div className="divide-y divide-gray-100/60">
+                      {(topTransactionType === 'expenses' ? analyticsData?.topExpenses : analyticsData?.topIncome)?.slice(0, 10).map((transaction, index) => (
+                        <div key={index} className="px-2 py-2 hover:bg-gray-50/50 transition-colors">
+                          <div className="grid grid-cols-12 gap-3 items-center">
+                            <div className="col-span-4">
+                              <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-xs text-gray-600">
+                                {new Date(transaction.date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="col-span-3">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                <span className="text-xs text-gray-600">{transaction.categories?.name}</span>
+                              </div>
+                            </div>
+                            <div className="col-span-3">
+                              <span className={`text-sm font-medium ${
+                                topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                                {topTransactionType === 'expenses' ? '-' : '+'}${Number(transaction.amount).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-6">
+                    <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No {topTransactionType} data</h3>
+                    <p className="text-xs text-gray-500">Add some {topTransactionType} to see analytics</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
           </div>
         </main>
       </div>
