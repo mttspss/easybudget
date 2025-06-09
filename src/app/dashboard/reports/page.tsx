@@ -32,7 +32,10 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  Legend,
+  AreaChart,
+  Area
 } from 'recharts'
 
 interface ReportData {
@@ -40,6 +43,7 @@ interface ReportData {
   categoryData: any[]
   yearlyComparison: any[]
   topExpenses: any[]
+  topIncome: any[]
   incomeVsExpenses: any[]
 }
 
@@ -48,6 +52,7 @@ export default function ReportsPage() {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("6months")
+  const [topTransactionType, setTopTransactionType] = useState<'expenses' | 'income'>('expenses')
 
   const fetchReportData = useCallback(async () => {
     if (!user) return
@@ -133,11 +138,18 @@ export default function ReportsPage() {
         .sort((a, b) => Number(b.amount) - Number(a.amount))
         .slice(0, 10)
 
+      // Top income
+      const topIncome = transactions
+        .filter(t => t.type === 'income')
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .slice(0, 10)
+
       setReportData({
         monthlyData,
         categoryData,
         yearlyComparison: [],
         topExpenses,
+        topIncome,
         incomeVsExpenses: monthlyData
       })
     } catch (error) {
@@ -203,7 +215,7 @@ export default function ReportsPage() {
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <Card>
-                <CardContent className="p-3">
+                <CardContent className="p-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Monthly Income</p>
@@ -221,7 +233,7 @@ export default function ReportsPage() {
               </Card>
               
               <Card>
-                <CardContent className="p-3">
+                <CardContent className="p-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Monthly Expenses</p>
@@ -239,7 +251,7 @@ export default function ReportsPage() {
               </Card>
               
               <Card>
-                <CardContent className="p-3">
+                <CardContent className="p-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Net Average</p>
@@ -257,7 +269,7 @@ export default function ReportsPage() {
               </Card>
               
               <Card>
-                <CardContent className="p-3">
+                <CardContent className="p-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Top Category</p>
@@ -276,15 +288,48 @@ export default function ReportsPage() {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               
-              {/* Income vs Expenses Trend */}
+              {/* Total Balance Trend - AreaChart */}
               <Card>
-                <CardHeader className="pb-1 px-3 pt-3">
+                <CardHeader className="pb-1 px-2 pt-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <TrendingUp className="h-4 w-4 text-blue-600" />
+                    Total Balance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 px-2 pb-2">
+                  {isLoading ? (
+                    <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                  ) : (
+                    <div className="h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={reportData?.monthlyData || []}>
+                          <defs>
+                            <linearGradient id="netGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                          <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                          <Tooltip formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']} />
+                          <Area type="monotone" dataKey="net" stroke="#3b82f6" fillOpacity={1} fill="url(#netGradient)" strokeWidth={2} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Income vs Expenses with Legend */}
+              <Card>
+                <CardHeader className="pb-1 px-2 pt-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
                     Income vs Expenses Trend
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 px-3 pb-3">
+                <CardContent className="pt-0 px-2 pb-2">
                   {isLoading ? (
                     <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                   ) : (
@@ -295,25 +340,28 @@ export default function ReportsPage() {
                           <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                           <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
                           <Tooltip formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']} />
-                          <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 4 }} />
-                          <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={3} dot={{ fill: '#ef4444', r: 4 }} />
-                          <Line type="monotone" dataKey="net" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', r: 4 }} />
+                          <Legend />
+                          <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 4 }} name="Income" />
+                          <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={3} dot={{ fill: '#ef4444', r: 4 }} name="Expenses" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
                   )}
                 </CardContent>
               </Card>
+            </div>
 
+            {/* Second Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {/* Expense Categories */}
               <Card>
-                <CardHeader className="pb-1 px-3 pt-3">
+                <CardHeader className="pb-1 px-2 pt-2">
                   <CardTitle className="flex items-center gap-2 text-sm">
                     <PieChart className="h-4 w-4 text-purple-600" />
                     Expense Categories
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 px-3 pb-3">
+                <CardContent className="pt-0 px-2 pb-2">
                   {isLoading ? (
                     <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                   ) : (
@@ -339,15 +387,53 @@ export default function ReportsPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Placeholder for future chart */}
+              <Card>
+                <CardHeader className="pb-1 px-2 pt-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <PieChart className="h-4 w-4 text-orange-600" />
+                    Monthly Comparison
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 px-2 pb-2">
+                  <div className="h-48 flex items-center justify-center text-gray-500">
+                    <div className="text-center">
+                      <TrendingUp className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">Coming Soon</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Top Expenses Table */}
+            {/* Top Expenses/Income Table */}
             <Card className="border border-gray-200">
-              <CardHeader className="pb-1 px-3 pt-3">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <FileText className="h-4 w-4 text-orange-600" />
-                  Top Expenses
-                </CardTitle>
+              <CardHeader className="pb-1 px-2 pt-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <FileText className="h-4 w-4 text-orange-600" />
+                    {topTransactionType === 'expenses' ? 'Top Expenses' : 'Top Income'}
+                  </CardTitle>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTopTransactionType('expenses')}
+                      className="text-xs px-2 py-1 h-7"
+                    >
+                      Expenses
+                    </Button>
+                    <Button
+                      variant={topTransactionType === 'income' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTopTransactionType('income')}
+                      className="text-xs px-2 py-1 h-7"
+                    >
+                      Income
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
                 {isLoading ? (
@@ -356,9 +442,9 @@ export default function ReportsPage() {
                       <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
-                ) : reportData?.topExpenses && reportData.topExpenses.length > 0 ? (
+                ) : (reportData?.topExpenses && reportData.topExpenses.length > 0) || (reportData?.topIncome && reportData.topIncome.length > 0) ? (
                   <>
-                    <div className="px-3 py-2 border-b border-gray-200/60">
+                    <div className="px-2 py-2 border-b border-gray-200/60">
                       <div className="grid grid-cols-12 gap-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                         <div className="col-span-4">Description</div>
                         <div className="col-span-2">Date</div>
@@ -367,8 +453,8 @@ export default function ReportsPage() {
                       </div>
                     </div>
                     <div className="divide-y divide-gray-100/60">
-                      {reportData.topExpenses.slice(0, 10).map((transaction, index) => (
-                        <div key={index} className="px-3 py-2 hover:bg-gray-50/50 transition-colors">
+                      {(topTransactionType === 'expenses' ? reportData?.topExpenses : reportData?.topIncome)?.slice(0, 10).map((transaction, index) => (
+                        <div key={index} className="px-2 py-2 hover:bg-gray-50/50 transition-colors">
                           <div className="grid grid-cols-12 gap-3 items-center">
                             <div className="col-span-4">
                               <span className="text-sm font-medium text-gray-900">{transaction.description}</span>
@@ -385,8 +471,10 @@ export default function ReportsPage() {
                               </div>
                             </div>
                             <div className="col-span-3">
-                              <span className="text-sm font-medium text-gray-900">
-                                ${Number(transaction.amount).toLocaleString()}
+                              <span className={`text-sm font-medium ${
+                                topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                                {topTransactionType === 'expenses' ? '-' : '+'}${Number(transaction.amount).toLocaleString()}
                               </span>
                             </div>
                           </div>
@@ -397,8 +485,8 @@ export default function ReportsPage() {
                 ) : (
                   <div className="text-center py-6">
                     <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">No expense data</h3>
-                    <p className="text-xs text-gray-500">Add some expenses to see reports</p>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">No {topTransactionType} data</h3>
+                    <p className="text-xs text-gray-500">Add some {topTransactionType} to see reports</p>
                   </div>
                 )}
               </CardContent>
