@@ -105,6 +105,13 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
     open: false,
     type: 'single'
   })
+  const [changeCategoryDialog, setChangeCategoryDialog] = useState<{
+    open: boolean
+    newCategoryId: string
+  }>({
+    open: false,
+    newCategoryId: ""
+  })
   const itemsPerPage = 10
   
   // Form state
@@ -306,6 +313,43 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
     }
   }
 
+  const handleBulkCategoryChange = () => {
+    if (selectedItems.size === 0) return
+    setChangeCategoryDialog({
+      open: true,
+      newCategoryId: ""
+    })
+  }
+
+  const confirmCategoryChange = async () => {
+    if (!changeCategoryDialog.newCategoryId) {
+      toast.error('Please select a category')
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .update({
+          category_id: changeCategoryDialog.newCategoryId,
+          updated_at: new Date().toISOString()
+        })
+        .in('id', Array.from(selectedItems))
+
+      if (error) throw error
+
+      const selectedCategory = categories.find(c => c.id === changeCategoryDialog.newCategoryId)
+      toast.success(`${selectedItems.size} transaction(s) moved to ${selectedCategory?.name}!`)
+      
+      setSelectedItems(new Set())
+      setChangeCategoryDialog({ open: false, newCategoryId: "" })
+      fetchData()
+    } catch (error: any) {
+      console.error('Error changing category:', error)
+      toast.error(`Error changing category: ${error.message || 'Please try again.'}`)
+    }
+  }
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === "all" || transaction.category_id === selectedCategory
@@ -397,15 +441,26 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
               </div>
               <div className="flex items-center gap-2">
                 {selectedItems.size > 0 && (
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleBulkDelete}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete Selected ({selectedItems.size})
-                  </Button>
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBulkCategoryChange}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Change Category ({selectedItems.size})
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete Selected ({selectedItems.size})
+                    </Button>
+                  </>
                 )}
                 <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-1" />
@@ -849,12 +904,10 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog(prev => ({ ...prev, open }))}>
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog({ ...deleteConfirmDialog, open })}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg">
-              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : 'Delete Multiple Transactions'}
-            </DialogTitle>
+            <DialogTitle className="text-lg">Confirm Delete</DialogTitle>
             <DialogDescription className="text-sm">
               {deleteConfirmDialog.type === 'single' 
                 ? 'Are you sure you want to delete this expense transaction? This action cannot be undone.'
@@ -862,22 +915,52 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
               }
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setDeleteConfirmDialog({ open: false, type: 'single' })}
-            >
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteConfirmDialog({ open: false, type: 'single' })}>
               Cancel
             </Button>
-            <Button 
-              type="button" 
-              size="sm"
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {deleteConfirmDialog.type === 'single' ? 'Delete Transaction' : `Delete ${deleteConfirmDialog.transactionCount} Transactions`}
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Category Dialog */}
+      <Dialog open={changeCategoryDialog.open} onOpenChange={(open) => setChangeCategoryDialog({ ...changeCategoryDialog, open })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Change Category</DialogTitle>
+            <DialogDescription className="text-sm">
+              Select a new category for {selectedItems.size} selected transaction(s).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="newCategory" className="text-sm">New Category *</Label>
+              <Select value={changeCategoryDialog.newCategoryId} onValueChange={(value) => setChangeCategoryDialog({ ...changeCategoryDialog, newCategoryId: value })}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category.id} value={category.id}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                        {category.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setChangeCategoryDialog({ open: false, newCategoryId: "" })}>
+              Cancel
+            </Button>
+            <Button onClick={confirmCategoryChange}>
+              Change Category
             </Button>
           </DialogFooter>
         </DialogContent>

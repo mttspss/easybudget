@@ -120,18 +120,18 @@ export function Sidebar() {
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group",
                   isActive
                     ? isProminent 
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                      ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-sm"
                       : "bg-white text-gray-900 shadow-sm"
                     : isProminent
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md"
+                      ? "bg-blue-50/50 text-blue-600 border border-blue-100 hover:bg-blue-50 hover:border-blue-200"
                       : "text-gray-600 hover:bg-white hover:text-gray-900"
                 )}
               >
                 <item.icon className={cn(
                   "h-4 w-4 transition-colors",
                   isActive
-                    ? isProminent ? "text-white" : "text-gray-900"
-                    : isProminent ? "text-white" : "text-gray-500 group-hover:text-gray-900"
+                    ? isProminent ? "text-blue-700" : "text-gray-900"
+                    : isProminent ? "text-blue-600" : "text-gray-500 group-hover:text-gray-900"
                 )} />
                 <span className={isProminent ? "font-semibold" : ""}>{item.title}</span>
               </Link>
