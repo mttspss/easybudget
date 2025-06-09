@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { DashboardPreview } from "@/components/ui/dashboard-preview"
 import { 
   Check, 
   Shield, 
@@ -359,6 +360,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Dashboard Preview Section */}
+      <DashboardPreview />
 
       {/* Transaction Transformation Section */}
       <section className="py-20 px-6 bg-gray-50">
