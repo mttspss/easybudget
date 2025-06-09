@@ -419,19 +419,19 @@ export default function ImportPage() {
       }
 
       let type: 'income' | 'expense' = 'expense'
-      if (typeStr) {
-        const typeValue = typeStr.toString().toLowerCase()
-        if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit')) {
-          type = 'income'
+      
+      // Priority 1: Amount sign (most reliable)
+      if (amountStr) {
+        if (!isNegative) {
+          type = 'income'  // Positive amount = Income
+        } else {
+          type = 'expense' // Negative amount = Expense
         }
-      } else {
-        // If no type column, determine based on amount sign
-        // Positive amounts or amounts with "+" are income
-        // Negative amounts or amounts with "-" are expenses
-        if (amountStr && (amountStr.toString().startsWith('+') || !isNegative)) {
+      } else if (typeStr) {
+        // Priority 2: Type column (fallback only if no amount)
+        const typeValue = typeStr.toString().toLowerCase()
+        if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
           type = 'income'
-        } else if (isNegative) {
-          type = 'expense'
         }
       }
 
