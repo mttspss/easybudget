@@ -37,6 +37,7 @@ import {
   Brush
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
+import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
 
 interface AnalyticsData {
   monthlyTrends: any[]
@@ -66,6 +67,23 @@ export default function AnalyticsPage() {
   const [activeChart, setActiveChart] = useState<'trends' | 'categories' | 'patterns'>('trends')
   const [drillDownData, setDrillDownData] = useState<any>(null)
   const [topTransactionType, setTopTransactionType] = useState<'expenses' | 'income'>('expenses')
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
+
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
 
   const fetchAnalyticsData = useCallback(async () => {
     if (!user) return
@@ -554,7 +572,7 @@ export default function AnalyticsPage() {
                                   tick={{ fontSize: 12, fill: '#64748b' }}
                                   axisLine={false}
                                   tickLine={false}
-                                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                                  tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
                                 />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Area
@@ -604,7 +622,7 @@ export default function AnalyticsPage() {
                                 </Pie>
                                 <Tooltip 
                                   formatter={(value: number, name: string) => [
-                                    `$${value.toLocaleString()}`,
+                                    userCurrency ? formatCurrency(value, userCurrency) : `€${value.toLocaleString()}`,
                                     name
                                   ]}
                                 />
@@ -626,7 +644,7 @@ export default function AnalyticsPage() {
                                   tick={{ fontSize: 12, fill: '#64748b' }}
                                   axisLine={false}
                                   tickLine={false}
-                                  tickFormatter={(value) => `$${value.toFixed(0)}`}
+                                  tickFormatter={(value) => userCurrency ? formatCurrency(value, userCurrency) : `€${value.toFixed(0)}`}
                                 />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Bar 
@@ -662,7 +680,7 @@ export default function AnalyticsPage() {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Value:</span>
-                            <span className="font-medium">${(drillDownData.value || drillDownData.amount || 0).toLocaleString()}</span>
+                            <span className="font-medium">{userCurrency ? formatCurrency(drillDownData.value || drillDownData.amount || 0, userCurrency) : `€${(drillDownData.value || drillDownData.amount || 0).toLocaleString()}`}</span>
                           </div>
                           {drillDownData.percentage && (
                             <div className="flex justify-between">
@@ -694,8 +712,8 @@ export default function AnalyticsPage() {
                     </div>
                               <div className="text-right">
                                 <div className="text-sm font-medium text-gray-900">
-                                  ${category.value.toLocaleString()}
-                    </div>
+                                  {userCurrency ? formatCurrency(category.value, userCurrency) : `€${category.value.toLocaleString()}`}
+                                </div>
                                 <div className="text-xs text-gray-500">
                                   {category.percentage.toFixed(1)}%
                     </div>
@@ -820,7 +838,7 @@ export default function AnalyticsPage() {
                               <span className={`text-sm font-medium ${
                                 topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
                               }`}>
-                                {topTransactionType === 'expenses' ? '-' : '+'}${Number(transaction.amount).toLocaleString()}
+                                {topTransactionType === 'expenses' ? '-' : '+'}{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toLocaleString()}`}
                               </span>
                             </div>
                           </div>

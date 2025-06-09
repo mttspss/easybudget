@@ -39,6 +39,7 @@ import {
   AreaChart
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
+import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
 
 interface DashboardStats {
   totalBalance: number
@@ -71,6 +72,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [balancePeriod, setBalancePeriod] = useState("3months")
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   const itemsPerPage = 5
 
   const fetchDashboardData = useCallback(async () => {
@@ -311,6 +313,22 @@ export default function Dashboard() {
     }
   }, [user, fetchDashboardData])
 
+  // Load user currency
+  useEffect(() => {
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
+      }
+    }
+
+    loadCurrency()
+  }, [user])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -405,7 +423,12 @@ export default function Dashboard() {
                         <p className="text-xs font-medium text-gray-500 mb-1">{stat.title}</p>
                         <div className="flex flex-col gap-1">
                           <span className="text-2xl font-bold text-gray-900">
-                            {stat.title === "Savings Rate" ? `${stat.amount.toFixed(1)}%` : `$${stat.amount.toLocaleString()}`}
+                            {stat.title === "Savings Rate" 
+                              ? `${stat.amount.toFixed(1)}%` 
+                              : userCurrency 
+                                ? formatCurrency(stat.amount, userCurrency)
+                                : `€${stat.amount.toLocaleString()}`
+                            }
                           </span>
                           <div className={`flex items-center text-xs font-medium ${
                               stat.changeType === 'increase' 
@@ -482,11 +505,14 @@ export default function Dashboard() {
                               tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                              tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
                               domain={['dataMin - 1000', 'dataMax + 1000']}
                             />
                             <Tooltip 
-                              formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
+                              formatter={(value: any) => [
+                                userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
+                                'Balance'
+                              ]}
                               labelStyle={{ color: '#374151', fontWeight: 'normal' }}
                               contentStyle={{
                                 backgroundColor: 'white',
@@ -543,11 +569,11 @@ export default function Dashboard() {
                               tick={{ fontSize: 12, fill: '#64748b' }}
                               axisLine={false}
                               tickLine={false}
-                              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                              tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
                             />
                             <Tooltip 
                               formatter={(value: any, name: string) => [
-                                `$${Number(value).toLocaleString()}`, 
+                                userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
                                 name === 'income' ? 'Income' : 'Expenses'
                               ]}
                               labelStyle={{ color: '#374151', fontWeight: 'normal' }}
@@ -667,7 +693,7 @@ export default function Dashboard() {
                                   <span className={`text-sm font-medium ${
                                     transaction.type === 'income' ? 'text-[#53E489]' : 'text-[#EF0465]'
                                   }`}>
-                                    {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+                                    {transaction.type === 'income' ? '+' : '-'}{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toFixed(2)}`}
                                   </span>
                                 </div>
                               </div>

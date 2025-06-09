@@ -5,7 +5,6 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import { Header } from "@/components/dashboard/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -39,9 +38,9 @@ export default function PreferencesPage() {
   const { user, loading } = useAuth()
   const [isUpdating, setIsUpdating] = useState(false)
   const [preferences, setPreferences] = useState<UserPreferences>({
-    currency: "USD",
-    date_format: "MM/DD/YYYY",
-    timezone: "America/New_York",
+    currency: "EUR",
+    date_format: "DD/MM/YYYY",
+    timezone: "Europe/Rome",
     theme: "light",
     email_notifications: true,
     push_notifications: false,
@@ -114,8 +113,8 @@ export default function PreferencesPage() {
   }
 
   const currencies = [
-    { value: "USD", label: "USD - US Dollar" },
     { value: "EUR", label: "EUR - Euro" },
+    { value: "USD", label: "USD - US Dollar" },
     { value: "GBP", label: "GBP - British Pound" },
     { value: "JPY", label: "JPY - Japanese Yen" },
     { value: "CAD", label: "CAD - Canadian Dollar" },
@@ -125,19 +124,20 @@ export default function PreferencesPage() {
   ]
 
   const dateFormats = [
-    { value: "MM/DD/YYYY", label: "MM/DD/YYYY (12/31/2024)" },
     { value: "DD/MM/YYYY", label: "DD/MM/YYYY (31/12/2024)" },
+    { value: "MM/DD/YYYY", label: "MM/DD/YYYY (12/31/2024)" },
     { value: "YYYY-MM-DD", label: "YYYY-MM-DD (2024-12-31)" },
     { value: "DD MMM YYYY", label: "DD MMM YYYY (31 Dec 2024)" }
   ]
 
   const timezones = [
+    { value: "Europe/Rome", label: "Rome (CET)" },
+    { value: "Europe/London", label: "London (GMT)" },
+    { value: "Europe/Paris", label: "Paris (CET)" },
     { value: "America/New_York", label: "Eastern Time (ET)" },
     { value: "America/Chicago", label: "Central Time (CT)" },
     { value: "America/Denver", label: "Mountain Time (MT)" },
     { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
-    { value: "Europe/London", label: "London (GMT)" },
-    { value: "Europe/Paris", label: "Paris (CET)" },
     { value: "Asia/Tokyo", label: "Tokyo (JST)" },
     { value: "Australia/Sydney", label: "Sydney (AEST)" }
   ]
@@ -147,18 +147,18 @@ export default function PreferencesPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+        {/* Simplified Header */}
+        <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+          <div className="flex items-center h-full px-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Preferences</h1>
+              <p className="text-sm text-gray-600">Customize your app experience</p>
+            </div>
+          </div>
+        </header>
         
         <main className="flex-1 overflow-auto p-6">
           <div className="max-w-4xl mx-auto space-y-6">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Preferences</h1>
-                <p className="text-gray-600 mt-1">Customize your app experience</p>
-              </div>
-            </div>
 
             {/* Regional Settings */}
             <Card className="bg-white border-0 shadow-sm">
@@ -188,6 +188,7 @@ export default function PreferencesPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-gray-500">This will change the currency symbol displayed throughout the app (€, $, £, etc.). No conversion is applied - only the display format changes.</p>
                   </div>
                   
                   <div className="space-y-2">
