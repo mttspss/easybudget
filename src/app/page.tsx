@@ -8,25 +8,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardPreview } from "@/components/ui/dashboard-preview"
 import { 
+  Mail, 
+  ChevronDown, 
   Check, 
-  Shield, 
-  Target,
-  ChevronDown,
+  Brain, 
+  Activity, 
+  X, 
   Menu,
-  X,
+  ArrowRight,
+  TrendingUp,
+  Home,
+  User,
+  Shield,
+  Target,
+  Database,
+  BarChart3,
   Upload,
   Twitter,
   Linkedin,
-  BarChart3,
-  Mail,
-  Database,
-  Brain,
-  Lock,
-  Activity,
-  User,
-  TrendingUp,
-  Home,
-  ArrowRight
+  Lock
 } from "lucide-react"
 
 export default function LandingPage() {
@@ -35,6 +35,8 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [email, setEmail] = useState("")
   const router = useRouter()
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
 
   const benefits = [
     {
@@ -136,7 +138,9 @@ export default function LandingPage() {
   const plans = [
     {
       name: "Professional", 
-      price: "$29", 
+      price: billingInterval === 'monthly' ? "$29" : "$290", 
+      yearlyPrice: "$290",
+      monthlyPrice: "$29",
       desc: "Perfect for individuals and small businesses",
       highlight: "Individual & Small Business",
       features: [
@@ -146,11 +150,14 @@ export default function LandingPage() {
         "Goal tracking and forecasting",
         "Email support"
       ],
-      cta: "Get Professional"
+      cta: isCreatingCheckout === 'starter' ? "Processing..." : "Get Professional",
+      planType: 'starter' as const
     },
     {
       name: "Business", 
-      price: "$89", 
+      price: billingInterval === 'monthly' ? "$89" : "$890", 
+      yearlyPrice: "$890",
+      monthlyPrice: "$89",
       desc: "Best for growing teams and multiple users",
       highlight: "Most Popular",
       popular: true,
@@ -162,11 +169,14 @@ export default function LandingPage() {
         "Priority support",
         "Custom categorization rules"
       ],
-      cta: "Get Business"
+      cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Business",
+      planType: 'pro' as const
     },
     {
       name: "Enterprise", 
       price: "Custom", 
+      yearlyPrice: "Custom",
+      monthlyPrice: "Custom",
       desc: "For large organizations with custom needs",
       highlight: "Large Organizations",
       features: [
@@ -178,7 +188,8 @@ export default function LandingPage() {
         "On-premise deployment options",
         "Advanced security features"
       ],
-      cta: "Contact Sales"
+      cta: "Contact Sales",
+      planType: 'growth' as const
     }
   ]
 
@@ -216,6 +227,63 @@ export default function LandingPage() {
   const handleEmailSignup = (e: React.FormEvent) => {
     e.preventDefault()
     router.push(`/auth/register?email=${encodeURIComponent(email)}`)
+  }
+
+  // Price mapping for Stripe
+  const PRICE_IDS = {
+    starter_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_MONTH,
+    starter_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_YEAR,
+    pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTH,
+    pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEAR,
+    growth_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH_MONTH,
+    growth_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH_YEAR,
+  }
+
+  const handleCheckout = async (planType: 'starter' | 'pro' | 'growth') => {
+    if (!user) {
+      router.push('/auth/register')
+      return
+    }
+
+    if (planType === 'growth') {
+      window.open('mailto:sales@easybudget.ing')
+      return
+    }
+
+    const priceKey = `${planType}_${billingInterval}` as keyof typeof PRICE_IDS
+    const priceId = PRICE_IDS[priceKey]
+
+    if (!priceId) {
+      console.error('Price ID not found for:', priceKey)
+      return
+    }
+
+    setIsCreatingCheckout(planType)
+
+    try {
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          priceId,
+          userId: user.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        console.error('No checkout URL returned')
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error)
+    } finally {
+      setIsCreatingCheckout(null)
+    }
   }
 
   return (
@@ -577,6 +645,35 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
+            
+            {/* Billing Toggle */}
+            <div className="flex items-center justify-center gap-3 mt-8">
+              <span className={`text-sm font-medium ${billingInterval === 'monthly' ? 'text-slate-900' : 'text-slate-500'}`}>
+                Monthly
+              </span>
+              <div className="relative">
+                <button
+                  onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
+                  className={`w-14 h-7 rounded-full transition-colors duration-300 ${
+                    billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                      billingInterval === 'yearly' ? 'translate-x-8' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              <span className={`text-sm font-medium ${billingInterval === 'yearly' ? 'text-slate-900' : 'text-slate-500'}`}>
+                Yearly
+              </span>
+              {billingInterval === 'yearly' && (
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                  Save 17%
+                </span>
+              )}
+            </div>
           </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
@@ -613,7 +710,7 @@ export default function LandingPage() {
                   className={`w-full py-3 px-4 rounded-full mb-6 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
                   style={plan.popular ? {background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'} : {}}
                   variant={plan.popular ? "default" : "outline"}
-                  onClick={() => plan.price === "Custom" ? window.open('mailto:sales@easybudget.ing') : router.push('/auth/register')}
+                  onClick={() => handleCheckout(plan.planType)}
                 >
                   {plan.cta}
                 </Button>
