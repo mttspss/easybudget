@@ -30,7 +30,6 @@ import {
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
 import {
@@ -531,13 +530,19 @@ export default function Dashboard() {
                               width={60}
                             />
                             <ChartTooltip 
-                              content={<ChartTooltipContent 
-                                formatter={(value: any) => [
-                                  userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
-                                  'Balance'
-                                ]}
-                                labelFormatter={(label) => `Date: ${label}`}
-                              />}
+                              content={({ active, payload, label }) => {
+                                if (active && payload && payload.length) {
+                                  return (
+                                    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                      <p className="text-sm text-gray-600 mb-1">{`Date: ${label}`}</p>
+                                      <p className="text-sm font-medium text-gray-900">
+                                        <span className="text-blue-600">Balance:</span> {userCurrency ? formatCurrency(Number(payload[0].value), userCurrency) : `€${Number(payload[0].value).toLocaleString()}`}
+                                      </p>
+                                    </div>
+                                  )
+                                }
+                                return null
+                              }}
                             />
                             <Area 
                               type="monotone" 
@@ -591,13 +596,23 @@ export default function Dashboard() {
                               width={60}
                             />
                             <ChartTooltip 
-                              content={<ChartTooltipContent 
-                                formatter={(value: any, name: any) => [
-                                  userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
-                                  name === 'income' ? 'Income' : 'Expenses'
-                                ]}
-                                labelFormatter={(label) => `Month: ${label}`}
-                              />}
+                              content={({ active, payload, label }) => {
+                                if (active && payload && payload.length) {
+                                  return (
+                                    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                      <p className="text-sm text-gray-600 mb-2">{`Month: ${label}`}</p>
+                                      {payload.map((entry, index) => (
+                                        <p key={index} className="text-sm font-medium text-gray-900 mb-1">
+                                          <span className={entry.dataKey === 'income' ? 'text-green-600' : 'text-red-600'}>
+                                            {entry.dataKey === 'income' ? 'Income:' : 'Expenses:'}
+                                          </span> {userCurrency ? formatCurrency(Number(entry.value), userCurrency) : `€${Number(entry.value).toLocaleString()}`}
+                                        </p>
+                                      ))}
+                                    </div>
+                                  )
+                                }
+                                return null
+                              }}
                             />
                             <defs>
                               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
