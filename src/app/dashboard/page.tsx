@@ -74,18 +74,18 @@ interface QuickStat {
 const balanceChartConfig = {
   balance: {
     label: "Balance",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(217.2 91.2% 59.8%)", // Blue from shadcn
   },
 } satisfies ChartConfig
 
 const monthlyChartConfig = {
   income: {
     label: "Income",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(142.1 76.2% 36.3%)", // Green
   },
   expenses: {
     label: "Expenses", 
-    color: "hsl(var(--chart-2))",
+    color: "hsl(346.8 77.2% 49.8%)", // Red/Pink
   },
 } satisfies ChartConfig
 
@@ -483,14 +483,14 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card className="relative overflow-hidden">
-                  {/* Simple Overlay Header */}
-                  <div className="absolute top-3 left-4 right-4 z-10 flex items-center justify-between">
+                  {/* Improved Header */}
+                  <div className="absolute top-4 left-6 right-6 z-10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-gray-900">Total Balance</span>
+                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900">Total Balance</span>
                     </div>
                     <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                      <SelectTrigger className="w-32 h-8 text-sm bg-white/90 backdrop-blur-sm border-gray-200 shadow-sm">
+                      <SelectTrigger className="w-28 h-7 text-xs bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -503,29 +503,29 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   
-                  <CardContent className="p-0 m-0">
+                  <CardContent className="pt-14 pb-4 px-4">
                     {isLoading ? (
-                        <div className="h-80 bg-gray-100 animate-pulse" />
+                        <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
-                        <div className="h-80">
+                        <div className="h-72">
                         <ChartContainer config={balanceChartConfig}>
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.2}/>
-                                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.02}/>
+                                <stop offset="5%" stopColor="hsl(217.2 91.2% 59.8%)" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="hsl(217.2 91.2% 59.8%)" stopOpacity={0.05}/>
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" />
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                             <XAxis 
                               dataKey="date" 
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
                               domain={['dataMin', 'dataMax']}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
@@ -537,20 +537,22 @@ export default function Dashboard() {
                                   userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
                                   'Balance'
                                 ]}
+                                labelFormatter={(label) => `Date: ${label}`}
                               />}
                             />
                             <Area 
-                              type="linear" 
+                              type="monotone" 
                               dataKey="balance" 
-                              stroke="hsl(var(--chart-1))"
-                              strokeWidth={2}
+                              stroke="hsl(217.2 91.2% 59.8%)"
+                              strokeWidth={3}
                               fill="url(#balanceGradient)"
                               dot={false}
                               activeDot={{ 
-                                r: 4, 
-                                stroke: "hsl(var(--chart-1))", 
+                                r: 5, 
+                                stroke: "hsl(217.2 91.2% 59.8%)", 
                                 strokeWidth: 2, 
-                                fill: 'white' 
+                                fill: 'white',
+                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
                               }}
                             />
                             </AreaChart>
@@ -562,28 +564,28 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card className="relative overflow-hidden">
-                  {/* Simple Overlay Header */}
-                  <div className="absolute top-3 left-4 right-4 z-10 flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-indigo-600" />
-                    <span className="text-sm font-medium text-gray-900">Monthly Comparison</span>
+                  {/* Improved Header */}
+                  <div className="absolute top-4 left-6 right-6 z-10 flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-indigo-600" />
+                    <span className="text-sm font-semibold text-gray-900">Monthly Comparison</span>
                   </div>
                   
-                  <CardContent className="p-0 m-0">
+                  <CardContent className="pt-14 pb-4 px-4">
                     {isLoading ? (
-                      <div className="h-80 bg-gray-100 animate-pulse" />
+                      <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
-                      <div className="h-80">
+                      <div className="h-72">
                         <ChartContainer config={monthlyChartConfig}>
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
@@ -594,20 +596,21 @@ export default function Dashboard() {
                                   userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
                                   name === 'income' ? 'Income' : 'Expenses'
                                 ]}
+                                labelFormatter={(label) => `Month: ${label}`}
                               />}
                             />
                             <defs>
                               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={0.9}/>
+                                <stop offset="95%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={0.6}/>
                               </linearGradient>
                               <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="hsl(346.8 77.2% 49.8%)" stopOpacity={0.9}/>
+                                <stop offset="95%" stopColor="hsl(346.8 77.2% 49.8%)" stopOpacity={0.6}/>
                               </linearGradient>
                             </defs>
-                            <Bar dataKey="income" fill="url(#incomeGradient)" radius={[2, 2, 0, 0]} />
-                            <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[2, 2, 0, 0]} />
+                            <Bar dataKey="income" fill="url(#incomeGradient)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         </ChartContainer>
                       </div>
