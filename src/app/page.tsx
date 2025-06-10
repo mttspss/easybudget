@@ -624,38 +624,38 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-12 relative bg-gradient-to-br from-white via-gray-50 to-white">
+      <section id="pricing" className="py-8 relative bg-gradient-to-br from-white via-gray-50 to-white">
         <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-4">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md border border-gray-200 mb-3">
               <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></div>
-              <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Pricing</span>
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">Pricing</span>
             </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-3 leading-tight">
               Choose Your
               <span className="block" style={{color: '#60ea8b'}}>
                 Perfect Plan
               </span>
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
             
             {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-3 mt-8">
+            <div className="flex items-center justify-center gap-3 mt-6">
               <span className={`text-sm font-medium ${billingInterval === 'monthly' ? 'text-slate-900' : 'text-slate-500'}`}>
                 Monthly
               </span>
               <div className="relative">
                 <button
                   onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
-                  className={`w-14 h-7 rounded-full transition-colors duration-300 ${
+                  className={`w-12 h-6 rounded-full transition-colors duration-300 ${
                     billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
                   }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
-                      billingInterval === 'yearly' ? 'translate-x-8' : 'translate-x-1'
+                    className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                      billingInterval === 'yearly' ? 'translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -664,80 +664,80 @@ export default function LandingPage() {
                 Yearly
               </span>
               {billingInterval === 'yearly' && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
                   Up to 4 months free
                 </span>
               )}
             </div>
           </div>
-          <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
-              <div key={index} className={`group rounded-2xl p-6 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-2xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
+              <div key={index} className={`group rounded-xl p-4 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
                 {billingInterval === 'yearly' && (
-                  <div className="text-center mb-3">
-                    <span className="text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
+                  <div className="text-center mb-2">
+                    <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
                       🔥 {plan.planType === 'starter' ? 'SAVE $18' : plan.planType === 'pro' ? 'SAVE $58' : 'SAVE $198'}
                     </span>
                   </div>
                 )}
                 {plan.popular && (
-                  <div className="text-center mb-4">
-                    <span className="text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
+                  <div className="text-center mb-3">
+                    <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
                       ✨ Most Popular
                     </span>
                   </div>
                 )}
-                <div className="text-center mb-6">
-                  <div className="text-sm text-slate-600 font-bold mb-2 uppercase tracking-wider">
+                <div className="text-center mb-4">
+                  <div className="text-xs text-slate-600 font-bold mb-1.5 uppercase tracking-wider">
                     {plan.highlight}
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
                   
                   {billingInterval === 'yearly' ? (
-                    <div className="mb-4">
+                    <div className="mb-3">
                       {/* Yearly Pricing Display */}
                       <div className="relative">
                         {/* Original monthly price crossed out */}
-                        <div className="text-sm text-slate-500 mb-1">
+                        <div className="text-xs text-slate-500 mb-0.5">
                           <span className="line-through">{plan.planType === 'starter' ? '$168/year' : plan.planType === 'pro' ? '$348/year' : '$588/year'}</span>
-                          <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                          <span className="ml-1.5 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
                             {plan.planType === 'starter' ? 'Save $18' : plan.planType === 'pro' ? 'Save $58' : 'Save $198'}
                           </span>
                         </div>
                         {/* New yearly price */}
                         <div className="flex items-baseline justify-center">
-                          <span className="text-3xl font-bold text-slate-900">{plan.yearlyPrice}</span>
-                          <span className="text-slate-600 ml-1">/year</span>
+                          <span className="text-2xl font-bold text-slate-900">{plan.yearlyPrice}</span>
+                          <span className="text-slate-600 ml-1 text-sm">/year</span>
                         </div>
-                        <div className="text-xs text-slate-500 mt-1">
+                        <div className="text-xs text-slate-500 mt-0.5">
                           billed yearly • {plan.planType === 'starter' ? '1 month' : plan.planType === 'pro' ? '2 months' : '4 months'} free
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="mb-4">
+                    <div className="mb-3">
                       {/* Monthly Pricing Display */}
                       <div className="flex items-baseline justify-center">
-                        <span className="text-3xl font-bold text-slate-900">{plan.monthlyPrice}</span>
-                        <span className="text-slate-600 ml-1">/month</span>
+                        <span className="text-2xl font-bold text-slate-900">{plan.monthlyPrice}</span>
+                        <span className="text-slate-600 ml-1 text-sm">/month</span>
                       </div>
-                      <div className="text-xs text-slate-500 mt-1">billed monthly</div>
+                      <div className="text-xs text-slate-500 mt-0.5">billed monthly</div>
                     </div>
                   )}
-                  <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{plan.desc}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{plan.desc}</p>
                 </div>
-                <ul className="space-y-3 mb-6">
+                <ul className="space-y-2 mb-4">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5 text-green-600" />
+                      <div className="w-3.5 h-3.5 bg-green-100 rounded-full flex items-center justify-center mr-2.5 flex-shrink-0 mt-0.5">
+                        <Check className="w-2 h-2 text-green-600" />
                       </div>
-                      <span className="text-slate-700 text-sm leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{feature}</span>
+                      <span className="text-slate-700 text-xs leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full py-3 px-4 rounded-full mb-6 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
+                  className={`w-full py-2 px-3 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
                   style={plan.popular ? {background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'} : {}}
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => handleCheckout(plan.planType)}
@@ -746,7 +746,7 @@ export default function LandingPage() {
                 </Button>
                 
                 {/* Subtle accent line */}
-                <div className={`w-16 h-1 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${plan.popular ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}></div>
+                <div className={`w-12 h-0.5 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${plan.popular ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}></div>
               </div>
             ))}
           </div>
