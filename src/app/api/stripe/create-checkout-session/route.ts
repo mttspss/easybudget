@@ -5,6 +5,12 @@ export async function POST(request: NextRequest) {
   try {
     const { priceId, userId } = await request.json()
 
+    console.log('=== CHECKOUT SESSION REQUEST ===')
+    console.log('Price ID:', priceId)
+    console.log('User ID:', userId)
+    console.log('Plan Type:', getPlanType(priceId))
+    console.log('Billing Interval:', getBillingInterval(priceId))
+
     if (!priceId || !userId) {
       return NextResponse.json(
         { error: 'Price ID and User ID are required' },
@@ -41,9 +47,14 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     })
 
-    console.log('Checkout session created:', session.id)
+    console.log('=== CHECKOUT SESSION CREATED ===')
+    console.log('Session ID:', session.id)
+    console.log('Checkout URL:', session.url)
+    console.log('Metadata:', session.metadata)
+    
     return NextResponse.json({ url: session.url })
   } catch (error) {
+    console.error('=== CHECKOUT SESSION ERROR ===')
     console.error('Error creating checkout session:', error)
     return NextResponse.json(
       { error: 'Failed to create checkout session', details: error instanceof Error ? error.message : 'Unknown error' },

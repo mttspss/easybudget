@@ -141,14 +141,15 @@ export default function LandingPage() {
       price: billingInterval === 'monthly' ? "$14" : "$150", 
       yearlyPrice: "$150",
       monthlyPrice: "$14",
-      desc: "Perfect for individuals and small businesses",
-      highlight: "Individual & Small Business",
+      desc: "Perfect for individuals getting started with budgeting",
+      highlight: "Personal Finance",
       features: [
-        "Up to 10 connected accounts",
-        "Advanced transaction categorization", 
-        "Monthly financial reports",
-        "Goal tracking and forecasting",
-        "Email support"
+        "Up to 100 transactions per month",
+        "1 CSV import per month",
+        "Complete analytics dashboard",
+        "Smart transaction categorization",
+        "Track up to 5 financial goals",
+        "Single personal account"
       ],
       cta: isCreatingCheckout === 'starter' ? "Processing..." : "Get Starter",
       planType: 'starter' as const
@@ -158,16 +159,16 @@ export default function LandingPage() {
       price: billingInterval === 'monthly' ? "$29" : "$290", 
       yearlyPrice: "$290",
       monthlyPrice: "$29",
-      desc: "Best for growing teams and multiple users",
+      desc: "Ideal for professionals and small business owners",
       highlight: "Most Popular",
       popular: true,
       features: [
-        "Unlimited account connections",
-        "Multi-user access (up to 5 users)",
-        "Advanced analytics and reporting", 
-        "API access for integrations",
-        "Priority support",
-        "Custom categorization rules"
+        "Unlimited transactions",
+        "Up to 3 CSV imports per month",
+        "Advanced analytics & reporting",
+        "Unlimited financial goals",
+        "Connect 1 business account",
+        "Priority email support"
       ],
       cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Pro",
       planType: 'pro' as const
@@ -177,16 +178,15 @@ export default function LandingPage() {
       price: billingInterval === 'monthly' ? "$49" : "$390", 
       yearlyPrice: "$390",
       monthlyPrice: "$49",
-      desc: "For large organizations with custom needs",
-      highlight: "Large Organizations",
+      desc: "For growing businesses and power users",
+      highlight: "Business & Teams",
       features: [
-        "Everything in Pro",
-        "Unlimited users",
-        "Dedicated account manager",
-        "Custom integrations",
-        "SLA guarantee", 
-        "On-premise deployment options",
-        "Advanced security features"
+        "Unlimited transactions",
+        "Unlimited CSV imports",
+        "Full analytics suite",
+        "Unlimited financial goals",
+        "Connect up to 5 business accounts",
+        "Priority support & mobile app access"
       ],
       cta: isCreatingCheckout === 'growth' ? "Processing..." : "Get Growth",
       planType: 'growth' as const
