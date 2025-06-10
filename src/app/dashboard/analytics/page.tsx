@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
                 style={{ backgroundColor: entry.color }}
               />
               <span className="text-gray-600">{entry.dataKey}:</span>
-              <span className="font-medium">${entry.value?.toLocaleString()}</span>
+              <span className="font-medium">${Math.round(entry.value || 0).toLocaleString()}</span>
             </div>
           ))}
         </div>
@@ -472,7 +472,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyIncome, userCurrency) : `€${analyticsData.insights.avgMonthlyIncome.toLocaleString()}`}
+                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyIncome), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyIncome).toLocaleString()}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
@@ -488,7 +488,7 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyExpenses, userCurrency) : `€${analyticsData.insights.avgMonthlyExpenses.toLocaleString()}`}
+                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyExpenses), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyExpenses).toLocaleString()}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
