@@ -28,13 +28,17 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
+import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   BarChart,
   Bar,
-  ResponsiveContainer,
   Area,
   AreaChart
 } from 'recharts'
@@ -65,6 +69,25 @@ interface QuickStat {
   icon: any
     color: string
 }
+
+// Chart configurations for shadcn
+const balanceChartConfig = {
+  balance: {
+    label: "Balance",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig
+
+const monthlyChartConfig = {
+  income: {
+    label: "Income",
+    color: "hsl(var(--chart-1))",
+  },
+  expenses: {
+    label: "Expenses", 
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -485,59 +508,53 @@ export default function Dashboard() {
                         <div className="h-80 bg-gray-100 animate-pulse" />
                     ) : (
                         <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ChartContainer config={balanceChartConfig}>
                             <AreaChart data={stats?.balanceTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02}/>
+                                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.2}/>
+                                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.02}/>
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                            <CartesianGrid strokeDasharray="3 3" />
                             <XAxis 
                               dataKey="date" 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 12 }}
                               axisLine={false}
                               tickLine={false}
                               domain={['dataMin', 'dataMax']}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 12 }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
                               domain={['dataMin - 1000', 'dataMax + 1000']}
                             />
-                            <Tooltip 
-                              formatter={(value: any) => [
-                                userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
-                                'Balance'
-                              ]}
-                              labelStyle={{ color: '#374151', fontWeight: 'normal' }}
-                              contentStyle={{
-                                backgroundColor: 'white',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '6px',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                fontSize: '12px'
-                              }}
+                            <ChartTooltip 
+                              content={<ChartTooltipContent 
+                                formatter={(value: any) => [
+                                  userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
+                                  'Balance'
+                                ]}
+                              />}
                             />
                             <Area 
                               type="linear" 
                               dataKey="balance" 
-                              stroke="#3b82f6"
+                              stroke="hsl(var(--chart-1))"
                               strokeWidth={2}
                               fill="url(#balanceGradient)"
                               dot={false}
                               activeDot={{ 
                                 r: 4, 
-                                stroke: '#3b82f6', 
+                                stroke: "hsl(var(--chart-1))", 
                                 strokeWidth: 2, 
                                 fill: 'white' 
                               }}
                             />
                             </AreaChart>
-                        </ResponsiveContainer>
+                        </ChartContainer>
                       </div>
                     )}
                   </CardContent>
@@ -556,49 +573,43 @@ export default function Dashboard() {
                       <div className="h-80 bg-gray-100 animate-pulse" />
                     ) : (
                       <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ChartContainer config={monthlyChartConfig}>
                           <BarChart data={stats?.monthlyTrend || []} margin={{ top: 50, right: 40, left: 20, bottom: 20 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                            <CartesianGrid strokeDasharray="3 3" />
                             <XAxis 
                               dataKey="month" 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 12 }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis 
-                              tick={{ fontSize: 12, fill: '#64748b' }}
+                              tick={{ fontSize: 12 }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
                             />
-                            <Tooltip 
-                              formatter={(value: any, name: string) => [
-                                userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
-                                name === 'income' ? 'Income' : 'Expenses'
-                              ]}
-                              labelStyle={{ color: '#374151', fontWeight: 'normal' }}
-                              contentStyle={{
-                                backgroundColor: 'white',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '6px',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                fontSize: '12px'
-                              }}
+                            <ChartTooltip 
+                              content={<ChartTooltipContent 
+                                formatter={(value: any, name: any) => [
+                                  userCurrency ? formatCurrency(Number(value), userCurrency) : `€${Number(value).toLocaleString()}`, 
+                                  name === 'income' ? 'Income' : 'Expenses'
+                                ]}
+                              />}
                             />
                             <defs>
                               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#53E489" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#53E489" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3}/>
                               </linearGradient>
                               <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#EF0465" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#EF0465" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3}/>
                               </linearGradient>
                             </defs>
                             <Bar dataKey="income" fill="url(#incomeGradient)" radius={[2, 2, 0, 0]} />
                             <Bar dataKey="expenses" fill="url(#expenseGradient)" radius={[2, 2, 0, 0]} />
                           </BarChart>
-                        </ResponsiveContainer>
+                        </ChartContainer>
                       </div>
                     )}
                   </CardContent>
