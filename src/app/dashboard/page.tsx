@@ -509,7 +509,7 @@ export default function Dashboard() {
                     ) : (
                         <div className="h-72">
                         <ChartContainer config={balanceChartConfig}>
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="hsl(217.2 91.2% 59.8%)" stopOpacity={0.3}/>
@@ -522,14 +522,13 @@ export default function Dashboard() {
                               tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
-                              domain={['dataMin', 'dataMax']}
                             />
                             <YAxis 
                               tick={{ fontSize: 11, fill: '#6b7280' }}
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
-                              domain={['dataMin - 1000', 'dataMax + 1000']}
+                              width={60}
                             />
                             <ChartTooltip 
                               content={<ChartTooltipContent 
@@ -576,7 +575,7 @@ export default function Dashboard() {
                     ) : (
                       <div className="h-72">
                         <ChartContainer config={monthlyChartConfig}>
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                             <XAxis 
                               dataKey="month" 
@@ -589,6 +588,7 @@ export default function Dashboard() {
                               axisLine={false}
                               tickLine={false}
                               tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
+                              width={60}
                             />
                             <ChartTooltip 
                               content={<ChartTooltipContent 
