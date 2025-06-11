@@ -19,7 +19,6 @@ import {
   TrendingUp,
   Home,
   User,
-  Shield,
   Target,
   BarChart3,
   Upload,
@@ -308,8 +307,7 @@ export default function LandingPage() {
                 <Button 
                   variant="ghost" 
                   onClick={() => router.push('/dashboard')} 
-                  style={{backgroundColor: '#60ea8b'}}
-                  className="hover:opacity-90 text-gray-900 font-medium px-4 py-2 rounded-lg transition-all"
+                  className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition-all"
                 >
                   Dashboard
                 </Button>
@@ -326,8 +324,7 @@ export default function LandingPage() {
                 <Button 
                   variant="ghost" 
                   onClick={() => router.push('/auth/signin')} 
-                  className="text-gray-900 font-medium px-6 py-2 rounded-lg border-2 shadow-md hover:opacity-90 transition-all"
-                  style={{borderColor: '#60ea8b'}}
+                  className="text-gray-900 font-medium px-6 py-2 rounded-lg border-2 shadow-md hover:opacity-90 transition-all border-green-500"
                 >
                   Sign In
                 </Button>
@@ -726,14 +723,14 @@ export default function LandingPage() {
                 {billingInterval === 'yearly' && (
                   <div className="text-center mb-2">
                     <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
-                      🔥 {plan.planType === 'starter' ? 'SAVE $18' : plan.planType === 'pro' ? 'SAVE $58' : 'SAVE $198'}
+                      SAVE {plan.planType === 'starter' ? '$18' : plan.planType === 'pro' ? '$58' : '$198'}
                     </span>
                   </div>
                 )}
                 {plan.popular && (
                   <div className="text-center mb-3">
                     <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
-                      ✨ Most Popular
+                      Most Popular
                     </span>
                   </div>
                 )}
@@ -751,7 +748,7 @@ export default function LandingPage() {
                         <div className="text-xs text-slate-500 mb-0.5">
                           <span className="line-through">{plan.planType === 'starter' ? '$168/year' : plan.planType === 'pro' ? '$348/year' : '$588/year'}</span>
                           <span className="ml-1.5 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
-                            {plan.planType === 'starter' ? 'Save $18' : plan.planType === 'pro' ? 'Save $58' : 'Save $198'}
+                            Save {plan.planType === 'starter' ? '$18' : plan.planType === 'pro' ? '$58' : '$198'}
                           </span>
                         </div>
                         {/* New yearly price */}
@@ -787,7 +784,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full py-2 px-3 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
+                  className={`w-full py-3 px-3 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
                   style={plan.popular ? {background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'} : {}}
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => handleCheckout(plan.planType)}
@@ -934,30 +931,6 @@ export default function LandingPage() {
               >
                 Talk to Sales
               </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
-              <div className="flex flex-col items-center space-y-2">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <Check className="w-6 h-6 text-green-600" />
-                </div>
-                <span className="font-semibold text-slate-900">No Setup Fees</span>
-                <span className="text-sm text-slate-600">Start immediately</span>
-              </div>
-              <div className="flex flex-col items-center space-y-2">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-blue-600" />
-                </div>
-                <span className="font-semibold text-slate-900">Bank-Level Security</span>
-                <span className="text-sm text-slate-600">SOC 2 certified</span>
-              </div>
-              <div className="flex flex-col items-center space-y-2">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Target className="w-6 h-6 text-purple-600" />
-                </div>
-                <span className="font-semibold text-slate-900">Cancel Anytime</span>
-                <span className="text-sm text-slate-600">No long-term commitment</span>
-              </div>
             </div>
           </div>
         </div>
