@@ -717,7 +717,7 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
-              <div key={index} className={`group rounded-xl p-4 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
+              <div key={index} className={`group rounded-xl p-4 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-2 border-black shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
                 {billingInterval === 'yearly' && (
                   <div className="text-center mb-2">
                     <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
@@ -733,9 +733,6 @@ export default function LandingPage() {
                   </div>
                 )}
                 <div className="text-center mb-4">
-                  <div className="text-xs text-black font-bold mb-1.5 uppercase tracking-wider">
-                    {plan.highlight}
-                  </div>
                   <h3 className="text-xl font-bold text-black mb-2 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
                   
                   {billingInterval === 'yearly' ? (
@@ -782,7 +779,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button 
-                  className={`w-full py-5 px-8 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg border-none cursor-pointer ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-slate-300 text-black hover:bg-slate-50 hover:border-slate-400 bg-white'}`}
+                  className={`w-full py-5 px-8 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg border-none cursor-pointer ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-black text-black hover:bg-slate-50 bg-white'}`}
                   onClick={() => handleCheckout(plan.planType)}
                 >
                   {plan.cta}
