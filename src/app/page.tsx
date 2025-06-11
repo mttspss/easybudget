@@ -117,21 +117,21 @@ export default function LandingPage() {
   const steps = [
     { 
       icon: Upload, 
-      title: "Connect Your Accounts", 
-      desc: "Link your banks, credit cards, and investment accounts in 2 minutes. We use read-only connections so your credentials stay secure.",
-      detail: "Works with 10,000+ financial institutions"
+      title: "Import Your Financial Data", 
+      desc: "Upload CSV files from any bank or connect to 10,000+ financial institutions. Our smart import system handles any format automatically.",
+      detail: "Support for 100+ bank formats • Duplicate detection"
     },
     { 
       icon: Brain, 
-      title: "We Organize Everything", 
-      desc: "Our AI automatically categorizes transactions and identifies patterns in your spending. No manual work required.",
-      detail: "99.2% accuracy with machine learning"
+      title: "AI Categorizes Everything", 
+      desc: "Watch as your transactions are automatically organized into meaningful categories. Our AI learns your spending patterns for 99.2% accuracy.",
+      detail: "Smart categorization • Custom rules • Pattern recognition"
     },
     { 
       icon: Activity, 
-      title: "Get Insights & Take Action", 
-      desc: "Receive personalized recommendations and alerts. Generate reports, set budgets, and track your financial goals.",
-      detail: "Real-time monitoring and smart alerts"
+      title: "Track Goals & Get Insights", 
+      desc: "Set financial goals, monitor progress, and receive personalized insights. Get real-time alerts and generate professional reports instantly.",
+      detail: "Goal tracking • Analytics dashboard • Financial forecasting"
     }
   ]
 
@@ -594,10 +594,10 @@ export default function LandingPage() {
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              How It Works
+              From Chaos to Clarity in 3 Steps
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Get up and running in minutes with our simple 3-step process
+              Transform your financial data into actionable insights in under 5 minutes
             </p>
           </div>
           <div className="grid lg:grid-cols-3 gap-8">
