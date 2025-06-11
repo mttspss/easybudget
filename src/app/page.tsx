@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardPreview } from "@/components/ui/dashboard-preview"
 import { 
-  Mail, 
+  Mail,
   ChevronDown, 
   Check, 
-  Brain, 
-  Activity, 
+  Brain,
+  Activity,
   X, 
   Menu,
   ArrowRight,
@@ -431,7 +431,7 @@ export default function LandingPage() {
                   </svg>
                   <span className="text-sm font-medium text-gray-600">Product Hunt</span>
                 </div>
-                
+
                 {/* X.com */}
                 <div className="flex items-center gap-2">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#000000">
@@ -757,14 +757,14 @@ export default function LandingPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="mb-3">
+                  <div className="mb-3">
                       {/* Monthly Pricing Display */}
                       <div className="flex items-baseline justify-center">
                         <span className="text-3xl font-bold text-black">{plan.monthlyPrice}</span>
                         <span className="text-black ml-1 text-sm">/month</span>
                       </div>
                       <div className="text-xs text-slate-500 mt-0.5">billed monthly</div>
-                    </div>
+                </div>
                   )}
                   <p className="text-sm text-black leading-relaxed group-hover:text-black transition-colors duration-300">{plan.desc}</p>
                 </div>
@@ -939,9 +939,8 @@ export default function LandingPage() {
               <ul className="space-y-4 text-slate-600">
                 <li><a href="#benefits" className="hover:text-slate-900 transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Integrations</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">API Documentation</a></li>
+                <li><a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a></li>
+                <li><a href="/dashboard" className="hover:text-slate-900 transition-colors">Dashboard</a></li>
               </ul>
             </div>
 
@@ -952,8 +951,6 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
                 <li><a href="/changelog" className="hover:text-slate-900 transition-colors">Changelog</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Contact</a></li>
               </ul>
             </div>
 
@@ -963,7 +960,6 @@ export default function LandingPage() {
               <ul className="space-y-4 text-slate-600">
                 <li><a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
                 <li><a href="/terms" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
               </ul>
             </div>
@@ -1036,7 +1032,7 @@ export default function LandingPage() {
             
             <div className="text-center mt-8">
               <p className="text-slate-500">
-                © 2024 EasyBudget. All rights reserved.
+                © 2025 EasyBudget. All rights reserved.
               </p>
             </div>
           </div>
