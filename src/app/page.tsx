@@ -160,7 +160,7 @@ export default function LandingPage() {
       yearlyPrice: "$290",
       monthlyPrice: "$29",
       desc: "Ideal for professionals and small business owners",
-      highlight: "Most Popular",
+      highlight: "Professional",
       popular: true,
       features: [
         "Unlimited transactions",
@@ -727,7 +727,7 @@ export default function LandingPage() {
                 )}
                 {plan.popular && (
                   <div className="text-center mb-3">
-                    <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}>
+                    <span className="text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg bg-green-500">
                       Most Popular
                     </span>
                   </div>
@@ -781,13 +781,12 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Button 
-                  className={`w-full py-4 px-6 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-slate-300 text-black hover:bg-slate-50 hover:border-slate-400'}`}
-                  variant={plan.popular ? "default" : "outline"}
+                <button 
+                  className={`w-full py-5 px-8 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg border-none cursor-pointer ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-slate-300 text-black hover:bg-slate-50 hover:border-slate-400 bg-white'}`}
                   onClick={() => handleCheckout(plan.planType)}
                 >
                   {plan.cta}
-                </Button>
+                </button>
                 
                 {/* Subtle accent line */}
                 <div className={`w-12 h-0.5 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${plan.popular ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}></div>
