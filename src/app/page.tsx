@@ -380,7 +380,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-6">
+      <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center">
             <a className="text-gray-600 font-medium text-sm px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 mb-8">
