@@ -733,10 +733,10 @@ export default function LandingPage() {
                   </div>
                 )}
                 <div className="text-center mb-4">
-                  <div className="text-xs text-slate-600 font-bold mb-1.5 uppercase tracking-wider">
+                  <div className="text-xs text-black font-bold mb-1.5 uppercase tracking-wider">
                     {plan.highlight}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
+                  <h3 className="text-xl font-bold text-black mb-2 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
                   
                   {billingInterval === 'yearly' ? (
                     <div className="mb-3">
@@ -751,8 +751,8 @@ export default function LandingPage() {
                         </div>
                         {/* New yearly price */}
                         <div className="flex items-baseline justify-center">
-                          <span className="text-2xl font-bold text-slate-900">{plan.yearlyPrice}</span>
-                          <span className="text-slate-600 ml-1 text-sm">/year</span>
+                          <span className="text-3xl font-bold text-black">{plan.yearlyPrice}</span>
+                          <span className="text-black ml-1 text-sm">/year</span>
                         </div>
                         <div className="text-xs text-slate-500 mt-0.5">
                           billed yearly • {plan.planType === 'starter' ? '1 month' : plan.planType === 'pro' ? '2 months' : '4 months'} free
@@ -763,27 +763,26 @@ export default function LandingPage() {
                     <div className="mb-3">
                       {/* Monthly Pricing Display */}
                       <div className="flex items-baseline justify-center">
-                        <span className="text-2xl font-bold text-slate-900">{plan.monthlyPrice}</span>
-                        <span className="text-slate-600 ml-1 text-sm">/month</span>
+                        <span className="text-3xl font-bold text-black">{plan.monthlyPrice}</span>
+                        <span className="text-black ml-1 text-sm">/month</span>
                       </div>
                       <div className="text-xs text-slate-500 mt-0.5">billed monthly</div>
                     </div>
                   )}
-                  <p className="text-sm text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{plan.desc}</p>
+                  <p className="text-sm text-black leading-relaxed group-hover:text-black transition-colors duration-300">{plan.desc}</p>
                 </div>
-                <ul className="space-y-2 mb-4">
+                <ul className="space-y-2 mb-6">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
                       <div className="w-3.5 h-3.5 bg-green-100 rounded-full flex items-center justify-center mr-2.5 flex-shrink-0 mt-0.5">
                         <Check className="w-2 h-2 text-green-600" />
                       </div>
-                      <span className="text-slate-700 text-xs leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{feature}</span>
+                      <span className="text-black text-sm leading-relaxed group-hover:text-black transition-colors duration-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full py-3 px-3 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm ${plan.popular ? 'text-white hover:opacity-90' : 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'}`}
-                  style={plan.popular ? {background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'} : {}}
+                  className={`w-full py-4 px-6 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-slate-300 text-black hover:bg-slate-50 hover:border-slate-400'}`}
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => handleCheckout(plan.planType)}
                 >
