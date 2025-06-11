@@ -104,10 +104,12 @@ export default function LandingPage() {
       color: "bg-purple-50 border-purple-200",
       iconColor: "bg-purple-100 text-purple-600",
       features: [
-        "Shared family dashboard access",
-        "Multiple savings goals (vacation, education, etc.)",
-        "Household expense categorization",
-        "Family budget planning & tracking"
+        "Multiple account management",
+        "Advanced analytics & insights", 
+        "Goal tracking with milestones",
+        "Built for families",
+        "Export financial reports",
+        "Premium customer support"
       ]
     }
   ]
@@ -380,7 +382,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col items-center justify-center text-center mb-16">
+          <div className="flex flex-col items-center justify-center text-center">
             <a className="text-gray-600 font-medium text-sm px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 mb-8">
               All Your Finances in One Dashboard
             </a>
@@ -417,7 +419,7 @@ export default function LandingPage() {
             </div>
 
             {/* Featured On Section - moved below buttons */}
-            <div className="mb-8">
+            <div>
               <p className="text-sm text-gray-500 mb-4 font-medium">FEATURED ON</p>
               <div className="flex items-center justify-center gap-8 opacity-60 grayscale">
                 {/* Product Hunt */}
@@ -465,10 +467,6 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="text-center text-gray-500 text-base">
-            2,847+ finance professionals already using EasyBudget
           </div>
         </div>
       </section>
@@ -651,7 +649,7 @@ export default function LandingPage() {
             {steps.map((step, index) => (
               <div key={index} className="text-center">
                 <div className="relative mb-6">
-                  <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-lg font-bold text-white">{index + 1}</span>
                   </div>
                   {index < 2 && (

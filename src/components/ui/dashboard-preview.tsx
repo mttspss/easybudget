@@ -6,11 +6,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { 
   BarChart3, 
-  PieChart, 
-  TrendingUp, 
   CreditCard, 
   Target,
-  Upload
+  Upload,
+  Clock,
+  TrendingUp
 } from "lucide-react"
 
 interface DashboardTab {
@@ -25,7 +25,7 @@ interface DashboardTab {
 const dashboardTabs: DashboardTab[] = [
   {
     id: "overview",
-    name: "Dashboard Overview",
+    name: "Dashboard overview",
     icon: BarChart3,
     description: "Get a complete view of your finances at a glance",
     image: "/dashboard-preview-overview.png",
@@ -39,53 +39,53 @@ const dashboardTabs: DashboardTab[] = [
   {
     id: "analytics", 
     name: "Advanced Analytics",
-    icon: PieChart,
-    description: "Deep insights into your spending patterns",
+    icon: Clock,
+    description: "Deep insights into your financial patterns and habits",
     image: "/dashboard-preview-analytics.png",
     features: [
-      "Category breakdown charts",
-      "Spending trend analysis", 
-      "Custom date range reports",
-      "Financial forecasting"
+      "Spending pattern analysis",
+      "Category breakdowns",
+      "Income vs expense trends",
+      "Monthly comparison charts"
     ]
   },
   {
     id: "transactions",
     name: "Transaction Management", 
     icon: CreditCard,
-    description: "Organize and categorize all your transactions",
+    description: "Organize and categorize all your financial transactions",
     image: "/dashboard-preview-transactions.png",
     features: [
       "Smart categorization",
+      "Quick filtering options",
       "Bulk editing tools",
-      "Advanced search & filters",
-      "Receipt attachments"
+      "Search and sort capabilities"
     ]
   },
   {
     id: "import",
     name: "Import CSV",
     icon: Upload,
-    description: "Import your bank statements and financial data effortlessly",
+    description: "Easily import your financial data from any bank or platform",
     image: "/dashboard-preview-import.png",
     features: [
-      "Support for 100+ bank formats",
-      "Drag & drop CSV upload",
-      "Automatic column mapping",
-      "Duplicate detection & merging"
+      "Support for all bank formats",
+      "Smart duplicate detection",
+      "Automatic categorization",
+      "Instant data processing"
     ]
   },
   {
     id: "goals",
     name: "Financial Goals",
     icon: Target,
-    description: "Set and track your financial objectives",
+    description: "Set and track your financial objectives with visual progress",
     image: "/dashboard-preview-goals.png", 
     features: [
-      "Custom savings goals",
-      "Progress tracking",
+      "Custom goal setting",
+      "Progress visualization",
       "Achievement milestones",
-      "Goal recommendations"
+      "Smart recommendations for families"
     ]
   }
 ]
@@ -115,21 +115,20 @@ export function DashboardPreview() {
 
         {/* Tab Navigation */}
         <div className="mb-12">
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="flex flex-wrap gap-2 justify-center mb-12">
             {dashboardTabs.map((tab) => (
-              <Button
+              <button
                 key={tab.id}
-                variant={activeTab === tab.id ? "default" : "outline"}
                 onClick={() => setActiveTab(tab.id)}
-                className={`h-12 px-6 text-sm font-medium transition-all duration-200 ${
-                  activeTab === tab.id 
-                    ? "bg-[#60ea8b] hover:bg-[#50da7b] text-white shadow-lg" 
-                    : "border-gray-200 text-gray-700 hover:border-[#60ea8b] hover:text-[#60ea8b]"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-green-500 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:border-green-500 border border-gray-200'
                 }`}
               >
-                <tab.icon className="h-4 w-4 mr-2" />
+                <tab.icon className="w-4 h-4" />
                 {tab.name}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
