@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
 import { 
   BarChart3, 
   PieChart, 
@@ -77,7 +78,12 @@ const dashboardTabs: DashboardTab[] = [
 
 export function DashboardPreview() {
   const [activeTab, setActiveTab] = useState("overview")
+  const [imageError, setImageError] = useState<Record<string, boolean>>({})
   const activeTabData = dashboardTabs.find(tab => tab.id === activeTab)
+
+  const handleImageError = (tabId: string) => {
+    setImageError(prev => ({ ...prev, [tabId]: true }))
+  }
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-gray-50">
@@ -179,11 +185,32 @@ export function DashboardPreview() {
                   </div>
                   
                   {/* Dashboard Preview Content */}
-                  <div className="bg-[#FAFAFA] p-6 min-h-[400px]">
-                    {activeTab === "overview" && <OverviewPreview />}
-                    {activeTab === "analytics" && <AnalyticsPreview />}
-                    {activeTab === "transactions" && <TransactionsPreview />}
-                    {activeTab === "goals" && <GoalsPreview />}
+                  <div className="bg-[#FAFAFA] min-h-[400px] relative">
+                    {!imageError[activeTab] ? (
+                      // Try to show real screenshot first
+                      <div className="relative w-full h-[400px] p-3">
+                        <div className="relative w-full h-full rounded-xl overflow-hidden border-4 bg-gradient-to-r from-[#60ea8b] via-[#50da7b] to-[#4ade80] p-0.5 shadow-lg">
+                          <div className="relative w-full h-full rounded-lg overflow-hidden bg-white">
+                            <Image
+                              src={activeTabData.image}
+                              alt={`${activeTabData.name} screenshot`}
+                              fill
+                              className="object-cover object-top"
+                              onError={() => handleImageError(activeTab)}
+                              priority={activeTab === "overview"}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      // Fallback to mockup component if image fails to load
+                      <div className="p-6">
+                        {activeTab === "overview" && <OverviewPreview />}
+                        {activeTab === "analytics" && <AnalyticsPreview />}
+                        {activeTab === "transactions" && <TransactionsPreview />}
+                        {activeTab === "goals" && <GoalsPreview />}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
