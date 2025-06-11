@@ -381,45 +381,46 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center justify-center text-center mb-12">
-            <a className="text-[#777] font-medium text-[14px] px-[12px] py-[4px] bg-[#FFF] rounded-full shadow mb-6">
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col items-center justify-center text-center mb-16">
+            <a className="text-gray-600 font-medium text-sm px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 mb-8">
               All Your Finances in One Dashboard
             </a>
             
-            <h1 className="text-[36px] md:text-[48px] font-extrabold text-[#333] whitespace-pre-line mb-6 leading-[42px] md:leading-[52px]">
-              <span className="hidden md:block">Making money management{'\n'}so simple,{'\n'}it feels magic.</span>
-              <span className="block md:hidden">Making money management so simple, it feels magic.</span>
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
+              Making money management so simple, it feels magic.
             </h1>
             
-            <p className="text-[16px] text-[#868686] md:text-[21px] leading-[22px] md:leading-[28px] max-w-[600px] mb-8">
-              <span className="hidden md:block">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
-              <span className="block md:hidden">Stop managing money in Spreadsheets, easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.</span>
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mb-12">
+              Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.
             </p>
             
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button 
                 onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
-                className="text-white text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-65 transition-opacity inline-flex items-center gap-2"
-                style={{background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)'}}
+                className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105"
+                style={{background: 'linear-gradient(135deg, #60ea8b 0%, #4ade80 100%)'}}
               >
-                {user ? 'Dashboard' : 'Start Now'}
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {user ? 'Go to Dashboard' : 'Get instant access'}
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>
                 </svg>
               </button>
               <button 
                 onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                className="bg-white text-[#333] text-[17px] font-medium px-8 py-3 rounded-full shadow-md hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
               >
                 Watch Demo
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m10 8 6 4-6 4V8z"></path>
+                </svg>
               </button>
             </div>
           </div>
 
-          <div className="text-center text-gray-500 text-sm">
+          <div className="text-center text-gray-500 text-base">
             2,847+ finance professionals already using EasyBudget
           </div>
         </div>
