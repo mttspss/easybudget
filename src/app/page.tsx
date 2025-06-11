@@ -389,12 +389,59 @@ export default function LandingPage() {
             </a>
             
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
-              Making money management so simple, it feels magic.
+              Track your entire money life,<br />
+              in one view
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mb-12">
-              Stop managing money in Spreadsheets. easybudget.ing automatically categorizes your transactions, giving you a complete financial overview in seconds.
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mb-8">
+              Your money deserves better than Excel. Easybudget turns every account, transaction, goal, and income stream into one live dashboard—giving you a complete financial overview in seconds.
             </p>
+
+            {/* Featured On Section */}
+            <div className="mb-12">
+              <p className="text-sm text-gray-500 mb-4 font-medium">FEATURED ON</p>
+              <div className="flex items-center justify-center gap-8 opacity-60 grayscale">
+                {/* Product Hunt */}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">P</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Product Hunt</span>
+                </div>
+                
+                {/* X.com */}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">𝕏</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">X.com</span>
+                </div>
+                
+                {/* TinyLaunch */}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">T</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">TinyLaunch</span>
+                </div>
+                
+                {/* Reddit */}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-orange-600 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">r</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Reddit</span>
+                </div>
+                
+                {/* Hacker News */}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">Y</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Hacker News</span>
+                </div>
+              </div>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <button 
