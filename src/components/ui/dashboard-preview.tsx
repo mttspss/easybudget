@@ -188,14 +188,14 @@ export function DashboardPreview() {
                   <div className="bg-[#FAFAFA] min-h-[400px] relative">
                     {!imageError[activeTab] ? (
                       // Try to show real screenshot first
-                      <div className="relative w-full h-[400px] p-3">
-                        <div className="relative w-full h-full rounded-xl overflow-hidden border-4 bg-gradient-to-r from-[#60ea8b] via-[#50da7b] to-[#4ade80] p-0.5 shadow-lg">
+                      <div className="relative w-full h-[450px] p-3">
+                        <div className="relative w-full h-full rounded-xl overflow-hidden bg-gradient-to-r from-[#60ea8b] via-[#50da7b] to-[#4ade80] p-1 shadow-lg">
                           <div className="relative w-full h-full rounded-lg overflow-hidden bg-white">
                             <Image
                               src={activeTabData.image}
                               alt={`${activeTabData.name} screenshot`}
                               fill
-                              className="object-cover object-top"
+                              className="object-contain p-2"
                               onError={() => handleImageError(activeTab)}
                               priority={activeTab === "overview"}
                             />
