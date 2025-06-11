@@ -388,17 +388,40 @@ export default function LandingPage() {
               All Your Finances in One Dashboard
             </a>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
               Track your entire money life,<br />
-              in one view
+              in one view<span className="inline-block w-3 h-3 bg-green-500 rounded-full ml-2"></span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mb-8">
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mb-12">
               Your money deserves better than Excel. Easybudget turns every account, transaction, goal, and income stream into one live dashboard—giving you a complete financial overview in seconds.
             </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <button 
+                onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
+                className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105"
+                style={{background: 'linear-gradient(135deg, #60ea8b 0%, #4ade80 100%)'}}
+              >
+                {user ? 'Go to Dashboard' : 'Get instant access'}
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </button>
+              <button 
+                onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
+                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
+              >
+                Watch Demo
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m10 8 6 4-6 4V8z"></path>
+                </svg>
+              </button>
+            </div>
 
-            {/* Featured On Section */}
-            <div className="mb-12">
+            {/* Featured On Section - moved below buttons */}
+            <div className="mb-8">
               <p className="text-sm text-gray-500 mb-4 font-medium">FEATURED ON</p>
               <div className="flex items-center justify-center gap-8 opacity-60 grayscale">
                 {/* Product Hunt */}
@@ -441,29 +464,6 @@ export default function LandingPage() {
                   <span className="text-sm font-medium text-gray-600">Hacker News</span>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
-                className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105"
-                style={{background: 'linear-gradient(135deg, #60ea8b 0%, #4ade80 100%)'}}
-              >
-                {user ? 'Go to Dashboard' : 'Get instant access'}
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              </button>
-              <button 
-                onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
-              >
-                Watch Demo
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m10 8 6 4-6 4V8z"></path>
-                </svg>
-              </button>
             </div>
           </div>
 
