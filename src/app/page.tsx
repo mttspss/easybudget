@@ -21,12 +21,11 @@ import {
   User,
   Shield,
   Target,
-  Database,
   BarChart3,
   Upload,
   Twitter,
   Linkedin,
-  Lock
+  CreditCard
 } from "lucide-react"
 
 export default function LandingPage() {
@@ -40,34 +39,34 @@ export default function LandingPage() {
 
   const benefits = [
     {
-      icon: Database,
-      title: "Connect All Your Financial Accounts", 
-      desc: "Link 10,000+ banks and import CSV files instantly. Get a complete view of your finances in one dashboard instead of checking multiple apps and spreadsheets."
+      icon: Upload,
+      title: "Simple CSV Import & Organization", 
+      desc: "Upload your bank statements in any CSV format. Our smart system automatically detects columns and organizes your transactions in a clean, unified dashboard."
     },
     {
       icon: Brain,
-      title: "Automatic Categorization & Insights",
-      desc: "Stop manually tagging transactions. Our AI categorizes everything with 99.2% accuracy and shows you exactly where your money goes each month."
-    },
-    {
-      icon: Activity,
-      title: "Predict Future Cash Flow",
-      desc: "See 30-90 day forecasts and get alerts before you run into cash flow problems. Never be surprised by unexpected expenses again."
+      title: "Smart Transaction Categorization",
+      desc: "Automatically categorize your expenses into meaningful categories like Food, Transport, Entertainment. Customize categories to match your spending habits."
     },
     {
       icon: BarChart3,
-      title: "Generate Professional Reports",
-      desc: "Create comprehensive financial reports in seconds. Export to Excel, PDF, or share with your accountant and business partners."
+      title: "Beautiful Analytics Dashboard",
+      desc: "Visualize your spending patterns with interactive charts and graphs. Track your balance trends, monthly comparisons, and expense breakdowns at a glance."
     },
     {
       icon: Target,
-      title: "Track Goals & Stay Motivated",
-      desc: "Set financial objectives and see your progress. Whether it's building an emergency fund or saving for a house - stay on track."
+      title: "Financial Goals Tracking",
+      desc: "Set savings goals and track your progress with visual indicators. Whether it's an emergency fund or vacation savings, stay motivated with clear milestones."
     },
     {
-      icon: Lock,
-      title: "Bank-Level Security You Can Trust",
-      desc: "Your data is protected with the same security standards used by major banks. SOC 2 certified with 256-bit encryption."
+      icon: Activity,
+      title: "Real-Time Financial Insights",
+      desc: "Monitor your income vs expenses, monthly trends, and spending patterns. Get instant insights into your financial health without complex spreadsheets."
+    },
+    {
+      icon: CreditCard,
+      title: "Multi Account Management",
+      desc: "Manage multiple bank accounts, credit cards, and business accounts in one unified dashboard. Track all your finances across different institutions seamlessly."
     }
   ]
 
