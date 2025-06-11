@@ -9,7 +9,8 @@ import {
   PieChart, 
   TrendingUp, 
   CreditCard, 
-  Target
+  Target,
+  Upload
 } from "lucide-react"
 
 interface DashboardTab {
@@ -59,6 +60,19 @@ const dashboardTabs: DashboardTab[] = [
       "Bulk editing tools",
       "Advanced search & filters",
       "Receipt attachments"
+    ]
+  },
+  {
+    id: "import",
+    name: "Import CSV",
+    icon: Upload,
+    description: "Import your bank statements and financial data effortlessly",
+    image: "/dashboard-preview-import.png",
+    features: [
+      "Support for 100+ bank formats",
+      "Drag & drop CSV upload",
+      "Automatic column mapping",
+      "Duplicate detection & merging"
     ]
   },
   {
@@ -209,6 +223,7 @@ export function DashboardPreview() {
                         {activeTab === "overview" && <OverviewPreview />}
                         {activeTab === "analytics" && <AnalyticsPreview />}
                         {activeTab === "transactions" && <TransactionsPreview />}
+                        {activeTab === "import" && <ImportPreview />}
                         {activeTab === "goals" && <GoalsPreview />}
                       </div>
                     )}
@@ -309,6 +324,28 @@ function TransactionsPreview() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function ImportPreview() {
+  return (
+    <div className="space-y-4">
+      {/* Import CSV Features */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg p-4 border">
+          <div className="text-xs text-gray-500 mb-1">Support for 100+ bank formats</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border">
+          <div className="text-xs text-gray-500 mb-1">Drag & drop CSV upload</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border">
+          <div className="text-xs text-gray-500 mb-1">Automatic column mapping</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border">
+          <div className="text-xs text-gray-500 mb-1">Duplicate detection & merging</div>
+        </div>
       </div>
     </div>
   )
