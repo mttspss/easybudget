@@ -198,27 +198,21 @@ export function DashboardPreview() {
                   </div>
                   
                   {/* Dashboard Preview Content */}
-                  <div className="bg-[#FAFAFA] relative flex items-center justify-center p-2">
+                  <div className="relative">
                     {!imageError[activeTab] ? (
                       // Try to show real screenshot first
-                      <div className="relative max-w-full">
-                        <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-[#60ea8b] via-[#50da7b] to-[#4ade80] p-1 shadow-lg">
-                          <div className="relative rounded-lg overflow-hidden bg-white">
-                            <Image
-                              src={activeTabData.image}
-                              alt={`${activeTabData.name} screenshot`}
-                              width={800}
-                              height={600}
-                              className="max-w-full max-h-[600px] w-auto h-auto object-contain"
-                              onError={() => handleImageError(activeTab)}
-                              priority={activeTab === "overview"}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <Image
+                        src={activeTabData.image}
+                        alt={`${activeTabData.name} screenshot`}
+                        width={800}
+                        height={600}
+                        className="w-full h-auto object-contain"
+                        onError={() => handleImageError(activeTab)}
+                        priority={activeTab === "overview"}
+                      />
                     ) : (
                       // Fallback to mockup component if image fails to load
-                      <div className="w-full min-h-[400px]">
+                      <div className="w-full min-h-[400px] bg-[#FAFAFA] p-4">
                         {activeTab === "overview" && <OverviewPreview />}
                         {activeTab === "analytics" && <AnalyticsPreview />}
                         {activeTab === "transactions" && <TransactionsPreview />}
