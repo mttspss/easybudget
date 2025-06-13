@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import { DashboardSelector } from "@/components/dashboard-selector"
+import { DashboardHeader } from "@/components/dashboard-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
@@ -13,7 +13,6 @@ import {
   Wallet,
   CreditCard,
   PiggyBank,
-  Filter,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -408,29 +407,7 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto space-y-3">
               
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">
-                  Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'}! 👋
-                  </h1>
-                <p className="text-gray-600 text-xs">
-                  Here&apos;s your financial overview for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-1" />
-                    Filter
-                  </Button>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Transaction
-                  </Button>
-                </div>
-              </div>
-
-            {/* Dashboard Selector */}
-            <DashboardSelector />
+            <DashboardHeader user={user} />
 
             {/* Quick Stats - More Compact */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
