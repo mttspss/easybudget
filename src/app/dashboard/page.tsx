@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
+import { DashboardSelector } from "@/components/dashboard-selector"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
@@ -427,6 +428,9 @@ export default function Dashboard() {
                   </Button>
                 </div>
               </div>
+
+            {/* Dashboard Selector */}
+            <DashboardSelector />
 
             {/* Quick Stats - More Compact */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
