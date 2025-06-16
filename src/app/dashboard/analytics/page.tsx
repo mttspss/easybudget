@@ -39,6 +39,7 @@ import {
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
+import { DashboardIndicator } from "@/components/dashboard-indicator"
 
 interface AnalyticsData {
   monthlyTrends: any[]
@@ -352,6 +353,7 @@ export default function AnalyticsPage() {
                   <p className="text-gray-600 text-xs mt-1">Advanced insights into your financial patterns</p>
               </div>
               <div className="flex items-center gap-2">
+                  <DashboardIndicator />
                   {/* Period Selection */}
                   <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
                     {[

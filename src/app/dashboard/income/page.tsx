@@ -55,6 +55,7 @@ import { toast } from "sonner"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
+import { DashboardIndicator } from "@/components/dashboard-indicator"
 
 interface Transaction {
   id: string
@@ -88,6 +89,7 @@ interface IncomePageProps {
 function IncomePageContent({ initialCategory }: IncomePageProps) {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -136,6 +138,18 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
       setSelectedCategory(initialCategory)
     }
   }, [initialCategory])
+
+  // Auto-open dialog if add=true in URL
+  useEffect(() => {
+    const shouldAdd = searchParams.get('add')
+    if (shouldAdd === 'true') {
+      setIsDialogOpen(true)
+      // Clean the URL by removing the add parameter
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('add')
+      window.history.replaceState({}, '', newUrl.toString())
+    }
+  }, [searchParams])
 
   // Load user currency
   useEffect(() => {
@@ -478,6 +492,7 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                 <p className="text-gray-600 text-xs">Track and manage your income sources</p>
               </div>
               <div className="flex items-center gap-2">
+                <DashboardIndicator />
                 {selectedItems.size > 0 && (
                   <>
                     <Button 

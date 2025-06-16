@@ -2,13 +2,16 @@
 
 import { useState } from 'react'
 import { useDashboards } from '@/lib/dashboard-context'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { 
   Plus, 
   Filter, 
   ChevronDown, 
   Trash2, 
-  Check
+  Check,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -31,6 +34,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
+  const router = useRouter()
   const { 
     dashboards, 
     activeDashboard, 
@@ -61,6 +65,12 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     if (confirm('Are you sure you want to delete this dashboard?')) {
       await deleteDashboard(id)
     }
+  }
+
+  const handleAddTransaction = (type: 'income' | 'expense') => {
+    // Navigate to the appropriate page with a flag to open the dialog
+    const targetPage = type === 'income' ? '/dashboard/income' : '/dashboard/expenses'
+    router.push(`${targetPage}?add=true`)
   }
 
   // Dashboard name to show (default or active dashboard name)
@@ -189,10 +199,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           </DialogContent>
         </Dialog>
 
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-1" />
-          Add Transaction
-        </Button>
+        {/* Add Transaction Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-1" />
+              Add Transaction
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleAddTransaction('income')}>
+              <ArrowUpRight className="h-4 w-4 mr-2 text-green-600" />
+              Add Income
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAddTransaction('expense')}>
+              <ArrowDownRight className="h-4 w-4 mr-2 text-red-600" />
+              Add Expense
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )

@@ -41,6 +41,7 @@ import {
 import { toast } from "sonner"
 import { createDefaultCategories } from "@/lib/default-categories"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
+import { DashboardIndicator } from "@/components/dashboard-indicator"
 
 interface ParsedTransaction {
   id: string
@@ -715,6 +716,7 @@ export default function ImportPage() {
                   <p className="text-gray-600 text-sm mt-1">Import transactions from CSV files with intelligent categorization</p>
                 </div>
                 <div className="flex gap-2">
+                  <DashboardIndicator />
                   <Button variant="outline" onClick={downloadTemplate}>
                     <Download className="h-4 w-4 mr-2" />
                     Download Template

@@ -48,6 +48,7 @@ import { createDefaultCategories } from "@/lib/default-categories"
 import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
+import { DashboardIndicator } from "@/components/dashboard-indicator"
 
 interface Category {
   id: string
@@ -324,107 +325,110 @@ export default function CategoriesPage() {
                 <h1 className="text-xl font-bold text-gray-900">Categories</h1>
                 <p className="text-gray-600 text-xs">Organize your income and expense categories</p>
               </div>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="sm"
-                    onClick={() => {
-                      setEditingCategory(null)
-                      setFormData({
-                        name: "",
-                        type: "expense",
-                        color: colorOptions[0],
-                        icon: "FolderOpen"
-                      })
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Create Category
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg">
-                      {editingCategory ? 'Edit Category' : 'Add New Category'}
-                    </DialogTitle>
-                    <DialogDescription className="text-sm">
-                      {editingCategory ? 'Update category details' : 'Create a new category to organize your transactions'}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div>
-                      <Label htmlFor="name" className="text-sm">Name *</Label>
-                      <Input
-                        id="name"
-                        placeholder="e.g., Groceries, Salary, etc."
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="mt-1"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="type" className="text-sm">Type *</Label>
-                      <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="expense">
-                            <div className="flex items-center gap-2">
-                              <ArrowDownRight className="h-4 w-4 text-red-500" />
-                              Expense
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="income">
-                            <div className="flex items-center gap-2">
-                              <ArrowUpRight className="h-4 w-4 text-green-500" />
-                              Income
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm">Color *</Label>
-                      <div className="grid grid-cols-6 gap-2 mt-1">
-                        {colorOptions.map(color => (
-                          <button
-                            key={color}
-                            type="button"
-                            className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-transparent'}`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => setFormData({...formData, color})}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="icon" className="text-sm">Icon</Label>
-                      <IconSelector 
-                        value={formData.icon} 
-                        onValueChange={(value) => setFormData({...formData, icon: value})}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <DialogFooter>
-                      <Button type="button" variant="outline" size="sm" onClick={() => {
-                        setIsDialogOpen(false)
+              <div className="flex items-center gap-2">
+                <DashboardIndicator />
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
                         setEditingCategory(null)
-                      }}>
-                        Cancel
-                      </Button>
-                      <Button type="submit" size="sm">
-                        {editingCategory ? 'Update' : 'Create'} Category
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                        setFormData({
+                          name: "",
+                          type: "expense",
+                          color: colorOptions[0],
+                          icon: "FolderOpen"
+                        })
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Create Category
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg">
+                        {editingCategory ? 'Edit Category' : 'Add New Category'}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm">
+                        {editingCategory ? 'Update category details' : 'Create a new category to organize your transactions'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                      <div>
+                        <Label htmlFor="name" className="text-sm">Name *</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g., Groceries, Salary, etc."
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="type" className="text-sm">Type *</Label>
+                        <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => setFormData({...formData, type: value})}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="expense">
+                              <div className="flex items-center gap-2">
+                                <ArrowDownRight className="h-4 w-4 text-red-500" />
+                                Expense
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="income">
+                              <div className="flex items-center gap-2">
+                                <ArrowUpRight className="h-4 w-4 text-green-500" />
+                                Income
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm">Color *</Label>
+                        <div className="grid grid-cols-6 gap-2 mt-1">
+                          {colorOptions.map(color => (
+                            <button
+                              key={color}
+                              type="button"
+                              className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-transparent'}`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => setFormData({...formData, color})}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="icon" className="text-sm">Icon</Label>
+                        <IconSelector 
+                          value={formData.icon} 
+                          onValueChange={(value) => setFormData({...formData, icon: value})}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" variant="outline" size="sm" onClick={() => {
+                          setIsDialogOpen(false)
+                          setEditingCategory(null)
+                        }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" size="sm">
+                          {editingCategory ? 'Update' : 'Create'} Category
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             {/* Search and Filters - Compact */}
