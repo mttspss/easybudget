@@ -7,7 +7,7 @@ export interface UserSubscription {
   user_id: string
   subscription_id: string | null
   status: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
-  plan_type: keyof typeof PLANS
+  plan_type: 'free' | 'starter' | 'pro' | 'growth'
   billing_interval: 'month' | 'year' | null
   current_period_start: string | null
   current_period_end: string | null
@@ -31,62 +31,26 @@ export function useSubscription(userId: string | undefined) {
     const fetchSubscription = async () => {
       try {
         setLoading(true)
+        setError(null)
+        
         const { data, error } = await supabase
           .from('user_subscriptions')
           .select('*')
           .eq('user_id', userId)
           .single()
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        // Handle 404 (no subscription found) gracefully
+        if (error && error.code !== 'PGRST116') {
           throw error
         }
 
-        if (data) {
-          setSubscription(data)
-        } else {
-          // Create default free subscription
-          console.log('Creating default free subscription for user:', userId)
-          
-          const defaultSubscription = {
-            user_id: userId,
-            subscription_id: null,
-            status: 'active' as const,
-            plan_type: 'free' as const,
-            billing_interval: null,
-            current_period_start: null,
-            current_period_end: null,
-            canceled_at: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-
-          console.log('Attempting to insert subscription:', defaultSubscription)
-
-          const { data: newData, error: insertError } = await supabase
-            .from('user_subscriptions')
-            .insert(defaultSubscription)
-            .select()
-            .single()
-
-          if (insertError) {
-            console.error('Failed to create free subscription:', insertError)
-            console.error('Error details:', JSON.stringify(insertError, null, 2))
-            
-            // For now, set a local subscription without saving to DB
-            const localSubscription = {
-              id: 'temp-' + userId,
-              ...defaultSubscription
-            }
-            setSubscription(localSubscription as UserSubscription)
-            return
-          }
-
-          console.log('Successfully created free subscription:', newData)
-          setSubscription(newData)
-        }
+        // Set data (can be null for free users)
+        setSubscription(data || null)
+        
       } catch (err) {
         console.error('Error fetching subscription:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch subscription')
+        setSubscription(null)
       } finally {
         setLoading(false)
       }
@@ -95,20 +59,24 @@ export function useSubscription(userId: string | undefined) {
     fetchSubscription()
   }, [userId])
 
+  // Helper functions
+  const getPlanType = (): 'free' | 'starter' | 'pro' | 'growth' => {
+    return subscription?.plan_type ?? 'free'
+  }
+
   const hasFeature = (feature: string): boolean => {
-    if (!subscription) return false
-    
-    const plan = PLANS[subscription.plan_type]
+    const planType = getPlanType()
+    const plan = PLANS[planType]
     if (!plan) return false
 
     // Pro and Growth have all Starter features
-    if ((subscription.plan_type === 'pro' || subscription.plan_type === 'growth') && 
+    if ((planType === 'pro' || planType === 'growth') && 
         PLANS.starter.features.includes(feature)) {
       return true
     }
     
     // Growth has all Pro features
-    if (subscription.plan_type === 'growth' && PLANS.pro.features.includes(feature)) {
+    if (planType === 'growth' && PLANS.pro.features.includes(feature)) {
       return true
     }
     
@@ -120,7 +88,7 @@ export function useSubscription(userId: string | undefined) {
   }
 
   const isPremium = (): boolean => {
-    return subscription?.plan_type !== 'free' && isActive()
+    return getPlanType() !== 'free' && isActive()
   }
 
   const canAccessFeature = (feature: string): boolean => {
@@ -131,36 +99,10 @@ export function useSubscription(userId: string | undefined) {
     subscription,
     loading,
     error,
+    planType: getPlanType(),
     hasFeature,
     isActive,
     isPremium,
     canAccessFeature,
-    refetch: () => {
-      if (userId) {
-        setLoading(true)
-        // Re-trigger the effect
-        const fetchSubscription = async () => {
-          try {
-            const { data, error } = await supabase
-              .from('user_subscriptions')
-              .select('*')
-              .eq('user_id', userId)
-              .single()
-
-            if (error && error.code !== 'PGRST116') {
-              throw error
-            }
-
-            setSubscription(data || null)
-          } catch (err) {
-            console.error('Error refetching subscription:', err)
-            setError(err instanceof Error ? err.message : 'Failed to refetch subscription')
-          } finally {
-            setLoading(false)
-          }
-        }
-        fetchSubscription()
-      }
-    }
   }
 } 

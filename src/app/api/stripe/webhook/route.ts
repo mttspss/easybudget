@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe, getPlanType, getBillingInterval } from '@/lib/stripe'
 import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+
+// Service role client for webhook - bypasses RLS
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   console.log('🔥 ==> STRIPE WEBHOOK RECEIVED')
@@ -201,7 +208,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 }
 
 async function upsertSubscription(subscription: Stripe.Subscription, userId: string) {
-  console.log('🔥 ==> UPSERTING SUBSCRIPTION')
+  console.log('🔥 ==> UPSERTING SUBSCRIPTION WITH SERVICE ROLE')
   console.log('🔥 User ID:', userId)
   console.log('🔥 Subscription ID:', subscription.id)
   console.log('🔥 Subscription status:', subscription.status)
@@ -221,15 +228,8 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   console.log('🔥 Billing interval:', billingInterval)
 
   // Safe timestamp conversion
-  const safeToISOString = (timestamp: number | null | undefined): string | null => {
-    if (!timestamp || typeof timestamp !== 'number') return null
-    try {
-      return new Date(timestamp * 1000).toISOString()
-    } catch (error) {
-      console.error('🔥 Error converting timestamp:', timestamp, error)
-      return null
-    }
-  }
+  const toDateOrNull = (timestamp?: number | null) => 
+    typeof timestamp === 'number' ? new Date(timestamp * 1000).toISOString() : null
 
   const subscriptionData = {
     user_id: userId,
@@ -237,18 +237,18 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
     status: subscription.status,
     plan_type: planType,
     billing_interval: billingInterval,
-    current_period_start: safeToISOString((subscription as any).current_period_start),
-    current_period_end: safeToISOString((subscription as any).current_period_end),
-    canceled_at: subscription.canceled_at ? safeToISOString(subscription.canceled_at) : null,
-    created_at: safeToISOString(subscription.created) || new Date().toISOString(),
+    current_period_start: toDateOrNull((subscription as any).current_period_start),
+    current_period_end: toDateOrNull((subscription as any).current_period_end),
+    canceled_at: subscription.canceled_at ? toDateOrNull(subscription.canceled_at) : null,
     updated_at: new Date().toISOString(),
   }
 
   console.log('🔥 Subscription data to upsert:', JSON.stringify(subscriptionData, null, 2))
 
-  const { error } = await supabase
+  // Use service role client with conflict resolution
+  const { error } = await supabaseAdmin
     .from('user_subscriptions')
-    .upsert(subscriptionData)
+    .upsert(subscriptionData, { onConflict: 'user_id' })
 
   if (error) {
     console.error('🔥 ERROR upserting subscription:', error)

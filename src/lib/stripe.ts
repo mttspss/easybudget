@@ -18,6 +18,16 @@ const PRICE_IDS = {
   GROWTH_YEAR: process.env.STRIPE_PRICE_GROWTH_YEAR,
 }
 
+// Hard-coded price ID to plan mapping - fixes "always free" bug
+export const PRICE_ID_TO_PLAN: Record<string, 'free' | 'starter' | 'pro' | 'growth'> = {
+  [process.env.STRIPE_PRICE_STARTER_MONTH!]: 'starter',
+  [process.env.STRIPE_PRICE_STARTER_YEAR!]: 'starter',
+  [process.env.STRIPE_PRICE_PRO_MONTH!]: 'pro',
+  [process.env.STRIPE_PRICE_PRO_YEAR!]: 'pro',
+  [process.env.STRIPE_PRICE_GROWTH_MONTH!]: 'growth',
+  [process.env.STRIPE_PRICE_GROWTH_YEAR!]: 'growth',
+}
+
 // Plan types and features
 export const PLANS = {
   free: {
@@ -63,18 +73,10 @@ export const PLANS = {
   }
 }
 
-// Get plan type from price ID
-export function getPlanType(priceId: string): keyof typeof PLANS {
-  if (priceId === PRICE_IDS.STARTER_MONTH || priceId === PRICE_IDS.STARTER_YEAR) {
-    return 'starter'
-  }
-  if (priceId === PRICE_IDS.PRO_MONTH || priceId === PRICE_IDS.PRO_YEAR) {
-    return 'pro'
-  }
-  if (priceId === PRICE_IDS.GROWTH_MONTH || priceId === PRICE_IDS.GROWTH_YEAR) {
-    return 'growth'
-  }
-  return 'free'
+// Get plan type from price ID - NEW RELIABLE METHOD
+export function getPlanType(priceId: string | null | undefined): 'free' | 'starter' | 'pro' | 'growth' {
+  if (!priceId) return 'free'
+  return PRICE_ID_TO_PLAN[priceId] || 'free'
 }
 
 // Get billing interval from price ID
