@@ -220,16 +220,27 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   console.log('🔥 Plan type:', planType)
   console.log('🔥 Billing interval:', billingInterval)
 
+  // Safe timestamp conversion
+  const safeToISOString = (timestamp: number | null | undefined): string | null => {
+    if (!timestamp || typeof timestamp !== 'number') return null
+    try {
+      return new Date(timestamp * 1000).toISOString()
+    } catch (error) {
+      console.error('🔥 Error converting timestamp:', timestamp, error)
+      return null
+    }
+  }
+
   const subscriptionData = {
     user_id: userId,
     subscription_id: subscription.id,
     status: subscription.status,
     plan_type: planType,
     billing_interval: billingInterval,
-    current_period_start: new Date((subscription as any).current_period_start * 1000).toISOString(),
-    current_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
-    canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
-    created_at: new Date(subscription.created * 1000).toISOString(),
+    current_period_start: safeToISOString((subscription as any).current_period_start),
+    current_period_end: safeToISOString((subscription as any).current_period_end),
+    canceled_at: subscription.canceled_at ? safeToISOString(subscription.canceled_at) : null,
+    created_at: safeToISOString(subscription.created) || new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }
 
