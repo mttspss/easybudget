@@ -45,6 +45,8 @@ export function useSubscription(userId: string | undefined) {
           setSubscription(data)
         } else {
           // Create default free subscription
+          console.log('Creating default free subscription for user:', userId)
+          
           const defaultSubscription = {
             user_id: userId,
             subscription_id: null,
@@ -58,6 +60,8 @@ export function useSubscription(userId: string | undefined) {
             updated_at: new Date().toISOString(),
           }
 
+          console.log('Attempting to insert subscription:', defaultSubscription)
+
           const { data: newData, error: insertError } = await supabase
             .from('user_subscriptions')
             .insert(defaultSubscription)
@@ -65,9 +69,19 @@ export function useSubscription(userId: string | undefined) {
             .single()
 
           if (insertError) {
-            throw insertError
+            console.error('Failed to create free subscription:', insertError)
+            console.error('Error details:', JSON.stringify(insertError, null, 2))
+            
+            // For now, set a local subscription without saving to DB
+            const localSubscription = {
+              id: 'temp-' + userId,
+              ...defaultSubscription
+            }
+            setSubscription(localSubscription as UserSubscription)
+            return
           }
 
+          console.log('Successfully created free subscription:', newData)
           setSubscription(newData)
         }
       } catch (err) {
