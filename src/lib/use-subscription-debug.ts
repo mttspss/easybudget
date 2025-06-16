@@ -35,7 +35,7 @@ export function useSubscriptionDebug(userId: string | undefined) {
         console.log('🔍 Starting fetchSubscription for userId:', userId)
         setLoading(true)
         
-        // SOLO SELECT - niente INSERT per ora
+        // STEP 1: SELECT
         console.log('🔍 Attempting SELECT...')
         const { data, error } = await supabase
           .from('user_subscriptions')
@@ -54,8 +54,38 @@ export function useSubscriptionDebug(userId: string | undefined) {
           console.log('🔍 Found existing subscription:', data)
           setSubscription(data)
         } else {
-          console.log('🔍 No subscription found - setting null (no auto-create)')
-          setSubscription(null)
+          console.log('🔍 No subscription found - TESTING INSERT...')
+          
+          // STEP 2: TEST INSERT
+          const defaultSubscription = {
+            user_id: userId,
+            subscription_id: null,
+            status: 'active' as const,
+            plan_type: 'free' as const,
+            billing_interval: null,
+            current_period_start: null,
+            current_period_end: null,
+            canceled_at: null,
+          }
+
+          console.log('🔍 Attempting INSERT with data:', defaultSubscription)
+
+          const { data: newData, error: insertError } = await supabase
+            .from('user_subscriptions')
+            .insert(defaultSubscription)
+            .select()
+            .single()
+
+          console.log('🔍 INSERT result - data:', newData, 'error:', insertError)
+
+          if (insertError) {
+            console.error('🔍 INSERT failed:', insertError)
+            // Don't throw - just set null subscription
+            setSubscription(null)
+          } else {
+            console.log('🔍 INSERT successful!', newData)
+            setSubscription(newData)
+          }
         }
         
         console.log('🔍 fetchSubscription completed successfully')
