@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -76,6 +77,7 @@ interface ImportState {
 
 export default function ImportPage() {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [importState, setImportState] = useState<ImportState>({
@@ -489,6 +491,9 @@ export default function ImportPage() {
 
       console.log(`Processing ${validTransactions.length} valid transactions`)
 
+      // Dashboard filter: assign transactions to active dashboard
+      const dashboardFilter = activeDashboard?.id || null
+
       for (let i = 0; i < validTransactions.length; i++) {
         const transaction = validTransactions[i]
         
@@ -533,7 +538,8 @@ export default function ImportPage() {
           amount: transaction.amount,
           date: transaction.date,
           type: transaction.type,
-          category_id: categoryId
+          category_id: categoryId,
+          dashboard_id: dashboardFilter
         }
 
         console.log('Transaction data to insert:', transactionData)
@@ -572,7 +578,7 @@ export default function ImportPage() {
       }))
 
       if (imported > 0) {
-        toast.success(`Import completed! ${imported} transactions imported.`)
+        toast.success(`Import completed! ${imported} transactions imported to ${activeDashboard?.name || 'Main Dashboard'}.`)
       } else {
         toast.error(`Import failed. ${skipped} transactions had errors.`)
       }

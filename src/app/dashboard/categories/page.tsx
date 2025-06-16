@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -65,6 +66,7 @@ const colorOptions = [
 
 export default function CategoriesPage() {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -87,53 +89,86 @@ export default function CategoriesPage() {
     try {
       setIsLoading(true)
       
-      // Fetch categories with transaction counts and totals
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
+      // First, fetch all categories
       const { data: categoriesData } = await supabase
         .from('categories')
-        .select(`
-          *,
-          transactions (
-            id,
-            amount
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('name')
 
-      const categoriesWithStats = (categoriesData || []).map(category => ({
-        ...category,
-        transaction_count: category.transactions?.length || 0,
-        total_amount: category.transactions?.reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0
-      }))
-
-      // AUTO-CREATE DEFAULT CATEGORIES if user has no categories
-      if (categoriesWithStats.length === 0) {
+      if (!categoriesData || categoriesData.length === 0) {
+        // AUTO-CREATE DEFAULT CATEGORIES if user has no categories
         console.log('No categories found, creating defaults...')
         const success = await createDefaultCategories(user.id)
         if (success) {
           // Refetch after creating defaults
           const { data: newCategoriesData } = await supabase
             .from('categories')
-            .select(`
-              *,
-              transactions (
-                id,
-                amount
-              )
-            `)
+            .select('*')
             .eq('user_id', user.id)
             .order('name')
-
-          const newCategoriesWithStats = (newCategoriesData || []).map(category => ({
-            ...category,
-            transaction_count: category.transactions?.length || 0,
-            total_amount: category.transactions?.reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0
-          }))
           
-          setCategories(newCategoriesWithStats)
-          toast.success('Welcome! Default categories have been created for you.')
+          if (newCategoriesData) {
+            // Fetch transactions for each category with dashboard filter
+            const categoriesWithStats = await Promise.all(
+              newCategoriesData.map(async (category) => {
+                let transactionQuery = supabase
+                  .from('transactions')
+                  .select('id, amount')
+                  .eq('user_id', user.id)
+                  .eq('category_id', category.id)
+
+                // Apply dashboard filter
+                if (dashboardFilter) {
+                  transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+                } else {
+                  transactionQuery = transactionQuery.is('dashboard_id', null)
+                }
+
+                const { data: transactions } = await transactionQuery
+
+                return {
+                  ...category,
+                  transaction_count: transactions?.length || 0,
+                  total_amount: transactions?.reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0
+                }
+              })
+            )
+            
+            setCategories(categoriesWithStats)
+            toast.success('Welcome! Default categories have been created for you.')
+          }
         }
       } else {
+        // Fetch transactions for each category with dashboard filter
+        const categoriesWithStats = await Promise.all(
+          categoriesData.map(async (category) => {
+            let transactionQuery = supabase
+              .from('transactions')
+              .select('id, amount')
+              .eq('user_id', user.id)
+              .eq('category_id', category.id)
+
+            // Apply dashboard filter
+            if (dashboardFilter) {
+              transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+            } else {
+              transactionQuery = transactionQuery.is('dashboard_id', null)
+            }
+
+            const { data: transactions } = await transactionQuery
+
+            return {
+              ...category,
+              transaction_count: transactions?.length || 0,
+              total_amount: transactions?.reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0
+            }
+          })
+        )
+
         setCategories(categoriesWithStats)
       }
     } catch (error) {
@@ -141,7 +176,7 @@ export default function CategoriesPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, activeDashboard])
 
   useEffect(() => {
     if (user) {
