@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -90,6 +91,7 @@ const monthlyChartConfig = {
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
@@ -108,8 +110,20 @@ export default function Dashboard() {
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
       const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
       
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
+      // Base query with dashboard filter
+      const buildQuery = (query: any) => {
+        if (dashboardFilter) {
+          return query.eq('dashboard_id', dashboardFilter)
+        } else {
+          return query.is('dashboard_id', null)
+        }
+      }
+      
       // Get current month transactions
-      const { data: currentTransactions } = await supabase
+      let currentQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -123,9 +137,12 @@ export default function Dashboard() {
         .eq('user_id', user.id)
         .gte('date', currentMonthStart.toISOString().split('T')[0])
         .order('date', { ascending: false })
+      
+      currentQuery = buildQuery(currentQuery)
+      const { data: currentTransactions } = await currentQuery
 
       // Get last month transactions for comparison
-      const { data: lastMonthTransactions } = await supabase
+      let lastMonthQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -140,9 +157,12 @@ export default function Dashboard() {
         .gte('date', lastMonthStart.toISOString().split('T')[0])
         .lte('date', lastMonthEnd.toISOString().split('T')[0])
         .order('date', { ascending: false })
+      
+      lastMonthQuery = buildQuery(lastMonthQuery)
+      const { data: lastMonthTransactions } = await lastMonthQuery
 
       // Get all transactions for balance calculation
-      const { data: allTransactions } = await supabase
+      let allQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -155,6 +175,9 @@ export default function Dashboard() {
         `)
         .eq('user_id', user.id)
         .order('date', { ascending: false })
+      
+      allQuery = buildQuery(allQuery)
+      const { data: allTransactions } = await allQuery
 
       // Calculate current month stats
       const currentIncome = (currentTransactions || [])
@@ -327,7 +350,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }, [user, balancePeriod])
+  }, [user, balancePeriod, activeDashboard])
 
   useEffect(() => {
     if (user) {
