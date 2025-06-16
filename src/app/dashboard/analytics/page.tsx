@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
@@ -60,6 +61,7 @@ const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'
 
 export default function AnalyticsPage() {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("3months")
@@ -91,6 +93,9 @@ export default function AnalyticsPage() {
     try {
       setIsLoading(true)
       
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
       // Calculate date ranges
       const now = new Date()
       let startDate: Date
@@ -116,8 +121,8 @@ export default function AnalyticsPage() {
         }
       }
 
-      // Fetch all transactions in the period
-      const { data: transactions } = await supabase
+      // Fetch all transactions in the period with dashboard filter
+      let transactionQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -130,6 +135,15 @@ export default function AnalyticsPage() {
         .gte('date', startDate.toISOString().split('T')[0])
         .lte('date', endDate.toISOString().split('T')[0])
         .order('date', { ascending: true })
+
+      // Apply dashboard filter
+      if (dashboardFilter) {
+        transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+      } else {
+        transactionQuery = transactionQuery.is('dashboard_id', null)
+      }
+
+      const { data: transactions } = await transactionQuery
 
       if (!transactions) {
         setAnalyticsData(null)
@@ -271,7 +285,7 @@ export default function AnalyticsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [user, selectedPeriod, customDateRange])
+  }, [user, selectedPeriod, customDateRange, activeDashboard])
 
   useEffect(() => {
     if (user) {

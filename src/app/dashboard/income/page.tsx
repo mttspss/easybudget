@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -86,6 +87,7 @@ interface IncomePageProps {
 
 function IncomePageContent({ initialCategory }: IncomePageProps) {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -157,7 +159,10 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
     try {
       setIsLoading(true)
       
-      // Fetch income categories
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
+      // Fetch income categories (not filtered by dashboard)
       const { data: categoryData } = await supabase
         .from('categories')
         .select('*')
@@ -165,8 +170,8 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
         .eq('type', 'income')
         .order('name')
 
-      // Fetch income transactions
-      const { data: transactionData } = await supabase
+      // Fetch income transactions with dashboard filter
+      let transactionQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -179,6 +184,15 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
         .eq('type', 'income')
         .order('date', { ascending: false })
 
+      // Apply dashboard filter
+      if (dashboardFilter) {
+        transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+      } else {
+        transactionQuery = transactionQuery.is('dashboard_id', null)
+      }
+
+      const { data: transactionData } = await transactionQuery
+
       setCategories(categoryData || [])
       setTransactions(transactionData || [])
     } catch (error) {
@@ -186,7 +200,7 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, activeDashboard])
 
   useEffect(() => {
     if (user) {
@@ -236,7 +250,9 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
         
         toast.success('Income updated successfully!')
       } else {
-        // Create new transaction
+        // Create new transaction with dashboard assignment
+        const dashboardFilter = activeDashboard?.id || null
+        
         const { error } = await supabase
           .from('transactions')
           .insert({
@@ -246,7 +262,8 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
             date: formData.date,
             category_id: formData.category_id,
             icon: formData.icon,
-            type: 'income'
+            type: 'income',
+            dashboard_id: dashboardFilter
           })
 
         if (error) {

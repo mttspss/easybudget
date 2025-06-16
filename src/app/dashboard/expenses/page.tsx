@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -83,6 +84,7 @@ interface ExpensesPageProps {
 
 function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
   const { user, loading } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -154,7 +156,10 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
     try {
       setIsLoading(true)
       
-      // Fetch expense categories
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
+      // Fetch expense categories (not filtered by dashboard)
       const { data: categoryData } = await supabase
         .from('categories')
         .select('*')
@@ -162,8 +167,8 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
         .eq('type', 'expense')
         .order('name')
 
-      // Fetch expense transactions
-      const { data: transactionData } = await supabase
+      // Fetch expense transactions with dashboard filter
+      let transactionQuery = supabase
         .from('transactions')
         .select(`
           *,
@@ -176,6 +181,15 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
         .eq('type', 'expense')
         .order('date', { ascending: false })
 
+      // Apply dashboard filter
+      if (dashboardFilter) {
+        transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+      } else {
+        transactionQuery = transactionQuery.is('dashboard_id', null)
+      }
+
+      const { data: transactionData } = await transactionQuery
+
       setCategories(categoryData || [])
       setTransactions(transactionData || [])
     } catch (error) {
@@ -183,7 +197,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, activeDashboard])
 
   useEffect(() => {
     if (user) {
@@ -233,7 +247,9 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
         
         toast.success('Expense updated successfully!')
       } else {
-        // Create new transaction
+        // Create new transaction with dashboard assignment
+        const dashboardFilter = activeDashboard?.id || null
+        
         const { error } = await supabase
           .from('transactions')
           .insert({
@@ -243,7 +259,8 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
             date: formData.date,
             category_id: formData.category_id,
             icon: formData.icon,
-            type: 'expense'
+            type: 'expense',
+            dashboard_id: dashboardFilter
           })
 
         if (error) {
