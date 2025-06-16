@@ -32,7 +32,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useSubscription } from "@/lib/use-subscription"
 
 const sidebarItems = [
   {
@@ -77,20 +76,6 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const router = useRouter()
-  const { subscription } = useSubscription(user?.id)
-
-  // Get plan display name
-  const getPlanDisplayName = () => {
-    if (!subscription) return 'Free Plan'
-    
-    switch (subscription.plan_type) {
-      case 'starter': return 'Starter Plan'
-      case 'pro': return 'Pro Plan'
-      case 'growth': return 'Growth Plan'
-      case 'free': return 'Free Plan'
-      default: return 'Free Plan'
-    }
-  }
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
@@ -196,7 +181,7 @@ export function Sidebar() {
             <div className="text-sm font-semibold text-gray-900 truncate">
               {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
             </div>
-            <div className="text-xs text-gray-500">{getPlanDisplayName()}</div>
+            <div className="text-xs text-gray-500">Free Plan</div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

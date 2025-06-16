@@ -35,6 +35,47 @@ export type Database = {
           updated_at?: string
         }
       }
+      user_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          subscription_id: string | null
+          status: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
+          plan_type: 'free' | 'starter' | 'pro' | 'growth'
+          billing_interval: 'month' | 'year' | null
+          current_period_start: string | null
+          current_period_end: string | null
+          canceled_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          subscription_id?: string | null
+          status?: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
+          plan_type?: 'free' | 'starter' | 'pro' | 'growth'
+          billing_interval?: 'month' | 'year' | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          subscription_id?: string | null
+          status?: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
+          plan_type?: 'free' | 'starter' | 'pro' | 'growth'
+          billing_interval?: 'month' | 'year' | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       user_preferences: {
         Row: {
           id: string
