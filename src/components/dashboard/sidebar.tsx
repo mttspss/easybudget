@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useSubscriptionDebug } from "@/lib/use-subscription-debug"
+import { useSubscription } from "@/lib/use-subscription"
 
 const sidebarItems = [
   {
@@ -77,7 +77,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const router = useRouter()
-  const { subscription, loading, error } = useSubscriptionDebug(user?.id)
+  const { subscription, loading, error } = useSubscription(user?.id)
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
