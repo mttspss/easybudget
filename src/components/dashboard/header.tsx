@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth-context"
-// import { useSubscription } from "@/lib/use-subscription" // Temporarily disabled
+import { useSubscription } from "@/lib/use-subscription"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { 
@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function Header() {
   const { user, signOut } = useAuth()
-  // const { planType, loading: subscriptionLoading } = useSubscription(user?.id) // Temporarily disabled
+  const { planType, loading: subscriptionLoading } = useSubscription(user?.id)
   const router = useRouter()
 
   const handleProfileSettings = () => {
@@ -85,7 +85,10 @@ export function Header() {
                     <div className="text-sm font-semibold text-gray-900">
                       {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
                     </div>
-                    <div className="text-xs text-gray-500">Free Plan</div>
+                    <div className="text-xs text-gray-500">
+                      {subscriptionLoading ? 'Loading...' : 
+                       planType && planType !== 'free' ? `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan` : 'Free Plan'}
+                    </div>
                   </div>
                   <Avatar className="h-8 w-8 ring-2 ring-gray-200">
                     <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt="Profile" />

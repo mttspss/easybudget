@@ -5,8 +5,8 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
-// import { useSubscription } from "@/lib/use-subscription"  // Temporarily disabled
-import { useSubscriptionDebug } from "@/lib/use-subscription-debug"  // DEBUG VERSION
+import { useSubscription } from "@/lib/use-subscription"  // Back to normal version
+// import { useSubscriptionDebug } from "@/lib/use-subscription-debug"  // DEBUG VERSION
 import { Button } from "@/components/ui/button"
 import { 
   BarChart3,
@@ -78,8 +78,8 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const router = useRouter()
-  // const { planType, loading: subscriptionLoading } = useSubscription(user?.id) // Temporarily disabled
-  const { subscription, loading: subscriptionLoading, error } = useSubscriptionDebug(user?.id) // DEBUG
+  const { planType, loading: subscriptionLoading, error } = useSubscription(user?.id) // Normal version
+  // const { subscription, loading: subscriptionLoading, error } = useSubscriptionDebug(user?.id) // DEBUG
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
@@ -187,8 +187,8 @@ export function Sidebar() {
             </div>
             <div className="text-xs text-gray-500">
               {subscriptionLoading ? 'Loading...' : 
-               subscription?.plan_type ? `${subscription.plan_type.charAt(0).toUpperCase() + subscription.plan_type.slice(1)} Plan` : 'Free Plan'}
-              {error && <div className="text-red-500">Error: {error}</div>}
+               planType && planType !== 'free' ? `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan` : 'Free Plan'}
+              {error && <div className="text-red-500 text-xs">Error: {error}</div>}
             </div>
           </div>
           <DropdownMenu>
