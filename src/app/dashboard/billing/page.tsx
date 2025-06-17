@@ -16,7 +16,8 @@ import {
   Settings,
   Crown,
   Zap,
-  Rocket
+  Rocket,
+  DollarSign
 } from "lucide-react"
 
 export default function BillingPage() {
@@ -84,7 +85,7 @@ export default function BillingPage() {
       case 'starter': return <Zap className="h-5 w-5" />
       case 'pro': return <Crown className="h-5 w-5" />
       case 'growth': return <Rocket className="h-5 w-5" />
-      default: return <Settings className="h-5 w-5" />
+      default: return <DollarSign className="h-5 w-5" />
     }
   }
 
@@ -107,18 +108,18 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50/50">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="max-w-7xl mx-auto space-y-3">
             
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Billing & Subscription</h1>
-                <p className="text-gray-600 mt-1">Manage your subscription, billing, and payment methods</p>
+                <h1 className="text-xl font-bold text-gray-900">Billing & Subscription</h1>
+                <p className="text-gray-600 text-xs">Manage your subscription, billing, and payment methods</p>
               </div>
             </div>
 
@@ -130,7 +131,7 @@ export default function BillingPage() {
                   Current Plan
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-lg ${getPlanColor(planType)}`}>
@@ -170,7 +171,7 @@ export default function BillingPage() {
 
             {/* Subscription Details */}
             {subscription && planType !== 'free' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Card className="bg-white border-0 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3">
@@ -243,18 +244,18 @@ export default function BillingPage() {
               <CardHeader className="border-b border-gray-100 pb-4">
                 <CardTitle className="text-lg">Need Help?</CardTitle>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="p-6">
                 <div className="space-y-3">
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     • <strong>Change Plan:</strong> Use the &ldquo;Manage Billing&rdquo; button to upgrade, downgrade, or cancel
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     • <strong>Update Payment:</strong> Add or change your payment method in the billing portal
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     • <strong>Download Invoices:</strong> Access all your invoices and receipts
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     • <strong>Support:</strong> Contact us at support@easybudget.ing for any billing questions
                   </p>
                 </div>

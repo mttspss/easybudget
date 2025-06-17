@@ -23,7 +23,8 @@ import {
   HelpCircle,
   MoreHorizontal,
   ArrowLeft,
-  FileText
+  FileText,
+  CreditCard
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -71,11 +72,6 @@ const sidebarItems = [
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: TrendingUp,
-  },
-  {
-    title: "Billing",
-    href: "/dashboard/billing",
-    icon: Settings,
   }
 ]
 
@@ -92,6 +88,10 @@ export function Sidebar() {
 
   const handlePreferences = () => {
     router.push('/dashboard/preferences')
+  }
+
+  const handleBilling = () => {
+    router.push('/dashboard/billing')
   }
 
   const handleHelpSupport = () => {
@@ -227,6 +227,13 @@ export function Sidebar() {
               >
                 <Settings className="mr-3 h-4 w-4 text-gray-500" />
                 Preferences
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
+                onClick={handleBilling}
+              >
+                <CreditCard className="mr-3 h-4 w-4 text-gray-500" />
+                Billing
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="text-sm py-2 focus:bg-gray-50 cursor-pointer"
