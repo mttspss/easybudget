@@ -30,26 +30,11 @@ export const PRICE_ID_TO_PLAN: Record<string, 'free' | 'starter' | 'pro' | 'grow
 
 // Get plan type from price ID - NEW RELIABLE METHOD
 export function getPlanType(priceId: string | null | undefined): 'free' | 'starter' | 'pro' | 'growth' {
-  console.log('🔥 DEBUG getPlanType called with priceId:', priceId)
-  
-  // Log all available environment variables
-  console.log('🔥 DEBUG env vars:')
-  console.log('🔥 STRIPE_PRICE_PRO_MONTH:', process.env.STRIPE_PRICE_PRO_MONTH)
-  console.log('🔥 STRIPE_PRICE_STARTER_MONTH:', process.env.STRIPE_PRICE_STARTER_MONTH)
-  console.log('🔥 STRIPE_PRICE_GROWTH_MONTH:', process.env.STRIPE_PRICE_GROWTH_MONTH)
-  
-  // Log the entire mapping object
-  console.log('🔥 DEBUG PRICE_ID_TO_PLAN mapping:', JSON.stringify(PRICE_ID_TO_PLAN, null, 2))
-  
   if (!priceId) {
-    console.log('🔥 DEBUG: No priceId provided, returning free')
     return 'free'
   }
   
-  const result = PRICE_ID_TO_PLAN[priceId] || 'free'
-  console.log('🔥 DEBUG: Mapping result for', priceId, '=', result)
-  
-  return result
+  return PRICE_ID_TO_PLAN[priceId] || 'free'
 }
 
 // Get billing interval from price ID
