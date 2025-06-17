@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
-import { PLANS } from './stripe'
+import { PLANS } from './plans'
 
 export interface UserSubscription {
   id: string
