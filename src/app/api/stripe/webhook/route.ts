@@ -218,10 +218,14 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   
   // DEBUG: Log the raw subscription object to see timestamp structure
   console.log('🔥 RAW SUBSCRIPTION OBJECT:', JSON.stringify(subscriptionData, null, 2))
-  console.log('🔥 Current period start RAW:', subscriptionData.current_period_start)
-  console.log('🔥 Current period end RAW:', subscriptionData.current_period_end)
-  console.log('🔥 Typeof current_period_start:', typeof subscriptionData.current_period_start)
-  console.log('🔥 Typeof current_period_end:', typeof subscriptionData.current_period_end)
+  
+  // The timestamps are in the subscription items, not at the root level!
+  const firstItem = subscriptionData.items?.data?.[0]
+  console.log('🔥 First subscription item:', JSON.stringify(firstItem, null, 2))
+  console.log('🔥 Current period start RAW:', firstItem?.current_period_start)
+  console.log('🔥 Current period end RAW:', firstItem?.current_period_end)
+  console.log('🔥 Typeof current_period_start:', typeof firstItem?.current_period_start)
+  console.log('🔥 Typeof current_period_end:', typeof firstItem?.current_period_end)
   
   const priceId = subscription.items.data[0]?.price?.id
   console.log('🔥 Price ID:', priceId)
@@ -249,8 +253,8 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
     return null
   }
 
-  const currentPeriodStart = toDateOrNull(subscriptionData.current_period_start)
-  const currentPeriodEnd = toDateOrNull(subscriptionData.current_period_end)
+  const currentPeriodStart = toDateOrNull(firstItem?.current_period_start)
+  const currentPeriodEnd = toDateOrNull(firstItem?.current_period_end)
   
   console.log('🔥 FINAL TIMESTAMPS:')
   console.log('🔥 - current_period_start:', currentPeriodStart)
