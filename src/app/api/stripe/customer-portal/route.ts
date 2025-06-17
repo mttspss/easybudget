@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+// Service role client for customer portal - bypasses RLS
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,10 +22,10 @@ export async function POST(request: NextRequest) {
     console.log('=== CUSTOMER PORTAL REQUEST ===')
     console.log('User ID:', userId)
 
-    // Get user's subscription from database with detailed logging
+    // Get user's subscription from database with detailed logging - USING SERVICE ROLE
     console.log('Querying user_subscriptions table for user_id:', userId)
     
-    const { data: subscription, error: dbError } = await supabase
+    const { data: subscription, error: dbError } = await supabaseAdmin
       .from('user_subscriptions')
       .select('*')
       .eq('user_id', userId)
@@ -30,7 +36,7 @@ export async function POST(request: NextRequest) {
     console.log('- database error:', dbError)
 
     // Also check if there are ANY subscriptions for this user
-    const { data: allSubscriptions, error: allSubsError } = await supabase
+    const { data: allSubscriptions, error: allSubsError } = await supabaseAdmin
       .from('user_subscriptions')
       .select('*')
       .eq('user_id', userId)
