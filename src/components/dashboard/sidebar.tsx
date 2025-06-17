@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
 // import { useSubscription } from "@/lib/use-subscription"  // Temporarily disabled
+import { useSubscriptionDebug } from "@/lib/use-subscription-debug"  // DEBUG VERSION
 import { Button } from "@/components/ui/button"
 import { 
   BarChart3,
@@ -78,6 +79,7 @@ export function Sidebar() {
   const { user, signOut } = useAuth()
   const router = useRouter()
   // const { planType, loading: subscriptionLoading } = useSubscription(user?.id) // Temporarily disabled
+  const { subscription, loading: subscriptionLoading, error } = useSubscriptionDebug(user?.id) // DEBUG
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
@@ -183,7 +185,11 @@ export function Sidebar() {
             <div className="text-sm font-semibold text-gray-900 truncate">
               {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
             </div>
-            <div className="text-xs text-gray-500">Free Plan</div>
+            <div className="text-xs text-gray-500">
+              {subscriptionLoading ? 'Loading...' : 
+               subscription?.plan_type ? `${subscription.plan_type.charAt(0).toUpperCase() + subscription.plan_type.slice(1)} Plan` : 'Free Plan'}
+              {error && <div className="text-red-500">Error: {error}</div>}
+            </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
