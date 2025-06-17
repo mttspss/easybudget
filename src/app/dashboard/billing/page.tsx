@@ -39,6 +39,9 @@ export default function BillingPage() {
   const handleManageBilling = async () => {
     setIsLoading(true)
     try {
+      console.log('=== OPENING CUSTOMER PORTAL ===')
+      console.log('User ID:', user.id)
+      
       const response = await fetch('/api/stripe/customer-portal', {
         method: 'POST',
         headers: {
@@ -49,16 +52,28 @@ export default function BillingPage() {
         }),
       })
 
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
       const data = await response.json()
+      console.log('Response data:', data)
+
+      if (!response.ok) {
+        console.error('API Error:', data)
+        toast.error(data.error || 'Failed to create portal session')
+        return
+      }
 
       if (data.url) {
+        console.log('Redirecting to:', data.url)
         window.location.href = data.url
       } else {
-        toast.error('Failed to open billing portal')
+        console.error('No URL in response:', data)
+        toast.error('No portal URL received')
       }
     } catch (error) {
       console.error('Error opening billing portal:', error)
-      toast.error('Something went wrong')
+      toast.error('Network error: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
       setIsLoading(false)
     }
