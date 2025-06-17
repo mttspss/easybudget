@@ -71,6 +71,11 @@ const sidebarItems = [
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: TrendingUp,
+  },
+  {
+    title: "Billing",
+    href: "/dashboard/billing",
+    icon: Settings,
   }
 ]
 
