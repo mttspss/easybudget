@@ -213,6 +213,16 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   console.log('🔥 Subscription ID:', subscription.id)
   console.log('🔥 Subscription status:', subscription.status)
   
+  // Cast to any to access timestamp properties
+  const subscriptionData = subscription as any
+  
+  // DEBUG: Log the raw subscription object to see timestamp structure
+  console.log('🔥 RAW SUBSCRIPTION OBJECT:', JSON.stringify(subscriptionData, null, 2))
+  console.log('🔥 Current period start RAW:', subscriptionData.current_period_start)
+  console.log('🔥 Current period end RAW:', subscriptionData.current_period_end)
+  console.log('🔥 Typeof current_period_start:', typeof subscriptionData.current_period_start)
+  console.log('🔥 Typeof current_period_end:', typeof subscriptionData.current_period_end)
+  
   const priceId = subscription.items.data[0]?.price?.id
   console.log('🔥 Price ID:', priceId)
   
@@ -227,28 +237,43 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   console.log('🔥 Plan type:', planType)
   console.log('🔥 Billing interval:', billingInterval)
 
-  // Safe timestamp conversion
-  const toDateOrNull = (timestamp?: number | null) => 
-    typeof timestamp === 'number' ? new Date(timestamp * 1000).toISOString() : null
+  // Safe timestamp conversion with enhanced logging
+  const toDateOrNull = (timestamp?: number | null) => {
+    console.log('🔥 Converting timestamp:', timestamp, 'typeof:', typeof timestamp)
+    if (typeof timestamp === 'number') {
+      const converted = new Date(timestamp * 1000).toISOString()
+      console.log('🔥 Converted to:', converted)
+      return converted
+    }
+    console.log('🔥 Timestamp is null/undefined, returning null')
+    return null
+  }
 
-  const subscriptionData = {
+  const currentPeriodStart = toDateOrNull(subscriptionData.current_period_start)
+  const currentPeriodEnd = toDateOrNull(subscriptionData.current_period_end)
+  
+  console.log('🔥 FINAL TIMESTAMPS:')
+  console.log('🔥 - current_period_start:', currentPeriodStart)
+  console.log('🔥 - current_period_end:', currentPeriodEnd)
+
+  const dataToUpsert = {
     user_id: userId,
     subscription_id: subscription.id,
     status: subscription.status,
     plan_type: planType,
     billing_interval: billingInterval,
-    current_period_start: toDateOrNull((subscription as any).current_period_start),
-    current_period_end: toDateOrNull((subscription as any).current_period_end),
+    current_period_start: currentPeriodStart,
+    current_period_end: currentPeriodEnd,
     canceled_at: subscription.canceled_at ? toDateOrNull(subscription.canceled_at) : null,
     updated_at: new Date().toISOString(),
   }
 
-  console.log('🔥 Subscription data to upsert:', JSON.stringify(subscriptionData, null, 2))
+  console.log('🔥 Subscription data to upsert:', JSON.stringify(dataToUpsert, null, 2))
 
   // Use service role client with conflict resolution
   const { error } = await supabaseAdmin
     .from('user_subscriptions')
-    .upsert(subscriptionData, { onConflict: 'user_id' })
+    .upsert(dataToUpsert, { onConflict: 'user_id' })
 
   if (error) {
     console.error('🔥 ERROR upserting subscription:', error)
@@ -257,6 +282,43 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
   }
 
   console.log('🔥 ✅ SUCCESS! Subscription updated for user:', userId)
-
   console.log('🔥 Plan type set to:', planType)
+}
+
+// TEMP: Manual trigger to test subscription sync
+async function manualSyncSubscription(subscriptionId: string) {
+  console.log('🔥 MANUAL SYNC TRIGGERED for subscription:', subscriptionId)
+  
+  try {
+    // Get subscription from Stripe
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+    console.log('🔥 Retrieved subscription from Stripe:', subscription.id)
+    
+    const userId = subscription.metadata?.userId
+    if (!userId) {
+      console.error('🔥 ERROR: No userId in subscription metadata!')
+      return { success: false, error: 'No userId in metadata' }
+    }
+    
+    // Force upsert
+    await upsertSubscription(subscription, userId)
+    
+    return { success: true, message: 'Subscription synced successfully' }
+  } catch (error) {
+    console.error('🔥 ERROR in manual sync:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// Add GET endpoint for manual testing
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url)
+  const subscriptionId = url.searchParams.get('subscription_id')
+  
+  if (!subscriptionId) {
+    return NextResponse.json({ error: 'subscription_id parameter required' }, { status: 400 })
+  }
+  
+  const result = await manualSyncSubscription(subscriptionId)
+  return NextResponse.json(result)
 } 
