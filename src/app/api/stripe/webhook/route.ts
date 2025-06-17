@@ -258,23 +258,5 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
 
   console.log('🔥 ✅ SUCCESS! Subscription updated for user:', userId)
 
-  // ALSO UPDATE USERS TABLE for consistency
-  console.log('🔥 ==> UPDATING USERS TABLE')
-  const { error: usersError } = await supabaseAdmin
-    .from('users')
-    .update({
-      subscription_status: subscription.status,
-      plan_type: planType,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', userId)
-
-  if (usersError) {
-    console.error('🔥 ERROR updating users table:', usersError)
-    // Don't throw - subscription update succeeded
-  } else {
-    console.log('🔥 ✅ SUCCESS! Users table updated too')
-  }
-
   console.log('🔥 Plan type set to:', planType)
 } 
