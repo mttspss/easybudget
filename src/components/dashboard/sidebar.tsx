@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
-import { useSubscription } from "@/lib/use-subscription"
+// import { useSubscription } from "@/lib/use-subscription"  // Temporarily disabled
 import { Button } from "@/components/ui/button"
 import { 
   BarChart3,
@@ -77,7 +77,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const router = useRouter()
-  const { planType, loading: subscriptionLoading } = useSubscription(user?.id)
+  // const { planType, loading: subscriptionLoading } = useSubscription(user?.id) // Temporarily disabled
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
@@ -183,10 +183,7 @@ export function Sidebar() {
             <div className="text-sm font-semibold text-gray-900 truncate">
               {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
             </div>
-            <div className="text-xs text-gray-500">
-              {subscriptionLoading ? 'Loading...' : 
-               planType && planType !== 'free' ? `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan` : 'Free Plan'}
-            </div>
+            <div className="text-xs text-gray-500">Free Plan</div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
