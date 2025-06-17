@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { 
   Plus, 
-  Filter, 
   ChevronDown, 
   Trash2, 
   Check,
@@ -144,11 +143,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm">
-          <Filter className="h-4 w-4 mr-1" />
-          Filter
-        </Button>
-
         {/* Create Dashboard Dialog */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>

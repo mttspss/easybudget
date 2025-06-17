@@ -14,7 +14,6 @@ import {
   BarChart3,
   Activity,
   Target,
-  Filter,
   Download,
   ArrowUpRight,
   ArrowDownRight,
@@ -391,10 +390,6 @@ export default function AnalyticsPage() {
                     placeholder="Custom range"
                   />
                   
-                  <Button variant="outline" size="sm" className="h-7 text-xs">
-                    <Filter className="h-3 w-3 mr-1" />
-                  Filter
-                </Button>
                   <Button variant="outline" size="sm" className="h-7 text-xs">
                     <Download className="h-3 w-3 mr-1" />
                   Export

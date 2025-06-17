@@ -113,33 +113,33 @@ export default function BillingPage() {
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-3">
-          <div className="max-w-7xl mx-auto space-y-3">
+          <div className="max-w-5xl mx-auto space-y-2">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Billing & Subscription</h1>
+                <h1 className="text-lg font-bold text-gray-900">Billing & Subscription</h1>
                 <p className="text-gray-600 text-xs">Manage your subscription, billing, and payment methods</p>
               </div>
             </div>
 
             {/* Current Plan */}
             <Card className="bg-white border-0 shadow-sm">
-              <CardHeader className="border-b border-gray-100 pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <CreditCard className="h-5 w-5 text-gray-600" />
+              <CardHeader className="border-b border-gray-100 py-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CreditCard className="h-4 w-4 text-gray-600" />
                   Current Plan
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${getPlanColor(planType)}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${getPlanColor(planType)}`}>
                       {getPlanIcon(planType)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-900">
                           {planType.charAt(0).toUpperCase() + planType.slice(1)} Plan
                         </h3>
                         <Badge className={getPlanColor(planType)}>
@@ -147,7 +147,7 @@ export default function BillingPage() {
                         </Badge>
                       </div>
                       {subscription?.billing_interval && (
-                        <p className="text-gray-600 mt-1">
+                        <p className="text-gray-600 text-sm mt-0.5">
                           Billed {subscription.billing_interval}ly
                         </p>
                       )}
@@ -159,6 +159,7 @@ export default function BillingPage() {
                       onClick={handleManageBilling}
                       disabled={isLoading}
                       className="flex items-center gap-2"
+                      size="sm"
                     >
                       <Settings className="h-4 w-4" />
                       {isLoading ? 'Loading...' : 'Manage Billing'}
@@ -171,14 +172,14 @@ export default function BillingPage() {
 
             {/* Subscription Details */}
             {subscription && planType !== 'free' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 text-blue-600" />
+                      <Calendar className="h-4 w-4 text-blue-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-900">Current Period</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-xs text-gray-600 mt-0.5">
                           {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}
                         </p>
                       </div>
@@ -187,12 +188,12 @@ export default function BillingPage() {
                 </Card>
 
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <CreditCard className="h-5 w-5 text-green-600" />
+                      <CreditCard className="h-4 w-4 text-green-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-900">Status</p>
-                        <p className="text-sm text-gray-600 capitalize">
+                        <p className="text-xs text-gray-600 capitalize mt-0.5">
                           {subscription.status}
                         </p>
                       </div>
@@ -201,12 +202,12 @@ export default function BillingPage() {
                 </Card>
 
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <Settings className="h-5 w-5 text-purple-600" />
+                      <Settings className="h-4 w-4 text-purple-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-900">Subscription ID</p>
-                        <p className="text-sm text-gray-600 font-mono">
+                        <p className="text-xs text-gray-600 font-mono mt-0.5">
                           {subscription.subscription_id?.slice(-12) || 'N/A'}
                         </p>
                       </div>
@@ -219,17 +220,18 @@ export default function BillingPage() {
             {/* Free Plan Upgrade */}
             {planType === 'free' && (
               <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-base font-semibold text-gray-900 mb-2">
                       Ready to unlock more features?
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 text-sm mb-3">
                       Upgrade to a paid plan to access advanced analytics, unlimited transactions, and priority support.
                     </p>
                     <Button 
                       onClick={() => window.location.href = '/#pricing'}
                       className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      size="sm"
                     >
                       View Plans
                       <ExternalLink className="h-4 w-4 ml-2" />
@@ -241,11 +243,11 @@ export default function BillingPage() {
 
             {/* Help Section */}
             <Card className="bg-white border-0 shadow-sm">
-              <CardHeader className="border-b border-gray-100 pb-4">
-                <CardTitle className="text-lg">Need Help?</CardTitle>
+              <CardHeader className="border-b border-gray-100 py-3">
+                <CardTitle className="text-base">Need Help?</CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-3">
+              <CardContent className="p-4">
+                <div className="space-y-2">
                   <p className="text-gray-600 text-sm">
                     • <strong>Change Plan:</strong> Use the &ldquo;Manage Billing&rdquo; button to upgrade, downgrade, or cancel
                   </p>
