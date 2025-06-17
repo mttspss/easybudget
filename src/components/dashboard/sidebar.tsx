@@ -184,7 +184,8 @@ export function Sidebar() {
               {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
             </div>
             <div className="text-xs text-gray-500">
-              {subscriptionLoading ? 'Loading...' : `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`}
+              {subscriptionLoading ? 'Loading...' : 
+               planType && planType !== 'free' ? `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan` : 'Free Plan'}
             </div>
           </div>
           <DropdownMenu>

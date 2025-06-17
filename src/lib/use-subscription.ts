@@ -69,18 +69,21 @@ export function useSubscription(userId: string | undefined) {
     const plan = PLANS[planType]
     if (!plan) return false
 
+    // Safety check: ensure starter plan exists before checking features
+    if (!PLANS.starter) return false
+
     // Pro and Growth have all Starter features
     if ((planType === 'pro' || planType === 'growth') && 
-        PLANS.starter.features.includes(feature)) {
+        PLANS.starter.features && PLANS.starter.features.includes(feature)) {
       return true
     }
     
     // Growth has all Pro features
-    if (planType === 'growth' && PLANS.pro.features.includes(feature)) {
+    if (planType === 'growth' && PLANS.pro && PLANS.pro.features && PLANS.pro.features.includes(feature)) {
       return true
     }
     
-    return plan.features.includes(feature)
+    return plan.features && plan.features.includes(feature)
   }
 
   const isActive = (): boolean => {
