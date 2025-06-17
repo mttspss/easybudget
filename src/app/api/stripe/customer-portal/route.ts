@@ -16,16 +16,41 @@ export async function POST(request: NextRequest) {
     console.log('=== CUSTOMER PORTAL REQUEST ===')
     console.log('User ID:', userId)
 
-    // Get user's subscription from database
-    const { data: subscription } = await supabase
+    // Get user's subscription from database with detailed logging
+    console.log('Querying user_subscriptions table for user_id:', userId)
+    
+    const { data: subscription, error: dbError } = await supabase
       .from('user_subscriptions')
-      .select('subscription_id')
+      .select('*')
       .eq('user_id', userId)
       .single()
 
+    console.log('Database query result:')
+    console.log('- subscription data:', subscription)
+    console.log('- database error:', dbError)
+
+    // Also check if there are ANY subscriptions for this user
+    const { data: allSubscriptions, error: allSubsError } = await supabase
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+
+    console.log('All subscriptions for user:')
+    console.log('- all subscriptions:', allSubscriptions)
+    console.log('- all subscriptions error:', allSubsError)
+
     if (!subscription?.subscription_id) {
       return NextResponse.json(
-        { error: 'No active subscription found' },
+        { 
+          error: 'No active subscription found',
+          debug: {
+            userId,
+            subscription,
+            allSubscriptions,
+            dbError,
+            allSubsError
+          }
+        },
         { status: 404 }
       )
     }
