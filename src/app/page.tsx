@@ -471,136 +471,69 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Problem Section - Pain Points */}
-      <section className="py-20 px-6 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Stop the financial chaos 🔥
+      {/* Problem Section - Minimal Style */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          
+          {/* Main Problem Statement */}
+          <div className="mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight">
+              Financial chaos lives in scattered<br />
+              spreadsheets and forgotten goals
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Most people waste <span className="font-bold text-red-600">3+ hours every month</span> on 
-              financial admin. Here&apos;s what we&apos;re fixing:
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Where are all those budgets you started and savings goals you set?
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start mb-16">
-            {/* Left: Problems */}
-            <div className="space-y-6">
-              <div className="text-center lg:text-left mb-8">
-                <h3 className="text-2xl font-bold text-red-600 mb-2">
-                  😩 Without EasyBudget
-                </h3>
-                <p className="text-gray-500">The painful reality most people live with</p>
-              </div>
-              
-              {[
-                {
-                  emoji: "😤",
-                  title: "Spreadsheet Hell", 
-                  desc: "Hours wasted copying transactions from 5 different bank PDFs into Excel every month"
-                },
-                {
-                  emoji: "😵‍💫", 
-                  title: "Zero Financial Overview",
-                  desc: "No idea how much you actually have across all accounts, or where your money goes"
-                },
-                {
-                  emoji: "📊❌",
-                  title: "Budget Guesswork", 
-                  desc: "Making financial decisions based on gut feeling instead of real data"
-                },
-                {
-                  emoji: "🎯💸",
-                  title: "Goal Tracking Failure",
-                  desc: "Savings goals written in notes app, forgotten after 2 weeks, zero progress tracking"
-                }
-              ].map((problem, i) => (
-                <div key={i} className="group hover:scale-105 transition-all duration-300">
-                  <div className="flex gap-4 p-6 bg-white rounded-2xl border-2 border-red-100 shadow-lg hover:shadow-xl">
-                    <div className="text-3xl">{problem.emoji}</div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 mb-2 text-lg">{problem.title}</h4>
-                      <p className="text-gray-600">{problem.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {/* 3 Simple Steps - Problems */}
+          <div className="grid md:grid-cols-3 gap-16 mb-20">
+            <div className="space-y-4">
+              <div className="text-5xl mb-6">📊</div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Track expenses in Excel
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Hours copying bank PDFs into spreadsheets every month
+              </p>
             </div>
-
-            {/* Right: Solutions */}
-            <div className="space-y-6">
-              <div className="text-center lg:text-left mb-8">
-                <h3 className="text-2xl font-bold text-green-600 mb-2">
-                  🚀 With EasyBudget
-                </h3>
-                <p className="text-gray-500">What your financial life could look like</p>
-              </div>
-              
-              {[
-                {
-                  emoji: "⚡️",
-                  title: "One-Click CSV Import",
-                  desc: "Upload all your bank statements in seconds. Any format, any bank, instantly organized"
-                },
-                {
-                  emoji: "📊✨",
-                  title: "Live Financial Dashboard", 
-                  desc: "See your total balance, monthly trends, and spending patterns in one beautiful view"
-                },
-                {
-                  emoji: "🧠💡",
-                  title: "Data-Driven Decisions",
-                  desc: "Beautiful charts and analytics show exactly where every euro goes, no more guessing"
-                },
-                {
-                  emoji: "🎯📈",
-                  title: "Visual Goal Tracking",
-                  desc: "Set savings goals with progress bars that actually motivate you to save more"
-                }
-              ].map((solution, i) => (
-                <div key={i} className="group hover:scale-105 transition-all duration-300">
-                  <div className="flex gap-4 p-6 bg-white rounded-2xl border-2 border-green-100 shadow-lg hover:shadow-xl">
-                    <div className="text-3xl">{solution.emoji}</div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 mb-2 text-lg">{solution.title}</h4>
-                      <p className="text-gray-600">{solution.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            
+            <div className="space-y-4">
+              <div className="text-5xl mb-6">🤷‍♂️</div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Lose track of everything
+              </h3>
+              <p className="text-gray-600 text-sm">
+                No idea where your money actually goes each month
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="text-5xl mb-6">🔄</div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Repeat the same cycle
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Make financial decisions based on guesswork
+              </p>
             </div>
           </div>
 
-          {/* Stats Row */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="text-4xl mb-2">⏱️</div>
-              <div className="text-3xl font-bold text-gray-900">3+ hours</div>
-              <div className="text-gray-600">saved every month</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="text-4xl mb-2">💰</div>
-              <div className="text-3xl font-bold text-gray-900">100%</div>
-              <div className="text-gray-600">financial overview</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="text-4xl mb-2">📈</div>
-              <div className="text-3xl font-bold text-gray-900">Real-time</div>
-              <div className="text-gray-600">insights & analytics</div>
-            </div>
-          </div>
-
-          {/* Strong CTA */}
-          <div className="text-center">
+          {/* Solution Statement */}
+          <div className="border-t border-gray-200 pt-20">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+              From chaos to clarity in seconds
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12">
+              Import any bank statement, get instant insights, track real progress
+            </p>
+            
             <button 
               onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-xl font-bold px-12 py-6 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              className="bg-black text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-800 transition-colors"
             >
-              Stop the chaos, start organizing 🎯
-              <ArrowRight className="inline ml-3 h-6 w-6" />
+              Start organizing today
             </button>
-            <p className="text-gray-500 mt-4 text-sm">Takes less than 2 minutes to set up</p>
           </div>
         </div>
       </section>
