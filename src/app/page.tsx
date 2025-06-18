@@ -435,7 +435,7 @@ export default function LandingPage() {
                 {/* X.com */}
                 <div className="flex items-center gap-2">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#000000">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
                   </svg>
                   <span className="text-sm font-medium text-gray-600">X.com</span>
                 </div>
@@ -467,6 +467,140 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem Section - Pain Points */}
+      <section className="py-20 px-6 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Stop the financial chaos 🔥
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Most people waste <span className="font-bold text-red-600">3+ hours every month</span> on 
+              financial admin. Here&apos;s what we&apos;re fixing:
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-start mb-16">
+            {/* Left: Problems */}
+            <div className="space-y-6">
+              <div className="text-center lg:text-left mb-8">
+                <h3 className="text-2xl font-bold text-red-600 mb-2">
+                  😩 Without EasyBudget
+                </h3>
+                <p className="text-gray-500">The painful reality most people live with</p>
+              </div>
+              
+              {[
+                {
+                  emoji: "😤",
+                  title: "Spreadsheet Hell", 
+                  desc: "Hours wasted copying transactions from 5 different bank PDFs into Excel every month"
+                },
+                {
+                  emoji: "😵‍💫", 
+                  title: "Zero Financial Overview",
+                  desc: "No idea how much you actually have across all accounts, or where your money goes"
+                },
+                {
+                  emoji: "📊❌",
+                  title: "Budget Guesswork", 
+                  desc: "Making financial decisions based on gut feeling instead of real data"
+                },
+                {
+                  emoji: "🎯💸",
+                  title: "Goal Tracking Failure",
+                  desc: "Savings goals written in notes app, forgotten after 2 weeks, zero progress tracking"
+                }
+              ].map((problem, i) => (
+                <div key={i} className="group hover:scale-105 transition-all duration-300">
+                  <div className="flex gap-4 p-6 bg-white rounded-2xl border-2 border-red-100 shadow-lg hover:shadow-xl">
+                    <div className="text-3xl">{problem.emoji}</div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2 text-lg">{problem.title}</h4>
+                      <p className="text-gray-600">{problem.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right: Solutions */}
+            <div className="space-y-6">
+              <div className="text-center lg:text-left mb-8">
+                <h3 className="text-2xl font-bold text-green-600 mb-2">
+                  🚀 With EasyBudget
+                </h3>
+                <p className="text-gray-500">What your financial life could look like</p>
+              </div>
+              
+              {[
+                {
+                  emoji: "⚡️",
+                  title: "One-Click CSV Import",
+                  desc: "Upload all your bank statements in seconds. Any format, any bank, instantly organized"
+                },
+                {
+                  emoji: "📊✨",
+                  title: "Live Financial Dashboard", 
+                  desc: "See your total balance, monthly trends, and spending patterns in one beautiful view"
+                },
+                {
+                  emoji: "🧠💡",
+                  title: "Data-Driven Decisions",
+                  desc: "Beautiful charts and analytics show exactly where every euro goes, no more guessing"
+                },
+                {
+                  emoji: "🎯📈",
+                  title: "Visual Goal Tracking",
+                  desc: "Set savings goals with progress bars that actually motivate you to save more"
+                }
+              ].map((solution, i) => (
+                <div key={i} className="group hover:scale-105 transition-all duration-300">
+                  <div className="flex gap-4 p-6 bg-white rounded-2xl border-2 border-green-100 shadow-lg hover:shadow-xl">
+                    <div className="text-3xl">{solution.emoji}</div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2 text-lg">{solution.title}</h4>
+                      <p className="text-gray-600">{solution.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
+              <div className="text-4xl mb-2">⏱️</div>
+              <div className="text-3xl font-bold text-gray-900">3+ hours</div>
+              <div className="text-gray-600">saved every month</div>
+            </div>
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
+              <div className="text-4xl mb-2">💰</div>
+              <div className="text-3xl font-bold text-gray-900">100%</div>
+              <div className="text-gray-600">financial overview</div>
+            </div>
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
+              <div className="text-4xl mb-2">📈</div>
+              <div className="text-3xl font-bold text-gray-900">Real-time</div>
+              <div className="text-gray-600">insights & analytics</div>
+            </div>
+          </div>
+
+          {/* Strong CTA */}
+          <div className="text-center">
+            <button 
+              onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-xl font-bold px-12 py-6 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              Stop the chaos, start organizing 🎯
+              <ArrowRight className="inline ml-3 h-6 w-6" />
+            </button>
+            <p className="text-gray-500 mt-4 text-sm">Takes less than 2 minutes to set up</p>
           </div>
         </div>
       </section>
