@@ -472,7 +472,7 @@ export default function LandingPage() {
       </section>
 
       {/* Problem Section - First Part: ONLY PROBLEMS */}
-      <section className="pt-16 pb-56 px-6 bg-white">
+      <section className="min-h-screen flex flex-col justify-center items-center px-6 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           
           {/* Problem Statement */}
@@ -545,7 +545,7 @@ export default function LandingPage() {
       </section>
 
       {/* Solution Section - Second Part: ONLY SOLUTIONS */}
-      <section className="pt-24 pb-12 px-6 bg-white">
+      <section className="min-h-screen flex flex-col justify-center items-center px-6 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           
           {/* Solution Statement */}
