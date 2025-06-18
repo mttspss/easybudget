@@ -1,94 +1,26 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useOnboarding, tourSteps } from '@/lib/onboarding-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Rocket, BarChart3, Wallet, Upload, PartyPopper } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 
-interface WelcomeTourProps {
-  isOpen: boolean
-  onClose: () => void
-}
+const icons = [Rocket, Wallet, Upload, BarChart3, PartyPopper, PartyPopper, PartyPopper]
 
-const tourSteps = [
-  {
-    icon: Rocket,
-    title: "Welcome to easybudget!",
-    description: "Let's take a quick tour to get you started on the path to financial clarity.",
-    buttonText: "Let's go!",
-  },
-  {
-    icon: Wallet,
-    title: "This is your Dashboard",
-    description: "Here you'll see a complete overview of your finances: balance, income, expenses, and savings. Everything in one place.",
-    buttonText: "Next",
-  },
-  {
-    icon: Upload,
-    title: "Your First Step: Import Data",
-    description: "The magic begins when you import your transactions. Click 'Import' in the sidebar to upload your first CSV file.",
-    buttonText: "Got it, next",
-    action: 'highlight-import'
-  },
-  {
-    icon: BarChart3,
-    title: "Watch Your Finances Come to Life",
-    description: "Once imported, our AI will automatically categorize your transactions and generate beautiful, insightful charts.",
-    buttonText: "Let's do this!",
-  },
-  {
-    icon: PartyPopper,
-    title: "You're all set!",
-    description: "You're ready to take control of your money. Enjoy the clarity!",
-    buttonText: "Finish Tour",
-  }
-]
+export function WelcomeTour() {
+  const { isTourOpen, currentStep, nextStep, endTour, goToStep } = useOnboarding()
 
-export function WelcomeTour({ isOpen, onClose }: WelcomeTourProps) {
-  const [currentStep, setCurrentStep] = useState(0)
-  const { user } = useAuth()
-  const router = useRouter()
-  
-  const handleNext = () => {
-    if (currentStep < tourSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
-    } else {
-      handleFinish()
-    }
+  if (!isTourOpen) {
+    return null
   }
   
-  const handleFinish = async () => {
-    if (!user) return
-    try {
-      await supabase
-        .from('user_preferences')
-        .update({ has_completed_onboarding: true })
-        .eq('user_id', user.id)
-      onClose()
-      // Optional: redirect to import page after tour
-      router.push('/dashboard/import')
-    } catch (error) {
-      console.error("Failed to update onboarding status:", error)
-      onClose() // Still close the modal on error
-    }
-  }
-
-  // Reset step if dialog is reopened
-  useEffect(() => {
-    if (isOpen) {
-      setCurrentStep(0)
-    }
-  }, [isOpen])
-
-  const step = tourSteps[currentStep]
-  const Icon = step.icon
+  const stepData = tourSteps[currentStep]
+  const Icon = icons[currentStep] || Rocket
+  const isLastStep = currentStep === tourSteps.length - 1
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isTourOpen} onOpenChange={(open) => !open && endTour()}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
@@ -105,15 +37,34 @@ export function WelcomeTour({ isOpen, onClose }: WelcomeTourProps) {
                 </div>
               </div>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold mb-2">{step.title}</DialogTitle>
+                <DialogTitle className="text-2xl font-bold mb-2">{stepData.title}</DialogTitle>
                 <DialogDescription className="text-gray-600">
-                  {step.description}
+                  {stepData.description}
                 </DialogDescription>
               </DialogHeader>
             </div>
-            <DialogFooter className="bg-gray-50 p-4">
-                <Button onClick={handleNext} className="w-full bg-green-500 hover:bg-green-600">
-                    {step.buttonText}
+            
+            {/* Progress Dots */}
+            <div className="flex justify-center items-center gap-2 mb-4">
+              {tourSteps.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToStep(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    currentStep === index ? 'w-4 bg-green-500' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to step ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            <DialogFooter className="bg-gray-50 p-4 flex justify-between">
+                <Button onClick={endTour} variant="ghost">
+                    Skip Tour
+                </Button>
+                <Button onClick={nextStep} className="bg-green-500 hover:bg-green-600">
+                    {isLastStep ? 'Finish Tour' : 'Next'}
+                    {!isLastStep && <motion.div animate={{ x: [0, 3, 0] }} transition={{ repeat: Infinity, duration: 1}} className="ml-2">→ </motion.div>}
                 </Button>
             </DialogFooter>
           </motion.div>

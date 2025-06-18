@@ -1,4 +1,10 @@
-import { DashboardProvider } from '@/lib/dashboard-context'
+"use client"
+
+import { AuthProvider } from "@/lib/auth-context"
+import { DashboardProvider } from "@/lib/dashboard-context"
+import { OnboardingProvider } from "@/lib/onboarding-context"
+import { Toaster } from "@/components/ui/sonner"
+import { WelcomeTour } from "@/components/onboarding/welcome-tour"
 
 export default function DashboardLayout({
   children,
@@ -6,10 +12,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <DashboardProvider>
-      <div className="h-screen bg-gray-50">
-        {children}
-      </div>
-    </DashboardProvider>
+    <AuthProvider>
+      <DashboardProvider>
+        <OnboardingProvider>
+          {children}
+          <WelcomeTour />
+          <Toaster />
+        </OnboardingProvider>
+      </DashboardProvider>
+    </AuthProvider>
   )
 } 

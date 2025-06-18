@@ -45,7 +45,7 @@ import {
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
-import { WelcomeTour } from "@/components/onboarding/welcome-tour"
+import { useOnboarding } from "@/lib/onboarding-context"
 
 interface DashboardStats {
   totalBalance: number
@@ -94,10 +94,10 @@ const monthlyChartConfig = {
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { startTour } = useOnboarding()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showWelcomeTour, setShowWelcomeTour] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [balancePeriod, setBalancePeriod] = useState("3months")
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
@@ -135,7 +135,7 @@ export default function Dashboard() {
         .single()
 
       if (preferences && !preferences.has_completed_onboarding) {
-        setShowWelcomeTour(true)
+        startTour()
       }
       
       // Get current month transactions
@@ -367,7 +367,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }, [user, balancePeriod, activeDashboard])
+  }, [user, balancePeriod, activeDashboard, startTour])
 
   useEffect(() => {
     if (user) {
@@ -463,8 +463,6 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
-      <WelcomeTour isOpen={showWelcomeTour} onClose={() => setShowWelcomeTour(false)} />
-
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-3">
           <div className="max-w-7xl mx-auto space-y-3">
