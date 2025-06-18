@@ -88,6 +88,7 @@ export type Database = {
           push_notifications: boolean
           weekly_reports: boolean
           budget_alerts: boolean
+          has_completed_onboarding: boolean
           created_at: string
           updated_at: string
         }
@@ -102,6 +103,7 @@ export type Database = {
           push_notifications?: boolean
           weekly_reports?: boolean
           budget_alerts?: boolean
+          has_completed_onboarding?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -116,6 +118,7 @@ export type Database = {
           push_notifications?: boolean
           weekly_reports?: boolean
           budget_alerts?: boolean
+          has_completed_onboarding?: boolean
           created_at?: string
           updated_at?: string
         }

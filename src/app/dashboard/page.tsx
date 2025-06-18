@@ -18,7 +18,8 @@ import {
   ChevronRight,
   Clock,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  AlertTriangle
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -44,6 +45,7 @@ import {
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
+import { WelcomeTour } from "@/components/onboarding/welcome-tour"
 
 interface DashboardStats {
   totalBalance: number
@@ -94,6 +96,8 @@ export default function Dashboard() {
   const { activeDashboard } = useDashboards()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showWelcomeTour, setShowWelcomeTour] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [balancePeriod, setBalancePeriod] = useState("3months")
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
@@ -104,6 +108,7 @@ export default function Dashboard() {
     
     try {
       setIsLoading(true)
+      setError(null)
       
       const now = new Date()
       const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -120,6 +125,17 @@ export default function Dashboard() {
         } else {
           return query.is('dashboard_id', null)
         }
+      }
+      
+      // Fetch user preferences to check onboarding status
+      const { data: preferences } = await supabase
+        .from('user_preferences')
+        .select('has_completed_onboarding')
+        .eq('user_id', user.id)
+        .single()
+
+      if (preferences && !preferences.has_completed_onboarding) {
+        setShowWelcomeTour(true)
       }
       
       // Get current month transactions
@@ -347,6 +363,7 @@ export default function Dashboard() {
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
+      setError("Failed to load your dashboard. Please try again in a moment.")
     } finally {
       setIsLoading(false)
     }
@@ -378,6 +395,27 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen bg-gray-50/50">
+        <Sidebar />
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+          <div className="bg-white p-8 rounded-lg shadow-md border border-red-200">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops! Something went wrong.</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <Button onClick={fetchDashboardData}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 animate-spin-slow"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Try Again
+            </Button>
+          </div>
+        </div>
       </div>
     )
   }
@@ -425,6 +463,8 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       
+      <WelcomeTour isOpen={showWelcomeTour} onClose={() => setShowWelcomeTour(false)} />
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-3">
           <div className="max-w-7xl mx-auto space-y-3">
