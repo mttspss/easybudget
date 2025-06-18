@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { useDashboards } from '@/lib/dashboard-context'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -10,7 +11,7 @@ import { TrendingUp, TrendingDown, DollarSign, PieChart as PieIcon, BarChart2, A
 import { formatCurrency, formatCurrencyShort, getUserCurrency, CurrencyConfig } from '@/lib/currency'
 import { Button } from '@/components/ui/button'
 import { Sidebar } from '@/components/dashboard/sidebar'
-import { DashboardHeader } from '@/components/dashboard-header'
+import { DashboardSelector } from '@/components/dashboard-selector'
 
 type Transaction = {
   date: string;
@@ -41,6 +42,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1943'
 
 export default function AnalyticsPage() {
   const { user } = useAuth()
+  const { activeDashboard } = useDashboards()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,11 +70,21 @@ export default function AnalyticsPage() {
         const months = period === '3m' ? 3 : period === '6m' ? 6 : 12
         dateFrom.setMonth(dateFrom.getMonth() - months)
 
-        const { data: transactions, error } = await supabase
+        // buildQuery helper to apply dashboard filter
+        const buildQuery = (query: any) => {
+          if (activeDashboard?.id) {
+            return query.eq('dashboard_id', activeDashboard.id)
+          }
+          return query.is('dashboard_id', null)
+        }
+
+        const transactionQuery = supabase
           .from('transactions')
           .select('date, amount, type, categories ( name, color )')
           .eq('user_id', user.id)
           .gte('date', dateFrom.toISOString())
+
+        const { data: transactions, error } = await buildQuery(transactionQuery)
 
         if (error) throw error
         if (!transactions) throw new Error("No transactions found")
@@ -123,6 +135,7 @@ export default function AnalyticsPage() {
         // Key Business Metrics
         const netCashFlow = totalIncome - totalExpenses
         const burnRate = totalExpenses / months
+        // TODO: The get_total_balance RPC function needs to be scoped by dashboard_id for this to be accurate.
         const { data: balanceData } = await supabase.rpc('get_total_balance', { p_user_id: user.id })
         const runway = balanceData > 0 && burnRate > 0 ? balanceData / burnRate : 0
         const profitMargin = totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0
@@ -177,7 +190,7 @@ export default function AnalyticsPage() {
     }
 
     fetchAnalyticsData()
-  }, [user, period])
+  }, [user, period, activeDashboard])
   
   const StatCard = ({ title, value, icon: Icon, change, changeType, unit }: any) => (
     <Card>
@@ -202,20 +215,120 @@ export default function AnalyticsPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
       <main className="flex-1 overflow-auto p-3">
-        <DashboardHeader user={user} />
-          <div className="p-6 space-y-4">
-            <div className="h-10 w-48 bg-gray-200 rounded animate-pulse"></div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {[...Array(8)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="h-80 bg-gray-200 rounded animate-pulse lg:col-span-2"></div>
-              <div className="h-80 bg-gray-200 rounded animate-pulse"></div>
-            </div>
+        <div className="space-y-4 p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
+            <DashboardSelector />
           </div>
-        </main>
-      </div>
+
+          <div className="border-b border-gray-200"></div>
+
+          <div className="flex items-center justify-end space-x-2">
+              <Select value={period} onValueChange={setPeriod}>
+                <SelectTrigger className="w-[180px] h-9">
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3m">Last 3 Months</SelectItem>
+                  <SelectItem value="6m">Last 6 Months</SelectItem>
+                  <SelectItem value="12m">Last 12 Months</SelectItem>
+                </SelectContent>
+              </Select>
+          </div>
+          
+          {/* Business KPI Row */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data?.netCashFlow || 0, currency) : '...'} icon={Briefcase} />
+            <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data?.burnRate || 0, currency) : '...'} icon={Zap} />
+            <StatCard title="Runway" value={`${(data?.runway || 0).toFixed(1)}`} unit=" months" icon={Gauge} />
+            <StatCard title="Profit Margin" value={`${(data?.profitMargin || 0).toFixed(1)}`} unit="%" icon={TrendingUp} />
+          </div>
+
+          {/* Standard Metrics Row */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data?.avgMonthlyIncome || 0, currency) : '...'} icon={TrendingUp} />
+            <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data?.avgMonthlyExpenses || 0, currency) : '...'} icon={TrendingDown} />
+            <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data?.dailyAverage || 0, currency) : '...'} icon={DollarSign} />
+            <StatCard title="Monthly Projection" value={currency ? formatCurrency(data?.monthlyProjection || 0, currency) : '...'} icon={BarChart2} />
+            <StatCard title="Top Expense Category" value={data?.topCategory} icon={PieIcon} />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-1">
+              <Card>
+                  <CardHeader>
+                      <CardTitle>Cash Flow Sankey</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <ResponsiveContainer width="100%" height={400}>
+                          <>
+                              {data?.sankeyData && data.sankeyData.nodes.length > 0 ? (
+                                  <Sankey
+                                      data={data.sankeyData}
+                                      nodePadding={50}
+                                      margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                                      link={{ stroke: '#B3C4D8' }}
+                                  >
+                                      <Tooltip />
+                                  </Sankey>
+                              ) : (
+                                  <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                                      Not enough data to display cash flow.
+                                  </div>
+                              )}
+                          </>
+                      </ResponsiveContainer>
+                  </CardContent>
+              </Card>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={data?.monthlyBreakdown}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
+                    <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                    <Legend />
+                    <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
+                    <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="col-span-4 md:col-span-3">
+              <CardHeader>
+                <CardTitle>Expense Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie data={data?.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
+                         label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                           const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                           const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                           const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                           return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
+                         }}>
+                      {data?.categoryBreakdown.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                    <Legend wrapperStyle={{fontSize: "12px"}}/>
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
     </div>
+  </div>
     )
   }
 
@@ -225,16 +338,15 @@ export default function AnalyticsPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
       <main className="flex-1 overflow-auto p-3">
-        <DashboardHeader user={user} />
-          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </div>
-        </main>
-      </div>
+        <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </main>
     </div>
+  </div>
       )
     }
 
@@ -243,13 +355,17 @@ export default function AnalyticsPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-3">
-          <DashboardHeader user={user} />
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">Business Analytics</h2>
-              <div className="flex items-center space-x-2">
+          <div className="space-y-4 p-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
+              <DashboardSelector />
+            </div>
+
+            <div className="border-b border-gray-200"></div>
+
+            <div className="flex items-center justify-end space-x-2">
                 <Select value={period} onValueChange={setPeriod}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] h-9">
                     <SelectValue placeholder="Select period" />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,7 +374,6 @@ export default function AnalyticsPage() {
                     <SelectItem value="12m">Last 12 Months</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
             </div>
             
             {/* Business KPI Row */}
