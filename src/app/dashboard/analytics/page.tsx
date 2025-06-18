@@ -70,7 +70,6 @@ export default function AnalyticsPage() {
         const months = period === '3m' ? 3 : period === '6m' ? 6 : 12
         dateFrom.setMonth(dateFrom.getMonth() - months)
 
-        // buildQuery helper to apply dashboard filter
         const buildQuery = (query: any) => {
           if (activeDashboard?.id) {
             return query.eq('dashboard_id', activeDashboard.id)
@@ -87,7 +86,10 @@ export default function AnalyticsPage() {
         const { data: transactions, error } = await buildQuery(transactionQuery)
 
         if (error) throw error
-        if (!transactions) throw new Error("No transactions found")
+        if (!transactions || transactions.length === 0) {
+            setData(null) // Set data to null to show empty state
+            return
+        }
 
         const typedTransactions = transactions as Transaction[];
         
@@ -96,51 +98,52 @@ export default function AnalyticsPage() {
         const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0)
         const totalIncome = income.reduce((sum, t) => sum + t.amount, 0)
 
-        // Sankey Chart Data
-        const nodes = [{ name: 'Income' }];
-        const incomeSources = new Map<string, number>();
-        income.forEach(t => {
-            const sourceName = t.categories?.[0]?.name || 'Other Income';
-            if(!incomeSources.has(sourceName)) {
-                nodes.push({ name: sourceName });
-                incomeSources.set(sourceName, nodes.length - 1);
-            }
-        });
-        const expenseCategories = new Map<string, number>();
+        const categoryMap = new Map<string, { value: number, color: string }>()
         expenses.forEach(t => {
-            const catName = t.categories?.[0]?.name || 'Uncategorized';
-            if(!expenseCategories.has(catName)) {
-                nodes.push({ name: catName });
-                expenseCategories.set(catName, nodes.length - 1);
-            }
-        });
+          const name = t.categories?.[0]?.name || 'Uncategorized'
+          const color = t.categories?.[0]?.color || '#8884d8'
+          if (!categoryMap.has(name)) categoryMap.set(name, { value: 0, color })
+          categoryMap.get(name)!.value += t.amount
+        })
+        const categoryBreakdown = Array.from(categoryMap.entries()).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.value - a.value)
 
-        const links: { source: number, target: number, value: number }[] = [];
-        income.forEach(t => {
-            const sourceName = t.categories?.[0]?.name || 'Other Income';
-            const sourceIndex = incomeSources.get(sourceName);
-            if (sourceIndex !== undefined) {
-                 links.push({ source: sourceIndex, target: 0, value: t.amount });
+        // Sankey Chart Data: Total Income -> Categories & Savings
+        const sankeyNodes: { name: string }[] = [{ name: 'Total Income' }]
+        const sankeyLinks: { source: number; target: number; value: number }[] = []
+        const nodeMap = new Map<string, number>([['Total Income', 0]])
+
+        categoryBreakdown.forEach(cat => {
+            if (!nodeMap.has(cat.name)) {
+                nodeMap.set(cat.name, sankeyNodes.length)
+                sankeyNodes.push({ name: cat.name })
             }
-        });
-        expenses.forEach(t => {
-            const catName = t.categories?.[0]?.name || 'Uncategorized';
-            const targetIndex = expenseCategories.get(catName);
-            if (targetIndex !== undefined) {
-                links.push({ source: 0, target: targetIndex, value: t.amount });
+            sankeyLinks.push({
+                source: 0, // Total Income
+                target: nodeMap.get(cat.name)!,
+                value: cat.value
+            })
+        })
+        const netSavings = totalIncome - totalExpenses
+        if (netSavings > 0) {
+            if (!nodeMap.has('Savings')) {
+                nodeMap.set('Savings', sankeyNodes.length)
+                sankeyNodes.push({ name: 'Savings' })
             }
-        });
-        const sankeyData = { nodes, links };
+            sankeyLinks.push({
+                source: 0, // Total Income
+                target: nodeMap.get('Savings')!,
+                value: netSavings
+            })
+        }
+        const sankeyData = { nodes: sankeyNodes, links: sankeyLinks };
         
         // Key Business Metrics
         const netCashFlow = totalIncome - totalExpenses
-        const burnRate = totalExpenses / months
-        // TODO: The get_total_balance RPC function needs to be scoped by dashboard_id for this to be accurate.
+        const burnRate = months > 0 ? totalExpenses / months : 0
         const { data: balanceData } = await supabase.rpc('get_total_balance', { p_user_id: user.id })
         const runway = balanceData > 0 && burnRate > 0 ? balanceData / burnRate : 0
         const profitMargin = totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0
 
-        // ... other calculations from before
         const monthlyMap = new Map<string, { income: number; expenses: number }>()
         typedTransactions.forEach(t => {
           const month = new Date(t.date).toLocaleDateString('en-US', { year: '2-digit', month: 'short' })
@@ -150,22 +153,14 @@ export default function AnalyticsPage() {
           else monthlyMap.get(month)!.expenses += t.amount
         })
         const monthlyBreakdown = Array.from(monthlyMap.entries()).map(([month, data]) => ({ month, ...data })).reverse()
-        const categoryMap = new Map<string, { value: number, color: string }>()
-        expenses.forEach(t => {
-          const name = t.categories?.[0]?.name || 'Uncategorized'
-          const color = t.categories?.[0]?.color || '#8884d8'
-          if (!categoryMap.has(name)) categoryMap.set(name, { value: 0, color })
-          categoryMap.get(name)!.value += t.amount
-        })
-        const categoryBreakdown = Array.from(categoryMap.entries()).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.value - a.value)
         const topCategory = categoryBreakdown[0]?.name || 'N/A'
-        const dailyAverage = totalExpenses / (months * 30)
+        const dailyAverage = months > 0 ? totalExpenses / (months * 30) : 0
         const currentMonthExpenses = expenses.filter(t => new Date(t.date).getMonth() === new Date().getMonth()).reduce((sum, t) => sum + t.amount, 0)
         const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
         const dayOfMonth = new Date().getDate()
-        const monthlyProjection = (currentMonthExpenses / dayOfMonth) * daysInMonth
-        const avgMonthlyIncome = totalIncome / months
-        const avgMonthlyExpenses = totalExpenses / months
+        const monthlyProjection = dayOfMonth > 0 ? (currentMonthExpenses / dayOfMonth) * daysInMonth : 0
+        const avgMonthlyIncome = months > 0 ? totalIncome / months : 0
+        const avgMonthlyExpenses = months > 0 ? totalExpenses / months : 0
 
         setData({
           monthlyBreakdown,
@@ -192,7 +187,7 @@ export default function AnalyticsPage() {
     fetchAnalyticsData()
   }, [user, period, activeDashboard])
   
-  const StatCard = ({ title, value, icon: Icon, change, changeType, unit }: any) => (
+  const StatCard = ({ title, value, icon: Icon, unit }: any) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
@@ -200,13 +195,16 @@ export default function AnalyticsPage() {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}{unit}</div>
-        {change && (
-          <p className={`text-xs ${changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`}>
-            {change} vs last period
-          </p>
-        )}
       </CardContent>
     </Card>
+  )
+
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center h-full p-6 text-center rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 mt-4">
+        <BarChart2 className="w-12 h-12 text-gray-400 mb-4" />
+        <h3 className="text-xl font-semibold mb-2">No Data for Analytics</h3>
+        <p className="text-muted-foreground mb-4">There is no transaction data for the selected period or dashboard. <br/> Please select another period or import some transactions.</p>
+      </div>
   )
 
   if (isLoading) {
@@ -214,121 +212,25 @@ export default function AnalyticsPage() {
       <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-      <main className="flex-1 overflow-auto p-3">
-        <div className="space-y-4 p-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
-            <DashboardSelector />
+      <main className="flex-1 overflow-auto p-4">
+           <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
+              <DashboardSelector />
+            </div>
+            <div className="border-b border-gray-200 my-4"></div>
+          <div className="space-y-4">
+            <div className="h-10 w-48 bg-gray-200 rounded animate-pulse ml-auto"></div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
+            </div>
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              {[...Array(5)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
+            </div>
+            <div className="h-96 bg-gray-200 rounded animate-pulse"></div>
           </div>
-
-          <div className="border-b border-gray-200"></div>
-
-          <div className="flex items-center justify-end space-x-2">
-              <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger className="w-[180px] h-9">
-                  <SelectValue placeholder="Select period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3m">Last 3 Months</SelectItem>
-                  <SelectItem value="6m">Last 6 Months</SelectItem>
-                  <SelectItem value="12m">Last 12 Months</SelectItem>
-                </SelectContent>
-              </Select>
-          </div>
-          
-          {/* Business KPI Row */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data?.netCashFlow || 0, currency) : '...'} icon={Briefcase} />
-            <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data?.burnRate || 0, currency) : '...'} icon={Zap} />
-            <StatCard title="Runway" value={`${(data?.runway || 0).toFixed(1)}`} unit=" months" icon={Gauge} />
-            <StatCard title="Profit Margin" value={`${(data?.profitMargin || 0).toFixed(1)}`} unit="%" icon={TrendingUp} />
-          </div>
-
-          {/* Standard Metrics Row */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data?.avgMonthlyIncome || 0, currency) : '...'} icon={TrendingUp} />
-            <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data?.avgMonthlyExpenses || 0, currency) : '...'} icon={TrendingDown} />
-            <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data?.dailyAverage || 0, currency) : '...'} icon={DollarSign} />
-            <StatCard title="Monthly Projection" value={currency ? formatCurrency(data?.monthlyProjection || 0, currency) : '...'} icon={BarChart2} />
-            <StatCard title="Top Expense Category" value={data?.topCategory} icon={PieIcon} />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-1">
-              <Card>
-                  <CardHeader>
-                      <CardTitle>Cash Flow Sankey</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                      <ResponsiveContainer width="100%" height={400}>
-                          <>
-                              {data?.sankeyData && data.sankeyData.nodes.length > 0 ? (
-                                  <Sankey
-                                      data={data.sankeyData}
-                                      nodePadding={50}
-                                      margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
-                                      link={{ stroke: '#B3C4D8' }}
-                                  >
-                                      <Tooltip />
-                                  </Sankey>
-                              ) : (
-                                  <div className="flex items-center justify-center h-full text-sm text-gray-500">
-                                      Not enough data to display cash flow.
-                                  </div>
-                              )}
-                          </>
-                      </ResponsiveContainer>
-                  </CardContent>
-              </Card>
-          </div>
-          
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={data?.monthlyBreakdown}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
-                    <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                    <Legend />
-                    <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
-                    <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            <Card className="col-span-4 md:col-span-3">
-              <CardHeader>
-                <CardTitle>Expense Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <PieChart>
-                    <Pie data={data?.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
-                         label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                           const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                           const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                           const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                           return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
-                         }}>
-                      {data?.categoryBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                    <Legend wrapperStyle={{fontSize: "12px"}}/>
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
-  </div>
     )
   }
 
@@ -337,16 +239,21 @@ export default function AnalyticsPage() {
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-      <main className="flex-1 overflow-auto p-3">
+      <main className="flex-1 overflow-auto p-4">
+        <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
+            <DashboardSelector />
+        </div>
+        <div className="border-b border-gray-200 my-4"></div>
         <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>Try Again</Button>
+            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
       </main>
+      </div>
     </div>
-  </div>
       )
     }
 
@@ -354,118 +261,120 @@ export default function AnalyticsPage() {
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-3">
-          <div className="space-y-4 p-4">
+        <main className="flex-1 overflow-auto p-4">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
               <DashboardSelector />
             </div>
 
-            <div className="border-b border-gray-200"></div>
+            <div className="border-b border-gray-200 my-4"></div>
 
-            <div className="flex items-center justify-end space-x-2">
-                <Select value={period} onValueChange={setPeriod}>
-                  <SelectTrigger className="w-[180px] h-9">
-                    <SelectValue placeholder="Select period" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="3m">Last 3 Months</SelectItem>
-                    <SelectItem value="6m">Last 6 Months</SelectItem>
-                    <SelectItem value="12m">Last 12 Months</SelectItem>
-                  </SelectContent>
-                </Select>
-            </div>
-            
-            {/* Business KPI Row */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data?.netCashFlow || 0, currency) : '...'} icon={Briefcase} />
-              <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data?.burnRate || 0, currency) : '...'} icon={Zap} />
-              <StatCard title="Runway" value={`${(data?.runway || 0).toFixed(1)}`} unit=" months" icon={Gauge} />
-              <StatCard title="Profit Margin" value={`${(data?.profitMargin || 0).toFixed(1)}`} unit="%" icon={TrendingUp} />
-            </div>
+            {!data ? <EmptyState /> : (
+            <div className="space-y-4">
+                <div className="flex items-center justify-end space-x-2">
+                    <Select value={period} onValueChange={setPeriod}>
+                      <SelectTrigger className="w-[180px] h-9">
+                        <SelectValue placeholder="Select period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="3m">Last 3 Months</SelectItem>
+                        <SelectItem value="6m">Last 6 Months</SelectItem>
+                        <SelectItem value="12m">Last 12 Months</SelectItem>
+                      </SelectContent>
+                    </Select>
+                </div>
+                
+                {/* Business KPI Row */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data.netCashFlow, currency) : '...'} icon={Briefcase} />
+                  <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data.burnRate, currency) : '...'} icon={Zap} />
+                  <StatCard title="Runway" value={`${data.runway.toFixed(1)}`} unit=" months" icon={Gauge} />
+                  <StatCard title="Profit Margin" value={`${data.profitMargin.toFixed(1)}`} unit="%" icon={TrendingUp} />
+                </div>
 
-            {/* Standard Metrics Row */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-              <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data?.avgMonthlyIncome || 0, currency) : '...'} icon={TrendingUp} />
-              <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data?.avgMonthlyExpenses || 0, currency) : '...'} icon={TrendingDown} />
-              <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data?.dailyAverage || 0, currency) : '...'} icon={DollarSign} />
-              <StatCard title="Monthly Projection" value={currency ? formatCurrency(data?.monthlyProjection || 0, currency) : '...'} icon={BarChart2} />
-              <StatCard title="Top Expense Category" value={data?.topCategory} icon={PieIcon} />
-            </div>
+                {/* Standard Metrics Row */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+                  <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data.avgMonthlyIncome, currency) : '...'} icon={TrendingUp} />
+                  <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data.avgMonthlyExpenses, currency) : '...'} icon={TrendingDown} />
+                  <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data.dailyAverage, currency) : '...'} icon={DollarSign} />
+                  <StatCard title="Monthly Projection" value={currency ? formatCurrency(data.monthlyProjection, currency) : '...'} icon={BarChart2} />
+                  <StatCard title="Top Expense Category" value={data.topCategory} icon={PieIcon} />
+                </div>
 
-            <div className="grid gap-4 md:grid-cols-1">
-                <Card>
+                <div className="grid gap-4 md:grid-cols-1">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Cash Flow Sankey</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <>
+                                    {data.sankeyData && data.sankeyData.nodes.length > 1 ? (
+                                        <Sankey
+                                            data={data.sankeyData}
+                                            nodePadding={50}
+                                            margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                                            link={{ stroke: '#B3C4D8' }}
+                                        >
+                                            <Tooltip />
+                                        </Sankey>
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                                            Not enough data to display cash flow.
+                                        </div>
+                                    )}
+                                </>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </div>
+                
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                  <Card className="col-span-4">
                     <CardHeader>
-                        <CardTitle>Cash Flow Sankey</CardTitle>
+                      <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pl-2">
+                      <ResponsiveContainer width="100%" height={350}>
+                        <BarChart data={data.monthlyBreakdown}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
+                          <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                          <Legend />
+                          <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
+                          <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                  <Card className="col-span-4 md:col-span-3">
+                    <CardHeader>
+                      <CardTitle>Expense Breakdown</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={400}>
-                            <>
-                                {data?.sankeyData && data.sankeyData.nodes.length > 0 ? (
-                                    <Sankey
-                                        data={data.sankeyData}
-                                        nodePadding={50}
-                                        margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
-                                        link={{ stroke: '#B3C4D8' }}
-                                    >
-                                        <Tooltip />
-                                    </Sankey>
-                                ) : (
-                                    <div className="flex items-center justify-center h-full text-sm text-gray-500">
-                                        Not enough data to display cash flow.
-                                    </div>
-                                )}
-                            </>
-                        </ResponsiveContainer>
+                      <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                          <Pie data={data.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
+                               label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                 const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                                 const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                                 const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                                 return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
+                               }}>
+                            {data.categoryBreakdown.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                          <Legend wrapperStyle={{fontSize: "12px"}}/>
+                        </PieChart>
+                      </ResponsiveContainer>
                     </CardContent>
-                </Card>
+                  </Card>
+                </div>
             </div>
-            
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4">
-                <CardHeader>
-                  <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={data?.monthlyBreakdown}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
-                      <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                      <Legend />
-                      <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
-                      <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              <Card className="col-span-4 md:col-span-3">
-                <CardHeader>
-                  <CardTitle>Expense Breakdown</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={350}>
-                    <PieChart>
-                      <Pie data={data?.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
-                           label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                             const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                             const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                             return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
-                           }}>
-                        {data?.categoryBreakdown.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                      <Legend wrapperStyle={{fontSize: "12px"}}/>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+            )}
         </main>
       </div>
     </div>
