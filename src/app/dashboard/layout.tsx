@@ -1,3 +1,4 @@
+// Force full dashboard rebuild: 2024-07-18 18:32:00
 "use client"
 
 import { AuthProvider } from "@/lib/auth-context"

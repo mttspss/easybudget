@@ -32,11 +32,11 @@ interface AnalyticsData {
   burnRate: number
   runway: number
   profitMargin: number
-  topCategory: string
+    topCategory: string
   dailyAverage: number
   monthlyProjection: number
-  avgMonthlyIncome: number
-  avgMonthlyExpenses: number
+    avgMonthlyIncome: number
+    avgMonthlyExpenses: number
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1943', '#19D4FF'];
@@ -79,9 +79,9 @@ export default function AnalyticsPage() {
         }
 
         const transactionQuery = supabase
-          .from('transactions')
+        .from('transactions')
           .select('date, amount, type, categories ( name, color )')
-          .eq('user_id', user.id)
+        .eq('user_id', user.id)
           .gte('date', dateFrom.toISOString())
 
         const { data: transactions, error } = await buildQuery(transactionQuery)
@@ -89,8 +89,8 @@ export default function AnalyticsPage() {
         if (error) throw error
         if (!transactions || transactions.length === 0) {
             setData(null) // Set data to null to show empty state
-            return
-        }
+        return
+      }
 
         const typedTransactions = transactions as Transaction[];
         
@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
 
         setData({
           monthlyBreakdown,
-          categoryBreakdown,
+        categoryBreakdown,
           sankeyData,
           netCashFlow,
           burnRate,
@@ -231,7 +231,7 @@ export default function AnalyticsPage() {
           </div>
         </main>
       </div>
-    </div>
+      </div>
     )
   }
 
@@ -244,7 +244,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
             <DashboardSelector />
-        </div>
+            </div>
         <div className="border-b border-gray-200 my-4"></div>
         <div className="flex flex-col items-center justify-center h-full p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -254,7 +254,7 @@ export default function AnalyticsPage() {
         </div>
       </main>
       </div>
-    </div>
+        </div>
       )
     }
 
@@ -266,8 +266,8 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
               <DashboardSelector />
-            </div>
-
+                  </div>
+                  
             <div className="border-b border-gray-200 my-4"></div>
 
             {!data ? <EmptyState /> : (
@@ -283,15 +283,15 @@ export default function AnalyticsPage() {
                         <SelectItem value="12m">Last 12 Months</SelectItem>
                       </SelectContent>
                     </Select>
-                </div>
-                
+            </div>
+
                 {/* Business KPI Row */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                   <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data.netCashFlow, currency) : '...'} icon={Briefcase} />
                   <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data.burnRate, currency) : '...'} icon={Zap} />
                   <StatCard title="Runway" value={`${data.runway.toFixed(1)}`} unit=" months" icon={Gauge} />
                   <StatCard title="Profit Margin" value={`${data.profitMargin.toFixed(1)}`} unit="%" icon={TrendingUp} />
-                </div>
+                        </div>
 
                 {/* Standard Metrics Row */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -300,7 +300,7 @@ export default function AnalyticsPage() {
                   <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data.dailyAverage, currency) : '...'} icon={DollarSign} />
                   <StatCard title="Monthly Projection" value={currency ? formatCurrency(data.monthlyProjection, currency) : '...'} icon={BarChart2} />
                   <StatCard title="Top Expense Category" value={data.topCategory} icon={PieIcon} />
-                </div>
+                        </div>
 
                 <div className="grid gap-4 md:grid-cols-1">
                     <Card>
@@ -322,14 +322,14 @@ export default function AnalyticsPage() {
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-sm text-gray-500">
                                             Not enough data to display cash flow.
-                                        </div>
+                          </div>
                                     )}
                                 </>
                             </ResponsiveContainer>
-                        </CardContent>
+                      </CardContent>
                     </Card>
-                </div>
-                
+                  </div>
+
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                   <Card className="col-span-4">
                     <CardHeader>
@@ -345,8 +345,8 @@ export default function AnalyticsPage() {
                           <Legend />
                           <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
                           <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
-                        </BarChart>
-                      </ResponsiveContainer>
+                              </BarChart>
+                            </ResponsiveContainer>
                     </CardContent>
                   </Card>
                   <Card className="col-span-4 md:col-span-3">
@@ -371,11 +371,11 @@ export default function AnalyticsPage() {
                           <Legend wrapperStyle={{fontSize: "12px"}}/>
                         </PieChart>
                       </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
+              </CardContent>
+            </Card>
                 </div>
-            </div>
-            )}
+                    </div>
+                  )}
         </main>
       </div>
     </div>
