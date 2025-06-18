@@ -5,10 +5,12 @@ import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { TrendingUp, TrendingDown, DollarSign, PieChart as PieIcon, BarChart2, AlertCircle } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Sankey } from 'recharts'
+import { TrendingUp, TrendingDown, DollarSign, PieChart as PieIcon, BarChart2, AlertCircle, Briefcase, Zap, Gauge } from 'lucide-react'
 import { formatCurrency, formatCurrencyShort, getUserCurrency, CurrencyConfig } from '@/lib/currency'
 import { Button } from '@/components/ui/button'
+import { Sidebar } from '@/components/dashboard/sidebar'
+import { DashboardHeader } from '@/components/dashboard-header'
 
 type Transaction = {
   date: string;
@@ -23,6 +25,11 @@ type Transaction = {
 interface AnalyticsData {
   monthlyBreakdown: { month: string; income: number; expenses: number }[]
   categoryBreakdown: { name: string; value: number; color: string }[]
+  sankeyData: { nodes: { name: string }[], links: { source: number, target: number, value: number }[] }
+  netCashFlow: number
+  burnRate: number
+  runway: number
+  profitMargin: number
   topCategory: string
   dailyAverage: number
   monthlyProjection: number
@@ -52,7 +59,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     if (!user) return
-
+    
     const fetchAnalyticsData = async () => {
       setIsLoading(true)
       setError(null)
@@ -71,8 +78,56 @@ export default function AnalyticsPage() {
         if (!transactions) throw new Error("No transactions found")
 
         const typedTransactions = transactions as Transaction[];
+        
+        const expenses = typedTransactions.filter(t => t.type === 'expense')
+        const income = typedTransactions.filter(t => t.type === 'income')
+        const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0)
+        const totalIncome = income.reduce((sum, t) => sum + t.amount, 0)
 
-        // 1. Monthly Breakdown
+        // Sankey Chart Data
+        const nodes = [{ name: 'Income' }];
+        const incomeSources = new Map<string, number>();
+        income.forEach(t => {
+            const sourceName = t.categories?.[0]?.name || 'Other Income';
+            if(!incomeSources.has(sourceName)) {
+                nodes.push({ name: sourceName });
+                incomeSources.set(sourceName, nodes.length - 1);
+            }
+        });
+        const expenseCategories = new Map<string, number>();
+        expenses.forEach(t => {
+            const catName = t.categories?.[0]?.name || 'Uncategorized';
+            if(!expenseCategories.has(catName)) {
+                nodes.push({ name: catName });
+                expenseCategories.set(catName, nodes.length - 1);
+            }
+        });
+
+        const links: { source: number, target: number, value: number }[] = [];
+        income.forEach(t => {
+            const sourceName = t.categories?.[0]?.name || 'Other Income';
+            const sourceIndex = incomeSources.get(sourceName);
+            if (sourceIndex !== undefined) {
+                 links.push({ source: sourceIndex, target: 0, value: t.amount });
+            }
+        });
+        expenses.forEach(t => {
+            const catName = t.categories?.[0]?.name || 'Uncategorized';
+            const targetIndex = expenseCategories.get(catName);
+            if (targetIndex !== undefined) {
+                links.push({ source: 0, target: targetIndex, value: t.amount });
+            }
+        });
+        const sankeyData = { nodes, links };
+        
+        // Key Business Metrics
+        const netCashFlow = totalIncome - totalExpenses
+        const burnRate = totalExpenses / months
+        const { data: balanceData } = await supabase.rpc('get_total_balance', { p_user_id: user.id })
+        const runway = balanceData > 0 && burnRate > 0 ? balanceData / burnRate : 0
+        const profitMargin = totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0
+
+        // ... other calculations from before
         const monthlyMap = new Map<string, { income: number; expenses: number }>()
         typedTransactions.forEach(t => {
           const month = new Date(t.date).toLocaleDateString('en-US', { year: '2-digit', month: 'short' })
@@ -82,62 +137,56 @@ export default function AnalyticsPage() {
           else monthlyMap.get(month)!.expenses += t.amount
         })
         const monthlyBreakdown = Array.from(monthlyMap.entries()).map(([month, data]) => ({ month, ...data })).reverse()
-
-        // 2. Category Breakdown
         const categoryMap = new Map<string, { value: number, color: string }>()
-        typedTransactions.filter(t => t.type === 'expense').forEach(t => {
+        expenses.forEach(t => {
           const name = t.categories?.[0]?.name || 'Uncategorized'
           const color = t.categories?.[0]?.color || '#8884d8'
           if (!categoryMap.has(name)) categoryMap.set(name, { value: 0, color })
           categoryMap.get(name)!.value += t.amount
         })
         const categoryBreakdown = Array.from(categoryMap.entries()).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.value - a.value)
-        
-        // 3. Key Metrics
-        const expenses = typedTransactions.filter(t => t.type === 'expense')
-        const income = typedTransactions.filter(t => t.type === 'income')
-        const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0)
-        const totalIncome = income.reduce((sum, t) => sum + t.amount, 0)
-        
         const topCategory = categoryBreakdown[0]?.name || 'N/A'
         const dailyAverage = totalExpenses / (months * 30)
-        
         const currentMonthExpenses = expenses.filter(t => new Date(t.date).getMonth() === new Date().getMonth()).reduce((sum, t) => sum + t.amount, 0)
         const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
         const dayOfMonth = new Date().getDate()
         const monthlyProjection = (currentMonthExpenses / dayOfMonth) * daysInMonth
-        
         const avgMonthlyIncome = totalIncome / months
         const avgMonthlyExpenses = totalExpenses / months
 
         setData({
           monthlyBreakdown,
           categoryBreakdown,
+          sankeyData,
+          netCashFlow,
+          burnRate,
+          runway,
+          profitMargin,
           topCategory,
           dailyAverage,
           monthlyProjection,
           avgMonthlyIncome,
           avgMonthlyExpenses
-        })
+      })
 
       } catch (err: any) {
         setError(err.message || 'Failed to fetch analytics data.')
-      } finally {
-        setIsLoading(false)
-      }
+    } finally {
+      setIsLoading(false)
+    }
     }
 
     fetchAnalyticsData()
   }, [user, period])
   
-  const StatCard = ({ title, value, icon: Icon, change, changeType }: any) => (
+  const StatCard = ({ title, value, icon: Icon, change, changeType, unit }: any) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold">{value}{unit}</div>
         {change && (
           <p className={`text-xs ${changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`}>
             {change} vs last period
@@ -149,100 +198,160 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4">
-        <div className="h-10 w-48 bg-gray-200 rounded animate-pulse"></div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          {[...Array(5)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="h-80 bg-gray-200 rounded animate-pulse lg:col-span-2"></div>
-          <div className="h-80 bg-gray-200 rounded animate-pulse"></div>
-        </div>
+      <div className="flex h-screen bg-gray-50/50">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 overflow-auto p-3">
+        <DashboardHeader user={user} />
+          <div className="p-6 space-y-4">
+            <div className="h-10 w-48 bg-gray-200 rounded animate-pulse"></div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {[...Array(8)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="h-80 bg-gray-200 rounded animate-pulse lg:col-span-2"></div>
+              <div className="h-80 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </main>
       </div>
+    </div>
     )
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+      return (
+    <div className="flex h-screen bg-gray-50/50">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 overflow-auto p-3">
+        <DashboardHeader user={user} />
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        </main>
       </div>
-    )
-  }
+    </div>
+      )
+    }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h2>
-        <div className="flex items-center space-x-2">
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3m">Last 3 Months</SelectItem>
-              <SelectItem value="6m">Last 6 Months</SelectItem>
-              <SelectItem value="12m">Last 12 Months</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data?.avgMonthlyIncome || 0, currency) : '...'} icon={TrendingUp} />
-        <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data?.avgMonthlyExpenses || 0, currency) : '...'} icon={TrendingDown} />
-        <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data?.dailyAverage || 0, currency) : '...'} icon={DollarSign} />
-        <StatCard title="Monthly Projection" value={currency ? formatCurrency(data?.monthlyProjection || 0, currency) : '...'} icon={BarChart2} />
-        <StatCard title="Top Expense Category" value={data?.topCategory} icon={PieIcon} />
-      </div>
+    <div className="flex h-screen bg-gray-50/50">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-auto p-3">
+          <DashboardHeader user={user} />
+          <div className="flex-1 space-y-4 p-8 pt-6">
+            <div className="flex items-center justify-between space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight">Business Analytics</h2>
+              <div className="flex items-center space-x-2">
+                <Select value={period} onValueChange={setPeriod}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3m">Last 3 Months</SelectItem>
+                    <SelectItem value="6m">Last 6 Months</SelectItem>
+                    <SelectItem value="12m">Last 12 Months</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {/* Business KPI Row */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data?.netCashFlow || 0, currency) : '...'} icon={Briefcase} />
+              <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data?.burnRate || 0, currency) : '...'} icon={Zap} />
+              <StatCard title="Runway" value={`${(data?.runway || 0).toFixed(1)}`} unit=" months" icon={Gauge} />
+              <StatCard title="Profit Margin" value={`${(data?.profitMargin || 0).toFixed(1)}`} unit="%" icon={TrendingUp} />
+            </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={data?.monthlyBreakdown}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
-                <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                <Legend />
-                <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
-                <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="col-span-4 md:col-span-3">
-          <CardHeader>
-            <CardTitle>Expense Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie data={data?.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
-                     label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                       const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                       const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                       const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                       return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
-                     }}>
-                  {data?.categoryBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
-                <Legend wrapperStyle={{fontSize: "12px"}}/>
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            {/* Standard Metrics Row */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data?.avgMonthlyIncome || 0, currency) : '...'} icon={TrendingUp} />
+              <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data?.avgMonthlyExpenses || 0, currency) : '...'} icon={TrendingDown} />
+              <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data?.dailyAverage || 0, currency) : '...'} icon={DollarSign} />
+              <StatCard title="Monthly Projection" value={currency ? formatCurrency(data?.monthlyProjection || 0, currency) : '...'} icon={BarChart2} />
+              <StatCard title="Top Expense Category" value={data?.topCategory} icon={PieIcon} />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-1">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Cash Flow Sankey</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={400}>
+                            <>
+                                {data?.sankeyData && data.sankeyData.nodes.length > 0 ? (
+                                    <Sankey
+                                        data={data.sankeyData}
+                                        nodePadding={50}
+                                        margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                                        link={{ stroke: '#B3C4D8' }}
+                                    >
+                                        <Tooltip />
+                                    </Sankey>
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                                        Not enough data to display cash flow.
+                                    </div>
+                                )}
+                            </>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-4">
+                <CardHeader>
+                  <CardTitle>Cash Flow (Income vs Expenses)</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart data={data?.monthlyBreakdown}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} />
+                      <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                      <Legend />
+                      <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
+                      <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+              <Card className="col-span-4 md:col-span-3">
+                <CardHeader>
+                  <CardTitle>Expense Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <PieChart>
+                      <Pie data={data?.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
+                           label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                             const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                             const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                             return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
+                           }}>
+                        {data?.categoryBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} />
+                      <Legend wrapperStyle={{fontSize: "12px"}}/>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   )
