@@ -471,7 +471,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Problem Section - Minimal Style */}
+      {/* Problem Section - Reelsmeals Style */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto text-center">
           
@@ -486,8 +486,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* 3 Problems with Red Arrows */}
-          <div className="grid md:grid-cols-3 gap-8 mb-20 items-center">
+          {/* 3 Problems in a row with Red Arrows */}
+          <div className="grid md:grid-cols-5 gap-4 mb-32 items-center">
+            {/* Problem 1 */}
             <div className="space-y-4">
               <div className="text-5xl mb-6">📊</div>
               <h3 className="text-lg font-semibold text-gray-900">
@@ -508,6 +509,7 @@ export default function LandingPage() {
               </svg>
             </div>
             
+            {/* Problem 2 */}
             <div className="space-y-4">
               <div className="text-5xl mb-6">🤷‍♂️</div>
               <h3 className="text-lg font-semibold text-gray-900">
@@ -515,18 +517,6 @@ export default function LandingPage() {
               </h3>
               <p className="text-gray-600 text-sm">
                 No idea where your money actually goes each month
-              </p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-32 items-center">
-            <div className="md:col-start-2 space-y-4">
-              <div className="text-5xl mb-6">🔄</div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Repeat the same cycle
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Make financial decisions based on guesswork
               </p>
             </div>
             
@@ -538,6 +528,17 @@ export default function LandingPage() {
                   <path fillRule="evenodd" clipRule="evenodd" d="M56.5084 121.007C56.9835 118.685 57.6119 115.777 57.6736 115.445C59.3456 106.446 59.5323 97.67 58.4433 88.5628C58.3558 87.8236 57.6824 87.2948 56.9433 87.3824C56.2042 87.4699 55.6756 88.1435 55.7631 88.8828C56.8219 97.7138 56.6432 106.225 55.0203 114.954C54.926 115.463 53.5093 121.999 53.3221 123.342C53.2427 123.893 53.3688 124.229 53.4061 124.305C53.5887 124.719 53.8782 124.911 54.1287 125.015C54.4123 125.13 54.9267 125.205 55.5376 124.926C56.1758 124.631 57.3434 123.699 57.6571 123.487C62.3995 120.309 67.4155 116.348 72.791 113.634C77.9171 111.045 83.3769 109.588 89.255 111.269C89.9704 111.475 90.7181 111.057 90.9235 110.342C91.1288 109.626 90.7117 108.878 89.9963 108.673C83.424 106.794 77.3049 108.33 71.5763 111.223C66.2328 113.922 61.2322 117.814 56.5084 121.007Z"></path>
                 </g>
               </svg>
+            </div>
+            
+            {/* Problem 3 */}
+            <div className="space-y-4">
+              <div className="text-5xl mb-6">🔄</div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Repeat the same cycle
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Make financial decisions based on guesswork
+              </p>
             </div>
           </div>
 
@@ -551,8 +552,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* 3 Solutions with Green Arrows */}
-          <div className="grid md:grid-cols-3 gap-8 mb-20 items-center">
+          {/* 3 Solutions in a row with Green Arrows */}
+          <div className="grid md:grid-cols-5 gap-4 items-center">
+            {/* Solution 1 */}
             <div className="space-y-4">
               <div className="text-5xl mb-6">⚡️</div>
               <h3 className="text-lg font-semibold text-gray-900">
@@ -573,6 +575,7 @@ export default function LandingPage() {
               </svg>
             </div>
             
+            {/* Solution 2 */}
             <div className="space-y-4">
               <div className="text-5xl mb-6">📊</div>
               <h3 className="text-lg font-semibold text-gray-900">
@@ -580,18 +583,6 @@ export default function LandingPage() {
               </h3>
               <p className="text-gray-600 text-sm">
                 Beautiful charts show exactly where every euro goes
-              </p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 items-center">
-            <div className="md:col-start-2 space-y-4">
-              <div className="text-5xl mb-6">🎯</div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Achieve
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Set goals with progress bars that motivate real action
               </p>
             </div>
             
@@ -603,6 +594,17 @@ export default function LandingPage() {
                   <path fillRule="evenodd" clipRule="evenodd" d="M56.5084 121.007C56.9835 118.685 57.6119 115.777 57.6736 115.445C59.3456 106.446 59.5323 97.67 58.4433 88.5628C58.3558 87.8236 57.6824 87.2948 56.9433 87.3824C56.2042 87.4699 55.6756 88.1435 55.7631 88.8828C56.8219 97.7138 56.6432 106.225 55.0203 114.954C54.926 115.463 53.5093 121.999 53.3221 123.342C53.2427 123.893 53.3688 124.229 53.4061 124.305C53.5887 124.719 53.8782 124.911 54.1287 125.015C54.4123 125.13 54.9267 125.205 55.5376 124.926C56.1758 124.631 57.3434 123.699 57.6571 123.487C62.3995 120.309 67.4155 116.348 72.791 113.634C77.9171 111.045 83.3769 109.588 89.255 111.269C89.9704 111.475 90.7181 111.057 90.9235 110.342C91.1288 109.626 90.7117 108.878 89.9963 108.673C83.424 106.794 77.3049 108.33 71.5763 111.223C66.2328 113.922 61.2322 117.814 56.5084 121.007Z"></path>
                 </g>
               </svg>
+            </div>
+            
+            {/* Solution 3 */}
+            <div className="space-y-4">
+              <div className="text-5xl mb-6">🎯</div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Achieve
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Set goals with progress bars that motivate real action
+              </p>
             </div>
           </div>
         </div>
