@@ -61,11 +61,11 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const router = useRouter()
 
-  const startTour = () => {
+  const startTour = useCallback(() => {
     setCurrentStep(0)
     setIsTourOpen(true)
     router.push(tourSteps[0].path)
-  }
+  }, [router])
 
   const goToStep = useCallback((stepIndex: number) => {
     if (stepIndex >= 0 && stepIndex < tourSteps.length) {
@@ -74,15 +74,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   }, [router])
 
-  const nextStep = () => {
-    if (currentStep < tourSteps.length - 1) {
-      goToStep(currentStep + 1)
-    } else {
-      endTour()
-    }
-  }
-
-  const endTour = async () => {
+  const endTour = useCallback(async () => {
     setIsTourOpen(false)
     if (!user) return
     try {
@@ -93,7 +85,15 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Failed to update onboarding status:", error)
     }
-  }
+  }, [user])
+
+  const nextStep = useCallback(() => {
+    if (currentStep < tourSteps.length - 1) {
+      goToStep(currentStep + 1)
+    } else {
+      endTour()
+    }
+  }, [currentStep, goToStep, endTour])
 
   const value = { isTourOpen, currentStep, startTour, nextStep, endTour, goToStep }
 
