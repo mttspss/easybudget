@@ -13,11 +13,14 @@ import {
   PieChart,
   BarChart3,
   Activity,
-  Target,
   Download,
   ArrowUpRight,
   ArrowDownRight,
-  Eye
+  Eye,
+  Banknote,
+  Flame,
+  Timer,
+  Percent
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -34,7 +37,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  Brush
+  Brush,
+  Sankey
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
@@ -54,6 +58,14 @@ interface AnalyticsData {
     projectedMonthly: number
     avgMonthlyIncome: number
     avgMonthlyExpenses: number
+  }
+  netCashFlow: number
+  monthlyBurnRate: number
+  runwayMonths: number
+  profitMargin: number
+  sankeyData: {
+    nodes: { name: string }[]
+    links: { source: number; target: number; value: number }[]
   }
 }
 
@@ -202,11 +214,11 @@ export default function AnalyticsPage() {
         }
       })
 
-      const totalExpenses = Array.from(categoryMap.values()).reduce((sum, cat) => sum + cat.value, 0)
+      const totalExpensesCategories = Array.from(categoryMap.values()).reduce((sum, cat) => sum + cat.value, 0)
       const categoryBreakdown = Array.from(categoryMap.values())
         .map(cat => ({
           ...cat,
-          percentage: totalExpenses > 0 ? (cat.value / totalExpenses) * 100 : 0
+          percentage: totalExpensesCategories > 0 ? (cat.value / totalExpensesCategories) * 100 : 0
         }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 8) // Top 8 categories
@@ -243,6 +255,40 @@ export default function AnalyticsPage() {
 
       const projectedMonthly = averageDaily * 30
 
+      // --- Business-level metrics ---
+      const totalIncomeAmount = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+
+      const netCashFlow = totalIncomeAmount - totalExpensesCategories
+      // Placeholder monthlyBurnRate, will be calculated after avgMonthlyExpenses
+      let monthlyBurnRate = 0
+      let runwayMonths = monthlyBurnRate > 0 && netCashFlow > 0
+        ? +(netCashFlow / monthlyBurnRate).toFixed(1)
+        : 0
+      const profitMargin = totalIncomeAmount > 0
+        ? +((netCashFlow / totalIncomeAmount) * 100).toFixed(1)
+        : 0
+
+      // Sankey data (Income -> Expense categories & Savings)
+      const sankeyNodes: { name: string }[] = [{ name: 'Total Income' }]
+      const sankeyLinks: { source: number; target: number; value: number }[] = []
+
+      // Add expense categories as nodes and links
+      categoryBreakdown.forEach((cat, idx) => {
+        sankeyNodes.push({ name: cat.name })
+        sankeyLinks.push({ source: 0, target: idx + 1, value: cat.value })
+      })
+
+      const leftover = netCashFlow > 0 ? netCashFlow : 0
+      if (leftover > 0) {
+        const savingsIndex = sankeyNodes.length
+        sankeyNodes.push({ name: 'Savings' })
+        sankeyLinks.push({ source: 0, target: savingsIndex, value: leftover })
+      }
+
+      // --- End Business-level metrics ---
+
       // Top expenses
       const topExpenses = transactions
         .filter(t => t.type === 'expense')
@@ -264,6 +310,12 @@ export default function AnalyticsPage() {
         ? Math.round(monthlyTrends.reduce((sum, m) => sum + m.expenses, 0) / monthlyTrends.length)
         : 0
 
+      // Update monthlyBurnRate based on calculated avgMonthlyExpenses
+      monthlyBurnRate = avgMonthlyExpenses
+      runwayMonths = monthlyBurnRate > 0 && netCashFlow > 0
+        ? +(netCashFlow / monthlyBurnRate).toFixed(1)
+        : 0
+
       setAnalyticsData({
         monthlyTrends,
         categoryBreakdown,
@@ -271,6 +323,14 @@ export default function AnalyticsPage() {
         comparisonData: monthlyTrends.slice(-6), // Last 6 months for comparison
         topExpenses,
         topIncome,
+        netCashFlow,
+        monthlyBurnRate,
+        runwayMonths,
+        profitMargin,
+        sankeyData: {
+          nodes: sankeyNodes,
+          links: sankeyLinks
+        },
         insights: {
           topCategory,
           trendDirection,
@@ -348,7 +408,7 @@ export default function AnalyticsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
+                <h1 className="text-xl font-bold text-gray-900">Business Analytics</h1>
                   <p className="text-gray-600 text-xs mt-1">Advanced insights into your financial patterns</p>
               </div>
               <div className="flex items-center gap-2">
@@ -459,51 +519,71 @@ export default function AnalyticsPage() {
                     </Card>
                   </div>
 
-                  {/* Second Row - Financial Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
+                  {/* Second Row - Financial Metrics - Replaced with Business KPIs */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    {/* Net Cash Flow */}
+                    <Card className="border border-gray-200 bg-white">
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
+                            <p className="text-xs font-medium text-gray-600">Net Cash Flow</p>
+                            <p className={`text-sm font-semibold mt-1 ${analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {analyticsData.netCashFlow >= 0 ? '+' : '-'}{userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                            <Banknote className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Monthly Burn Rate */}
+                    <Card className="border border-gray-200 bg-white">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Monthly Burn Rate</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(analyticsData.insights.projectedMonthly, userCurrency) : `€${analyticsData.insights.projectedMonthly.toFixed(0)}`}
+                              {userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}
                             </p>
                           </div>
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
-                            <Target className="h-5 w-5 text-white" />
+                            <Flame className="h-5 w-5 text-white" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-teal-50/50 via-white to-white border border-teal-200/30">
+                    {/* Runway */}
+                    <Card className="border border-gray-200 bg-white">
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
+                            <p className="text-xs font-medium text-gray-600">Runway</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyIncome), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyIncome).toLocaleString()}`}
+                              {analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}
                             </p>
                           </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
-                            <TrendingUp className="h-5 w-5 text-white" />
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                            <Timer className="h-5 w-5 text-white" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30">
+                    {/* Profit Margin */}
+                    <Card className="border border-gray-200 bg-white">
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
+                            <p className="text-xs font-medium text-gray-600">Profit Margin</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyExpenses), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyExpenses).toLocaleString()}`}
+                              {analyticsData.profitMargin.toFixed(1)}%
                             </p>
                           </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
-                            <ArrowDownRight className="h-5 w-5 text-white" />
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                            <Percent className="h-5 w-5 text-white" />
                           </div>
                         </div>
                       </CardContent>
@@ -868,6 +948,33 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Cash Flow Sankey Chart */}
+            {!isLoading && analyticsData && analyticsData.sankeyData.nodes.length > 1 && (
+              <div className="mt-6">
+                <Card className="border border-gray-200">
+                  <CardHeader className="pb-2 px-4 pt-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <PieChart className="h-5 w-5 text-blue-600" />
+                      Cash Flow Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="h-96 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <Sankey
+                          data={analyticsData.sankeyData}
+                          nodePadding={40}
+                          nodeWidth={20}
+                          link={{ stroke: "#d1d5db" }}
+                          node={{ cursor: 'pointer' }}
+                        />
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
           </div>
         </main>
