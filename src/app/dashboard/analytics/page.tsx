@@ -1,306 +1,875 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/lib/auth-context'
-import { useDashboards } from '@/lib/dashboard-context'
-import { supabase } from '@/lib/supabase'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Sankey } from 'recharts'
-import { TrendingUp, TrendingDown, DollarSign, PieChart as PieIcon, BarChart2, AlertCircle, Briefcase, Zap, Gauge } from 'lucide-react'
-import { formatCurrency, formatCurrencyShort, getUserCurrency, CurrencyConfig } from '@/lib/currency'
-import { Button } from '@/components/ui/button'
-import { Sidebar } from '@/components/dashboard/sidebar'
-import { DashboardSelector } from '@/components/dashboard-selector'
-
-type Transaction = {
-  date: string;
-  amount: number;
-  type: 'income' | 'expense';
-  categories: {
-    name: string;
-    color: string;
-  }[] | null;
-};
+import { useAuth } from "@/lib/auth-context"
+import { useDashboards } from "@/lib/dashboard-context"
+import { supabase } from "@/lib/supabase"
+import { redirect } from "next/navigation"
+import { Sidebar } from "@/components/dashboard/sidebar"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker"
+import { 
+  TrendingUp,
+  PieChart,
+  BarChart3,
+  Activity,
+  Target,
+  Download,
+  ArrowUpRight,
+  ArrowDownRight,
+  Eye
+} from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  Brush
+} from 'recharts'
+import { IconRenderer } from "@/components/ui/icon-renderer"
+import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
+import { DashboardIndicator } from "@/components/dashboard-indicator"
 
 interface AnalyticsData {
-  monthlyBreakdown: { month: string; income: number; expenses: number }[]
-  categoryBreakdown: { name: string; value: number; color: string }[]
-  sankeyData: { nodes: { name: string }[], links: { source: number, target: number, value: number }[] }
-  netCashFlow: number
-  burnRate: number
-  runway: number
-  profitMargin: number
+  monthlyTrends: any[]
+  categoryBreakdown: any[]
+  weeklyPatterns: any[]
+  comparisonData: any[]
+  topExpenses: any[]
+  topIncome: any[]
+  insights: {
     topCategory: string
-  dailyAverage: number
-  monthlyProjection: number
+    trendDirection: 'up' | 'down' | 'stable'
+    averageDaily: number
+    projectedMonthly: number
     avgMonthlyIncome: number
     avgMonthlyExpenses: number
+  }
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1943', '#19D4FF'];
+const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
 
 export default function AnalyticsPage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
-  const [data, setData] = useState<AnalyticsData | null>(null)
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [period, setPeriod] = useState('6m')
-  const [currency, setCurrency] = useState<CurrencyConfig | null>(null)
+  const [selectedPeriod, setSelectedPeriod] = useState("3months")
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined)
+  const [activeChart, setActiveChart] = useState<'trends' | 'categories' | 'patterns'>('trends')
+  const [drillDownData, setDrillDownData] = useState<any>(null)
+  const [topTransactionType, setTopTransactionType] = useState<'expenses' | 'income'>('expenses')
+  const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
 
+  // Load user currency
   useEffect(() => {
-    if (user) {
-      const fetchCurrency = async () => {
-        const c = await getUserCurrency(user.id)
-        setCurrency(c)
+    const loadCurrency = async () => {
+      if (!user) return
+      
+      try {
+        const currency = await getUserCurrency(user.id)
+        setUserCurrency(currency)
+      } catch (error) {
+        console.error('Error loading currency:', error)
       }
-      fetchCurrency()
     }
+
+    loadCurrency()
   }, [user])
 
-  useEffect(() => {
+  const fetchAnalyticsData = useCallback(async () => {
     if (!user) return
     
-    const fetchAnalyticsData = async () => {
+    try {
       setIsLoading(true)
-      setError(null)
-      try {
-        const dateFrom = new Date()
-        const months = period === '3m' ? 3 : period === '6m' ? 6 : 12
-        dateFrom.setMonth(dateFrom.getMonth() - months)
+      
+      // Dashboard filter: null for main dashboard, specific ID for custom dashboards
+      const dashboardFilter = activeDashboard?.id || null
+      
+      // Calculate date ranges
+      const now = new Date()
+      let startDate: Date
+      let endDate: Date
 
-        const buildQuery = (query: any) => {
-          if (activeDashboard?.id) {
-            return query.eq('dashboard_id', activeDashboard.id)
-          }
-          return query.is('dashboard_id', null)
+      if (customDateRange?.from && customDateRange?.to) {
+        startDate = customDateRange.from
+        endDate = customDateRange.to
+      } else {
+        endDate = now
+        switch (selectedPeriod) {
+          case '1month':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+            break
+          case '6months':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+            break
+          case '1year':
+            startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
+            break
+          default: // 3months
+            startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
         }
+      }
 
-        const transactionQuery = supabase
+      // Fetch all transactions in the period with dashboard filter
+      let transactionQuery = supabase
         .from('transactions')
-          .select('date, amount, type, categories ( name, color )')
+        .select(`
+          *,
+          categories (
+            name,
+            color
+          )
+        `)
         .eq('user_id', user.id)
-          .gte('date', dateFrom.toISOString())
+        .gte('date', startDate.toISOString().split('T')[0])
+        .lte('date', endDate.toISOString().split('T')[0])
+        .order('date', { ascending: true })
 
-        const { data: transactions, error } = await buildQuery(transactionQuery)
+      // Apply dashboard filter
+      if (dashboardFilter) {
+        transactionQuery = transactionQuery.eq('dashboard_id', dashboardFilter)
+      } else {
+        transactionQuery = transactionQuery.is('dashboard_id', null)
+      }
 
-        if (error) throw error
-        if (!transactions || transactions.length === 0) {
-            setData(null)
-            setIsLoading(false)
+      const { data: transactions } = await transactionQuery
+
+      if (!transactions) {
+        setAnalyticsData(null)
         return
       }
 
-        const typedTransactions = transactions as Transaction[];
+      // Generate monthly trends
+      const monthlyTrends = []
+      const startMonth = new Date(startDate)
+      
+      while (startMonth <= endDate) {
+        const monthStart = new Date(startMonth.getFullYear(), startMonth.getMonth(), 1)
+        const monthEnd = new Date(startMonth.getFullYear(), startMonth.getMonth() + 1, 0)
         
-        const expenses = typedTransactions.filter(t => t.type === 'expense')
-        const income = typedTransactions.filter(t => t.type === 'income')
-        const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0)
-        const totalIncome = income.reduce((sum, t) => sum + t.amount, 0)
-
-        const categoryMap = new Map<string, { value: number, color: string }>()
-        expenses.forEach(t => {
-          const name = t.categories?.[0]?.name || 'Uncategorized'
-          const color = t.categories?.[0]?.color || '#8884d8'
-          if (!categoryMap.has(name)) categoryMap.set(name, { value: 0, color })
-          categoryMap.get(name)!.value += t.amount
+        const monthTransactions = transactions.filter(t => {
+          const tDate = new Date(t.date)
+          return tDate >= monthStart && tDate <= monthEnd
         })
-        const categoryBreakdown = Array.from(categoryMap.entries()).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.value - a.value)
-
-        const sankeyNodes: { name: string }[] = [{ name: 'Total Income' }]
-        const sankeyLinks: { source: number; target: number; value: number }[] = []
-        const nodeMap = new Map<string, number>([['Total Income', 0]])
-
-        categoryBreakdown.forEach(cat => {
-            if (!nodeMap.has(cat.name)) {
-                nodeMap.set(cat.name, sankeyNodes.length)
-                sankeyNodes.push({ name: cat.name })
-            }
-            sankeyLinks.push({ source: 0, target: nodeMap.get(cat.name)!, value: cat.value })
+        
+        const income = monthTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        const expenses = monthTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0)
+        
+        monthlyTrends.push({
+          month: startMonth.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+          income,
+          expenses,
+          net: income - expenses,
+          transactionCount: monthTransactions.length
         })
-        const netSavings = totalIncome - totalExpenses
-        if (netSavings > 0) {
-            if (!nodeMap.has('Savings')) {
-                nodeMap.set('Savings', sankeyNodes.length)
-                sankeyNodes.push({ name: 'Savings' })
-            }
-            sankeyLinks.push({ source: 0, target: nodeMap.get('Savings')!, value: netSavings })
-        }
-        const sankeyData = { nodes: sankeyNodes, links: sankeyLinks };
         
-        const netCashFlow = totalIncome - totalExpenses
-        const burnRate = months > 0 ? totalExpenses / months : 0
+        startMonth.setMonth(startMonth.getMonth() + 1)
+      }
+
+      // Generate category breakdown
+      const categoryMap = new Map()
+      transactions.filter(t => t.type === 'expense').forEach(t => {
+        const categoryName = t.categories?.name || 'Uncategorized'
+        const categoryColor = t.categories?.color || '#6B7280'
         
-        let totalBalance = 0;
-        if(activeDashboard?.id) {
-            const { data: dashboardBalance } = await supabase.rpc('get_dashboard_balance', { p_dashboard_id: activeDashboard.id });
-            totalBalance = dashboardBalance;
+        if (categoryMap.has(categoryName)) {
+          categoryMap.get(categoryName).value += Number(t.amount)
+          categoryMap.get(categoryName).count += 1
         } else {
-            const { data: mainBalance } = await supabase.rpc('get_total_balance', { p_user_id: user.id });
-            totalBalance = mainBalance;
+          categoryMap.set(categoryName, {
+            name: categoryName,
+            value: Number(t.amount),
+            count: 1,
+            color: categoryColor,
+            percentage: 0
+          })
         }
+      })
 
-        const runway = totalBalance > 0 && burnRate > 0 ? totalBalance / burnRate : 0
-        const profitMargin = totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0
+      const totalExpenses = Array.from(categoryMap.values()).reduce((sum, cat) => sum + cat.value, 0)
+      const categoryBreakdown = Array.from(categoryMap.values())
+        .map(cat => ({
+          ...cat,
+          percentage: totalExpenses > 0 ? (cat.value / totalExpenses) * 100 : 0
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 8) // Top 8 categories
 
-        const monthlyMap = new Map<string, { income: number; expenses: number }>()
-        typedTransactions.forEach(t => {
-          const month = new Date(t.date).toLocaleDateString('en-US', { year: '2-digit', month: 'short' })
-          if (!monthlyMap.has(month)) monthlyMap.set(month, { income: 0, expenses: 0 })
-          
-          if (t.type === 'income') monthlyMap.get(month)!.income += t.amount
-          else monthlyMap.get(month)!.expenses += t.amount
+      // Generate weekly patterns
+      const weeklyPatterns = []
+      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      
+      for (let i = 0; i < 7; i++) {
+        const dayTransactions = transactions.filter(t => new Date(t.date).getDay() === i)
+        const avgAmount = dayTransactions.length > 0 
+          ? dayTransactions.reduce((sum, t) => sum + Number(t.amount), 0) / dayTransactions.length 
+          : 0
+        
+        weeklyPatterns.push({
+          day: daysOfWeek[i],
+          amount: avgAmount,
+          count: dayTransactions.length
         })
-        const monthlyBreakdown = Array.from(monthlyMap.entries()).map(([month, data]) => ({ month, ...data })).reverse()
-        const topCategory = categoryBreakdown[0]?.name || 'N/A'
-        const dailyAverage = months > 0 ? totalExpenses / (months * 30) : 0
-        const currentMonthExpenses = expenses.filter(t => new Date(t.date).getMonth() === new Date().getMonth()).reduce((sum, t) => sum + t.amount, 0)
-        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
-        const dayOfMonth = new Date().getDate()
-        const monthlyProjection = dayOfMonth > 0 ? (currentMonthExpenses / dayOfMonth) * daysInMonth : 0
-        const avgMonthlyIncome = months > 0 ? totalIncome / months : 0
-        const avgMonthlyExpenses = months > 0 ? totalExpenses / months : 0
+      }
 
-        setData({
-          monthlyBreakdown, categoryBreakdown, sankeyData, netCashFlow, burnRate,
-          runway, profitMargin, topCategory, dailyAverage, monthlyProjection,
-          avgMonthlyIncome, avgMonthlyExpenses
-        })
+      // Generate insights
+      const topCategory = categoryBreakdown[0]?.name || 'No data'
+      const recentTrend = monthlyTrends.slice(-3)
+      const trendDirection = recentTrend.length >= 2 
+        ? recentTrend[recentTrend.length - 1].net > recentTrend[recentTrend.length - 2].net 
+          ? 'up' : 'down'
+        : 'stable'
+      
+      const averageDaily = transactions.length > 0 
+        ? transactions.reduce((sum, t) => sum + Number(t.amount), 0) / 
+          Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0
 
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch analytics data.')
+      const projectedMonthly = averageDaily * 30
+
+      // Top expenses
+      const topExpenses = transactions
+        .filter(t => t.type === 'expense')
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .slice(0, 10)
+
+      // Top income
+      const topIncome = transactions
+        .filter(t => t.type === 'income')
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .slice(0, 10)
+
+      // Calculate average monthly income and expenses
+      const avgMonthlyIncome = monthlyTrends.length > 0 
+        ? Math.round(monthlyTrends.reduce((sum, m) => sum + m.income, 0) / monthlyTrends.length)
+        : 0
+      
+      const avgMonthlyExpenses = monthlyTrends.length > 0 
+        ? Math.round(monthlyTrends.reduce((sum, m) => sum + m.expenses, 0) / monthlyTrends.length)
+        : 0
+
+      setAnalyticsData({
+        monthlyTrends,
+        categoryBreakdown,
+        weeklyPatterns,
+        comparisonData: monthlyTrends.slice(-6), // Last 6 months for comparison
+        topExpenses,
+        topIncome,
+        insights: {
+          topCategory,
+          trendDirection,
+          averageDaily,
+          projectedMonthly,
+          avgMonthlyIncome,
+          avgMonthlyExpenses
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching analytics data:', error)
     } finally {
       setIsLoading(false)
     }
-    }
-    fetchAnalyticsData()
-  }, [user, period, activeDashboard])
-  
-  const StatCard = ({ title, value, icon: Icon, unit }: any) => (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}{unit}</div>
-      </CardContent>
-    </Card>
-  )
+  }, [user, selectedPeriod, customDateRange, activeDashboard])
 
-  const EmptyState = () => (
-    <div className="flex flex-col items-center justify-center h-full p-6 text-center rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 mt-4">
-        <BarChart2 className="w-12 h-12 text-gray-400 mb-4" />
-        <h3 className="text-xl font-semibold mb-2">No Data for Analytics</h3>
-        <p className="text-muted-foreground mb-4">There is no transaction data for the selected period or dashboard. <br/> Please select another period or import some transactions.</p>
+  useEffect(() => {
+    if (user) {
+      fetchAnalyticsData()
+    }
+  }, [user, fetchAnalyticsData])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
       </div>
     )
+  }
 
-  const LoadingState = () => (
-    <div className="space-y-4">
-        <div className="h-10 w-48 bg-gray-200 rounded animate-pulse ml-auto"></div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
+  if (!user) {
+    redirect("/")
+  }
+
+  const handleChartClick = (data: any, chartType: string) => {
+    setDrillDownData({ ...data, chartType })
+  }
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-medium text-gray-900 mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-2 text-sm">
+              <div 
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-gray-600">{entry.dataKey}:</span>
+              <span className="font-medium">${Math.round(entry.value || 0).toLocaleString()}</span>
             </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            {[...Array(5)].map((_, i) => <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>)}
+          ))}
         </div>
-        <div className="h-96 bg-gray-200 rounded animate-pulse"></div>
+      )
+    }
+    return null
+  }
+
+  const LoadingChart = () => (
+    <div className="h-80 bg-gray-50 rounded-lg animate-pulse flex items-center justify-center">
+      <div className="text-gray-400 text-sm">Loading chart data...</div>
     </div>
   )
 
   return (
-    <div className="flex h-screen bg-gray-50/50">
+    <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-4">
+        <main className="flex-1 overflow-auto p-3">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 min-h-full">
+          <div className="max-w-7xl mx-auto space-y-3">
+            
+            {/* Header */}
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">Business Analytics</h1>
-              <DashboardSelector />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
+                  <p className="text-gray-600 text-xs mt-1">Advanced insights into your financial patterns</p>
+              </div>
+              <div className="flex items-center gap-2">
+                  <DashboardIndicator />
+                  {/* Period Selection */}
+                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1">
+                    {[
+                      { key: "1month", label: "1M" },
+                      { key: "3months", label: "3M" },
+                      { key: "6months", label: "6M" },
+                      { key: "1year", label: "1Y" }
+                    ].map((period) => (
+                      <Button
+                        key={period.key}
+                        variant={selectedPeriod === period.key && !customDateRange ? "default" : "ghost"}
+                        size="sm"
+                        className={`h-7 px-2 text-xs transition-all ${
+                          selectedPeriod === period.key && !customDateRange ? "bg-blue-600 text-white shadow-sm" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedPeriod(period.key)
+                          setCustomDateRange(undefined)
+                        }}
+                      >
+                        {period.label}
+                </Button>
+                    ))}
+                  </div>
+                  
+                  <DateRangePicker
+                    value={customDateRange}
+                    onValueChange={(range) => {
+                      setCustomDateRange(range)
+                      if (range?.from && range?.to) {
+                        setSelectedPeriod("")
+                      }
+                    }}
+                    className="h-7 text-xs"
+                    placeholder="Custom range"
+                  />
+                  
+                  <Button variant="outline" size="sm" className="h-7 text-xs">
+                    <Download className="h-3 w-3 mr-1" />
+                  Export
+                </Button>
+              </div>
             </div>
-            <div className="border-b border-gray-200 my-4"></div>
 
-            {isLoading ? <LoadingState /> : error ? (
-                <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                    <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Error Loading Analytics</h3>
-                    <p className="text-muted-foreground mb-4">{error}</p>
-                    <Button onClick={() => window.location.reload()}>Try Again</Button>
+              {/* Key Insights Cards */}
+              {!isLoading && analyticsData && (
+                <div className="space-y-3">
+                  {/* First Row - Primary Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Top Category</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {analyticsData.insights.topCategory}
+                            </p>
                           </div>
-            ) : !data ? <EmptyState /> : (
-            <div className="space-y-4">
-                <div className="flex items-center justify-end space-x-2">
-                    <Select value={period} onValueChange={setPeriod}>
-                      <SelectTrigger className="w-[180px] h-9"><SelectValue placeholder="Select period" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="3m">Last 3 Months</SelectItem>
-                        <SelectItem value="6m">Last 6 Months</SelectItem>
-                        <SelectItem value="12m">Last 12 Months</SelectItem>
-                      </SelectContent>
-                    </Select>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                            <PieChart className="h-5 w-5 text-white" />
+                          </div>
                         </div>
-                
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <StatCard title="Net Cash Flow" value={currency ? formatCurrency(data.netCashFlow, currency) : '...'} icon={Briefcase} />
-                  <StatCard title="Monthly Burn Rate" value={currency ? formatCurrency(data.burnRate, currency) : '...'} icon={Zap} />
-                  <StatCard title="Runway" value={`${data.runway.toFixed(1)}`} unit=" months" icon={Gauge} />
-                  <StatCard title="Profit Margin" value={`${data.profitMargin.toFixed(1)}`} unit="%" icon={TrendingUp} />
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Trend</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {analyticsData.insights.trendDirection === 'up' ? (
+                                <ArrowUpRight className="h-3 w-3 text-green-600" />
+                              ) : analyticsData.insights.trendDirection === 'down' ? (
+                                <ArrowDownRight className="h-3 w-3 text-red-600" />
+                              ) : null}
+                              <span className="text-sm font-semibold text-gray-900">
+                                {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
+                                 analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
+                              </span>
                             </div>
-
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                  <StatCard title="Avg Monthly Income" value={currency ? formatCurrency(data.avgMonthlyIncome, currency) : '...'} icon={TrendingUp} />
-                  <StatCard title="Avg Monthly Expenses" value={currency ? formatCurrency(data.avgMonthlyExpenses, currency) : '...'} icon={TrendingDown} />
-                  <StatCard title="Daily Avg Expense" value={currency ? formatCurrency(data.dailyAverage, currency) : '...'} icon={DollarSign} />
-                  <StatCard title="Monthly Projection" value={currency ? formatCurrency(data.monthlyProjection, currency) : '...'} icon={BarChart2} />
-                  <StatCard title="Top Expense Category" value={data.topCategory} icon={PieIcon} />
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                            <TrendingUp className="h-5 w-5 text-white" />
+                          </div>
                         </div>
+                      </CardContent>
+                    </Card>
 
-                <div className="grid gap-4 md:grid-cols-1">
-                    <Card><CardHeader><CardTitle>Cash Flow Sankey</CardTitle></CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <>
-                                    {data.sankeyData && data.sankeyData.nodes.length > 1 ? (
-                                        <Sankey data={data.sankeyData} nodePadding={50} margin={{ top: 5, right: 5, bottom: 5, left: 5 }} link={{ stroke: '#B3C4D8' }}><Tooltip /></Sankey>
-                                    ) : ( <div className="flex items-center justify-center h-full text-sm text-gray-500">Not enough data to display cash flow.</div> )}
-                                </>
-                            </ResponsiveContainer>
+                    <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Daily Average</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                            <Activity className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                  <Card className="col-span-4"><CardHeader><CardTitle>Cash Flow (Income vs Expenses)</CardTitle></CardHeader>
-                    <CardContent className="pl-2">
-                      <ResponsiveContainer width="100%" height={350}>
-                        <BarChart data={data.monthlyBreakdown}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} /><YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => currency ? formatCurrencyShort(value, currency) : value} /><Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} /><Legend /><Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" /><Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" /></BarChart>
-                      </ResponsiveContainer>
+                  {/* Second Row - Financial Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Card className="bg-gradient-to-br from-orange-50/50 via-white to-white border border-orange-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Monthly Projection</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {userCurrency ? formatCurrency(analyticsData.insights.projectedMonthly, userCurrency) : `€${analyticsData.insights.projectedMonthly.toFixed(0)}`}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+                            <Target className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
-                  <Card className="col-span-4 md:col-span-3"><CardHeader><CardTitle>Expense Breakdown</CardTitle></CardHeader>
+
+                    <Card className="bg-gradient-to-br from-teal-50/50 via-white to-white border border-teal-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Avg Monthly Income</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyIncome), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyIncome).toLocaleString()}`}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
+                            <TrendingUp className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-red-50/50 via-white to-white border border-red-200/30">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">Avg Monthly Expenses</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">
+                              {userCurrency ? formatCurrency(Math.round(analyticsData.insights.avgMonthlyExpenses), userCurrency) : `€${Math.round(analyticsData.insights.avgMonthlyExpenses).toLocaleString()}`}
+                            </p>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                            <ArrowDownRight className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Chart Navigation */}
+              <div className="flex items-center gap-2 border-b border-gray-200">
+                {[
+                  { key: 'trends', label: 'Financial Trends', icon: Activity },
+                  { key: 'categories', label: 'Category Breakdown', icon: PieChart },
+                  { key: 'patterns', label: 'Weekly Patterns', icon: BarChart3 }
+                ].map(({ key, label, icon: Icon }) => (
+                  <Button
+                    key={key}
+                    variant="ghost"
+                    className={`h-10 px-4 rounded-none border-b-2 transition-all ${
+                      activeChart === key 
+                        ? "border-blue-600 text-blue-600 bg-blue-50/50" 
+                        : "border-transparent text-gray-600 hover:text-gray-900"
+                    }`}
+                    onClick={() => setActiveChart(key as any)}
+                  >
+                    <Icon className="h-4 w-4 mr-2" />
+                    {label}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Interactive Charts */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Chart Area */}
+                <div className="lg:col-span-2">
+                  <Card className="h-full">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        {activeChart === 'trends' && <Activity className="h-5 w-5 text-blue-600" />}
+                        {activeChart === 'categories' && <PieChart className="h-5 w-5 text-purple-600" />}
+                        {activeChart === 'patterns' && <BarChart3 className="h-5 w-5 text-green-600" />}
+                        {activeChart === 'trends' && 'Income vs Expenses Trend'}
+                        {activeChart === 'categories' && 'Expense Categories'}
+                        {activeChart === 'patterns' && 'Weekly Spending Patterns'}
+                      </CardTitle>
+                    </CardHeader>
                     <CardContent>
-                      <ResponsiveContainer width="100%" height={350}>
-                        <PieChart>
-                          <Pie data={data.categoryBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}
-                               label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                 const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                                 const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                                 const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                                 return (percent > 0.05) ? <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12}>{`${(percent * 100).toFixed(0)}%`}</text> : null;
-                               }}>
-                            {data.categoryBreakdown.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                      {isLoading ? (
+                        <LoadingChart />
+                      ) : !analyticsData ? (
+                        <div className="h-80 flex items-center justify-center text-gray-500">
+                          No data available for the selected period
+                        </div>
+                      ) : (
+                        <div className="h-80">
+                          {activeChart === 'trends' && (
+                            <ResponsiveContainer width="100%" height="100%">
+                              <AreaChart data={analyticsData.monthlyTrends}>
+                                <defs>
+                                  <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                                  </linearGradient>
+                                  <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                <XAxis 
+                                  dataKey="month" 
+                                  tick={{ fontSize: 12, fill: '#64748b' }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                />
+                                <YAxis 
+                                  tick={{ fontSize: 12, fill: '#64748b' }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                  tickFormatter={(value) => userCurrency ? formatCurrencyShort(value, userCurrency) : `€${(value / 1000).toFixed(0)}k`}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Area
+                                  type="monotone"
+                                  dataKey="income"
+                                  stackId="1"
+                                  stroke="#10B981"
+                                  fill="url(#incomeGradient)"
+                                  strokeWidth={2}
+                                  onClick={(data) => handleChartClick(data, 'income')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                                <Area
+                                  type="monotone"
+                                  dataKey="expenses"
+                                  stackId="2"
+                                  stroke="#EF4444"
+                                  fill="url(#expenseGradient)"
+                                  strokeWidth={2}
+                                  onClick={(data) => handleChartClick(data, 'expenses')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                                <ReferenceLine y={0} stroke="#64748b" strokeDasharray="2 2" />
+                                <Brush dataKey="month" height={30} stroke="#3B82F6" />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          )}
+
+                          {activeChart === 'categories' && (
+                            <ResponsiveContainer width="100%" height="100%">
+                              <RechartsPieChart>
+                                <Pie
+                                  data={analyticsData.categoryBreakdown}
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={120}
+                                  dataKey="value"
+                                  onClick={(data) => handleChartClick(data, 'category')}
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  {analyticsData.categoryBreakdown.map((entry, index) => (
+                                    <Cell 
+                                      key={`cell-${index}`} 
+                                      fill={entry.color || COLORS[index % COLORS.length]} 
+                                    />
                                   ))}
                                 </Pie>
-                          <Tooltip formatter={(value: number) => currency ? formatCurrency(value, currency) : value} /><Legend wrapperStyle={{fontSize: "12px"}}/>
-                        </PieChart>
+                                <Tooltip 
+                                  formatter={(value: number, name: string) => [
+                                    userCurrency ? formatCurrency(value, userCurrency) : `€${value.toLocaleString()}`,
+                                    name
+                                  ]}
+                                />
+                              </RechartsPieChart>
                             </ResponsiveContainer>
+                          )}
+
+                          {activeChart === 'patterns' && (
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={analyticsData.weeklyPatterns}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                <XAxis 
+                                  dataKey="day" 
+                                  tick={{ fontSize: 12, fill: '#64748b' }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                />
+                                <YAxis 
+                                  tick={{ fontSize: 12, fill: '#64748b' }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                  tickFormatter={(value) => userCurrency ? formatCurrency(value, userCurrency) : `€${value.toFixed(0)}`}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Bar 
+                                  dataKey="amount" 
+                                  fill="#3B82F6"
+                                  radius={[4, 4, 0, 0]}
+                                  onClick={(data) => handleChartClick(data, 'weekly')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* Side Panel */}
+                <div className="space-y-4">
+                  {/* Drill-down Info */}
+                  {drillDownData && (
+                    <Card className="bg-gradient-to-br from-yellow-50/50 via-white to-white border border-yellow-200/30">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Eye className="h-4 w-4 text-yellow-600" />
+                          <span className="font-medium text-gray-900">Drill-down Data</span>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Selected:</span>
+                            <span className="font-medium">{drillDownData.name || drillDownData.month || drillDownData.day}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Value:</span>
+                            <span className="font-medium">{userCurrency ? formatCurrency(drillDownData.value || drillDownData.amount || 0, userCurrency) : `€${(drillDownData.value || drillDownData.amount || 0).toLocaleString()}`}</span>
+                          </div>
+                          {drillDownData.percentage && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Percentage:</span>
+                              <span className="font-medium">{drillDownData.percentage.toFixed(1)}%</span>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Category Details */}
+                  {!isLoading && analyticsData && activeChart === 'categories' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Top Categories</CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-4">
+                        <div className="space-y-3">
+                          {analyticsData.categoryBreakdown.slice(0, 5).map((category, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                <span className="text-sm text-gray-900">{category.name}</span>
+                    </div>
+                              <div className="text-right">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {userCurrency ? formatCurrency(category.value, userCurrency) : `€${category.value.toLocaleString()}`}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {category.percentage.toFixed(1)}%
+                    </div>
+                  </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Quick Stats */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Quick Stats</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {!isLoading && analyticsData && (
+                          <>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">Total Transactions</span>
+                              <span className="font-medium">
+                                {analyticsData.monthlyTrends.reduce((sum, month) => sum + month.transactionCount, 0)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">Categories Used</span>
+                              <span className="font-medium">{analyticsData.categoryBreakdown.length}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">Most Active Day</span>
+                              <span className="font-medium">
+                                {analyticsData.weeklyPatterns.reduce((prev, current) => 
+                                  (prev.count > current.count) ? prev : current
+                                ).day}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                </div>
+              </CardContent>
+            </Card>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Top Expenses/Income Table */}
+            <div className="mt-6">
+              <Card className="border border-gray-200">
+                <CardHeader className="pb-2 px-4 pt-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <BarChart3 className="h-5 w-5 text-orange-600" />
+                      {topTransactionType === 'expenses' ? 'Top Expenses' : 'Top Income'}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTopTransactionType('expenses')}
+                        className="text-sm px-3 py-2 h-8"
+                      >
+                        Expenses
+                      </Button>
+                      <Button
+                        variant={topTransactionType === 'income' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTopTransactionType('income')}
+                        className="text-sm px-3 py-2 h-8"
+                      >
+                        Income
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="p-4 space-y-2">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />
+                      ))}
+                    </div>
+                  ) : (analyticsData?.topExpenses && analyticsData.topExpenses.length > 0) || (analyticsData?.topIncome && analyticsData.topIncome.length > 0) ? (
+                    <>
+                      <div className="px-4 py-3 border-b border-gray-200/60 bg-gray-50/30">
+                        <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          <div className="col-span-4 flex items-center">Description</div>
+                          <div className="col-span-2 flex items-center">Date</div>
+                          <div className="col-span-3 flex items-center">Category</div>
+                          <div className="col-span-3 flex items-center justify-end">Amount</div>
+                        </div>
+                      </div>
+                      <div className="divide-y divide-gray-100/60">
+                        {(topTransactionType === 'expenses' ? analyticsData?.topExpenses : analyticsData?.topIncome)?.slice(0, 10).map((transaction, index) => (
+                          <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
+                            <div className="grid grid-cols-12 gap-4 items-center">
+                              <div className="col-span-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm" style={{ backgroundColor: transaction.categories?.color }}>
+                                    <IconRenderer 
+                                      iconName={transaction.icon} 
+                                      className="h-4 w-4 text-white"
+                                      fallbackColor="white"
+                                    />
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900 truncate">{transaction.description}</span>
+                                </div>
+                              </div>
+                              <div className="col-span-2 flex items-center">
+                                <span className="text-sm text-gray-600">
+                                  {new Date(transaction.date).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="col-span-3 flex items-center">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: transaction.categories?.color }} />
+                                  <span className="text-sm text-gray-600 truncate">{transaction.categories?.name}</span>
+                                </div>
+                              </div>
+                              <div className="col-span-3 flex items-center justify-end">
+                                <span className={`text-sm font-semibold ${
+                                  topTransactionType === 'expenses' ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  {topTransactionType === 'expenses' ? '-' : '+'}{userCurrency ? formatCurrency(Number(transaction.amount), userCurrency).replace(/^[+\-]/, '') : `€${Number(transaction.amount).toLocaleString()}`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-sm font-medium text-gray-900 mb-1">No {topTransactionType} data</h3>
+                      <p className="text-sm text-gray-500">Add some {topTransactionType} to see analytics</p>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+
+          </div>
         </main>
       </div>
     </div>
