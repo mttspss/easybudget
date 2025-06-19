@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
+import { OnboardingProvider } from "@/lib/onboarding-context";
+import { DashboardProvider } from '@/lib/dashboard-context';
+import { SubscriptionProvider } from '@/lib/subscription-context';
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,10 +34,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        <Toaster />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <AuthProvider>
+            <DashboardProvider>
+              <SubscriptionProvider>
+                <OnboardingProvider>
+                  {children}
+                  <Toaster />
+                </OnboardingProvider>
+              </SubscriptionProvider>
+            </DashboardProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

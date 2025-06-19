@@ -498,7 +498,7 @@ export default function AnalyticsPage() {
                     <StatCard title="Monthly Burn Rate" value={userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : '...'} icon={<Zap className="h-4 w-4 text-orange-500"/>} />
                     <StatCard title="Runway" value={`${analyticsData.runwayMonths.toFixed(1)}`} unit=" mo" icon={<Gauge className="h-4 w-4 text-indigo-500"/>} />
                     <StatCard title="Profit Margin" value={`${analyticsData.profitMargin.toFixed(1)}`} unit="%" icon={<TrendingUp className="h-4 w-4 text-green-500"/>} />
-                  </div>
+                          </div>
 
                   {/* Standard Metrics Row */}
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
@@ -541,10 +541,10 @@ export default function AnalyticsPage() {
                     <CardHeader>
                       {activeChart === 'categories' ? (
                         <div className="flex items-center justify-between">
-                          <CardTitle className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2">
                             <PieChart className="h-5 w-5 text-purple-600" />
                             {activeBreakdown === 'expense' ? 'Expense Categories' : 'Income Sources'}
-                          </CardTitle>
+                      </CardTitle>
                           <div className="flex items-center gap-2">
                             <Button variant={activeBreakdown === 'expense' ? 'default' : 'outline'} size="sm" onClick={() => setActiveBreakdown('expense')}>Expenses</Button>
                             <Button variant={activeBreakdown === 'income' ? 'default' : 'outline'} size="sm" onClick={() => setActiveBreakdown('income')}>Income</Button>
@@ -729,15 +729,15 @@ export default function AnalyticsPage() {
                                   style={{ backgroundColor: category.color }}
                                 />
                                 <span className="text-sm text-gray-900">{category.name}</span>
-                              </div>
+                    </div>
                               <div className="text-right">
                                 <div className="text-sm font-medium text-gray-900">
                                   {userCurrency ? formatCurrency(category.value, userCurrency) : `€${category.value.toLocaleString()}`}
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {category.percentage.toFixed(1)}%
-                                </div>
-                              </div>
+                    </div>
+                  </div>
                             </div>
                           ))}
                         </div>
@@ -778,9 +778,9 @@ export default function AnalyticsPage() {
                             </div>
                           </>
                         )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                </div>
+              </CardContent>
+            </Card>
                 </div>
               </div>
 

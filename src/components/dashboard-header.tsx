@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useDashboards } from '@/lib/dashboard-context'
+import { useSubscription } from '@/lib/subscription-context'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { 
@@ -27,6 +28,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface DashboardHeaderProps {
   user: any
@@ -41,6 +43,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     deleteDashboard, 
     setActiveDashboard 
   } = useDashboards()
+  const { canCreateDashboard } = useSubscription()
   
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [newDashboardName, setNewDashboardName] = useState('')
@@ -145,12 +148,29 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       <div className="flex items-center gap-2">
         {/* Create Dashboard Dialog */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-1" />
-              New
-            </Button>
-          </DialogTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-block">
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      disabled={!canCreateDashboard(dashboards.length)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      New Dashboard
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </TooltipTrigger>
+              {!canCreateDashboard(dashboards.length) && (
+                <TooltipContent>
+                  <p>Upgrade to the Pro plan to create custom dashboards.</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Create New Dashboard</DialogTitle>
