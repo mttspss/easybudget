@@ -17,9 +17,18 @@ import {
   ChevronRight,
   Clock,
   DollarSign,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp,
+  BarChart3
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart"
 import { XAxis, YAxis, CartesianGrid, BarChart, Bar, Area, AreaChart } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
@@ -78,7 +87,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [balancePeriod] = useState("3months")
+  const [balancePeriod, setBalancePeriod] = useState("3months")
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   const itemsPerPage = 5
 
@@ -410,7 +419,7 @@ export default function Dashboard() {
       change: stats?.balanceChange || 0,
       changeType: (stats?.balanceChange || 0) >= 0 ? "increase" : "decrease",
       icon: Wallet,
-      color: "bg-blue-500"
+      color: "text-blue-500"
     },
     {
       title: "Monthly Income",
@@ -418,7 +427,7 @@ export default function Dashboard() {
       change: stats?.incomeChange || 0,
       changeType: (stats?.incomeChange || 0) >= 0 ? "increase" : "decrease",
       icon: DollarSign,
-      color: "bg-green-500"
+      color: "text-green-500"
     },
     {
       title: "Monthly Expenses",
@@ -426,7 +435,7 @@ export default function Dashboard() {
       change: stats?.expenseChange || 0,
       changeType: (stats?.expenseChange || 0) >= 0 ? "increase" : "decrease",
       icon: CreditCard,
-      color: "bg-orange-500"
+      color: "text-red-500"
     },
     {
       title: "Savings Rate",
@@ -434,7 +443,7 @@ export default function Dashboard() {
       change: stats?.savingsRateChange || 0,
       changeType: (stats?.savingsRateChange || 0) >= 0 ? "increase" : "decrease",
       icon: PiggyBank,
-      color: "bg-purple-500"
+      color: "text-purple-500"
     }
   ]
 
@@ -455,7 +464,7 @@ export default function Dashboard() {
                 <Card key={index} className="border-gray-200 shadow-sm">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                    <span className="text-muted-foreground"><stat.icon className="h-4 w-4" /></span>
+                    <span className={stat.color}><stat.icon className="h-4 w-4" /></span>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
@@ -484,10 +493,25 @@ export default function Dashboard() {
                 
                 {/* Total Balance Trend - Clean Area Chart */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Total Balance</CardTitle>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-gray-500" />
+                        <CardTitle className="text-base font-semibold">Total Balance</CardTitle>
+                    </div>
+                    <Select value={balancePeriod} onValueChange={setBalancePeriod}>
+                      <SelectTrigger className="w-28 h-7 text-xs bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1month">1 Month</SelectItem>
+                        <SelectItem value="3months">3 Months</SelectItem>
+                        <SelectItem value="6months">6 Months</SelectItem>
+                        <SelectItem value="12months">12 Months</SelectItem>
+                        <SelectItem value="alltime">All Time</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </CardHeader>
-                  <CardContent className="pl-2">
+                  <CardContent className="pl-2 pt-4">
                     {isLoading ? (
                         <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
@@ -553,10 +577,13 @@ export default function Dashboard() {
 
                 {/* Monthly Comparison - Bar Chart */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Monthly Comparison</CardTitle>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-gray-500" />
+                        <CardTitle className="text-base font-semibold">Monthly Comparison</CardTitle>
+                    </div>
                   </CardHeader>
-                  <CardContent className="pl-2">
+                  <CardContent className="pl-2 pt-4">
                     {isLoading ? (
                       <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
