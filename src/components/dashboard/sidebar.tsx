@@ -150,24 +150,8 @@ export function Sidebar() {
       {/* Bottom section */}
       <div className="p-4 space-y-3">
         
-        {/* Upgrade Button */}
-        {!subscriptionLoading && plan.id !== 'growth' && (
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-4 text-center border border-blue-200">
-            <h4 className="font-bold text-sm text-gray-800 mb-1">Upgrade to Pro</h4>
-            <p className="text-xs text-gray-600 mb-3">Unlock advanced features and remove all limits.</p>
-            <Button 
-              size="sm" 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => router.push('/#pricing')}
-            >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Upgrade Plan
-            </Button>
-          </div>
-        )}
-
         {/* User Profile - Enhanced with 3-dot menu */}
-        <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+        <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group mb-2">
           <Avatar className="h-8 w-8 ring-2 ring-gray-200">
             <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt="Profile" />
             <AvatarFallback className="text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
@@ -247,6 +231,17 @@ export function Sidebar() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        {/* Upgrade Button */}
+        {!subscriptionLoading && plan.id !== 'growth' && (
+          <Button 
+            size="sm" 
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
+            onClick={() => router.push('/#pricing')}
+          >
+            Upgrade
+          </Button>
+        )}
       </div>
     </div>
   )

@@ -46,7 +46,7 @@ interface Goal {
 
 export default function GoalsPage() {
   const { user, loading } = useAuth()
-  const { plan, goalsCount, canCreateGoal } = useSubscription()
+  const { plan, goalsCount, canCreateGoal, refreshUsage } = useSubscription()
   const [goals, setGoals] = useState<Goal[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -171,8 +171,9 @@ export default function GoalsPage() {
       setEditingGoal(null)
       setIsDialogOpen(false)
       
-      // Refresh data
+      // Refresh data and usage counts
       fetchGoals()
+      refreshUsage()
     } catch (error: any) {
       console.error('Error saving goal:', error)
       toast.error(`Error saving goal: ${error.message || 'Please try again.'}`)

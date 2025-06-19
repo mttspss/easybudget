@@ -87,7 +87,7 @@ interface ExpensesPageProps {
 function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
-  const { plan, transactionsThisMonth, canAddTransaction } = useSubscription()
+  const { plan, transactionsThisMonth, canAddTransaction, refreshUsage } = useSubscription()
   const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -298,8 +298,9 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
       setEditingTransaction(null)
       setIsDialogOpen(false)
       
-      // Refresh data
+      // Refresh data and usage counts
       fetchData()
+      refreshUsage()
     } catch (error: any) {
       console.error('Error saving transaction:', error)
       toast.error(`Error saving transaction: ${error.message || 'Please try again.'}`)

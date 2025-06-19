@@ -67,6 +67,7 @@ interface SubscriptionContextType {
   transactionsThisMonth: number;
   csvImportsThisMonth: number;
   goalsCount: number;
+  refreshUsage: () => void;
   canCreateDashboard: (currentCount: number) => boolean;
   canAddTransaction: () => boolean;
   canImportCsv: () => boolean;
@@ -85,6 +86,51 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [csvImportsThisMonth, setCsvImportsThisMonth] = useState(0);
   const [goalsCount, setGoalsCount] = useState(0);
 
+  const fetchUsageCounts = useCallback(async () => {
+    if (!user) return;
+
+    // Fetch transaction count for the current month
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+    
+    const { count: transactionCount, error: transactionError } = await supabase
+      .from('transactions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('date', startDate);
+
+    if (transactionError) {
+      console.error('Error fetching transaction count:', transactionError.message);
+    } else {
+      setTransactionsThisMonth(transactionCount || 0);
+    }
+
+    // Fetch CSV import count for the current month
+    const { count: csvCount, error: csvCountError } = await supabase
+      .from('csv_imports')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', startDate);
+
+    if (csvCountError) {
+      console.error('Error fetching CSV import count:', csvCountError.message);
+    } else {
+      setCsvImportsThisMonth(csvCount || 0);
+    }
+
+    // Fetch goals count
+    const { count: goalsCount, error: goalsCountError } = await supabase
+      .from('goals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    if (goalsCountError) {
+      console.error('Error fetching goals count:', goalsCountError.message);
+    } else {
+      setGoalsCount(goalsCount || 0);
+    }
+  }, [user]);
+
   const fetchSubscription = useCallback(async () => {
     if (!user) {
       setIsLoading(false)
@@ -102,13 +148,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
       if (error) {
         console.error('Error fetching subscription details:', error.message);
-        // Fallback to free plan if user details not found or error
         setPlan(PLANS.free);
         setStatus(null);
-        return;
-      }
-      
-      if (data) {
+      } else if (data) {
         const userPlan = PLANS[data.plan_type] || PLANS.free;
         setPlan(userPlan);
         setStatus(data.subscription_status);
@@ -117,46 +159,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setStatus(null);
       }
       
-      // Also fetch transaction count for the current month
-      const today = new Date();
-      const startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
-      
-      const { count, error: countError } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('date', startDate);
-
-      if (countError) {
-        console.error('Error fetching transaction count:', countError.message);
-      } else {
-        setTransactionsThisMonth(count || 0);
-      }
-
-      // Also fetch CSV import count for the current month
-      const { count: csvCount, error: csvCountError } = await supabase
-        .from('csv_imports')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', startDate);
-
-      if (csvCountError) {
-        console.error('Error fetching CSV import count:', csvCountError.message);
-      } else {
-        setCsvImportsThisMonth(csvCount || 0);
-      }
-
-      // Also fetch goals count
-      const { count: goalsCount, error: goalsCountError } = await supabase
-        .from('goals')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      if (goalsCountError) {
-        console.error('Error fetching goals count:', goalsCountError.message);
-      } else {
-        setGoalsCount(goalsCount || 0);
-      }
+      await fetchUsageCounts();
 
     } catch (error) {
       console.error('An unexpected error occurred:', error);
@@ -165,7 +168,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, fetchUsageCounts])
 
   useEffect(() => {
     fetchSubscription()
@@ -211,6 +214,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     transactionsThisMonth,
     csvImportsThisMonth,
     goalsCount,
+    refreshUsage: fetchUsageCounts,
     canCreateDashboard,
     canAddTransaction,
     canImportCsv,

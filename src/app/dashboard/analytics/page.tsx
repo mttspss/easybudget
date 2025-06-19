@@ -401,8 +401,8 @@ export default function AnalyticsPage() {
     redirect("/")
   }
 
-  // Block access for starter plan
-  if (plan.id === 'starter') {
+  // Block access for users without advanced analytics
+  if (!plan.hasAdvancedAnalytics) {
     return (
       <div className="flex h-screen bg-gray-50/50">
         <Sidebar />
