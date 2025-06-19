@@ -465,13 +465,8 @@ export default function AnalyticsPage() {
 
                     <StatCard
                       label="Trend"
-                      value={
-                        <span className="flex items-center gap-1">
-                          {analyticsData.insights.trendDirection === 'up' && <ArrowUpRight className="h-4 w-4 text-green-600" />}
-                          {analyticsData.insights.trendDirection === 'down' && <ArrowDownRight className="h-4 w-4 text-red-600" />}
-                          {analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
-                        </span>
-                      }
+                      icon={analyticsData.insights.trendDirection === 'up' ? <ArrowUpRight className="h-3 w-3 text-green-600" /> : analyticsData.insights.trendDirection === 'down' ? <ArrowDownRight className="h-3 w-3 text-red-600" /> : undefined}
+                      value={analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
                     />
 
                     <StatCard
