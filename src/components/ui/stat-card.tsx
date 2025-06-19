@@ -13,12 +13,12 @@ interface StatCardProps {
 export function StatCard({ title, value, unit, icon, valueClassName = "", className = "" }: StatCardProps) {
   return (
     <Card className={`border border-gray-200 bg-white ${className}`}>
-      <CardContent className="h-28 p-4 flex flex-col justify-between">
-        <div className="flex items-start justify-between text-xs font-medium text-gray-600">
+      <CardContent className="p-3 flex flex-col">
+        <div className="flex items-start justify-between text-[11px] font-medium text-gray-600">
           <span>{title}</span>
           {icon && <span className="text-gray-400">{icon}</span>}
         </div>
-        <div className={`text-2xl font-semibold ${valueClassName}`}>
+        <div className={`mt-1 text-xl font-semibold ${valueClassName}`}>
           {value}{unit && <span className="text-base font-medium text-gray-500">{unit}</span>}
         </div>
       </CardContent>
