@@ -13,9 +13,15 @@ import {
   BarChart3,
   Activity,
   Download,
-  ArrowUpRight,
-  ArrowDownRight,
-  Eye
+  Eye,
+  Briefcase,
+  Zap,
+  Gauge,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  BarChart2,
+  PieChart as PieIcon
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -455,48 +461,21 @@ export default function AnalyticsPage() {
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
                 <div className="space-y-3">
-                  {/* First Row - Primary Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <StatCard 
-                      label="Top Category"
-                      value={analyticsData.insights.topCategory}
-                      icon={<PieChart className="h-3 w-3" />}
-                    />
-
-                    <StatCard
-                      label="Trend"
-                      icon={analyticsData.insights.trendDirection === 'up' ? <ArrowUpRight className="h-3 w-3 text-green-600" /> : analyticsData.insights.trendDirection === 'down' ? <ArrowDownRight className="h-3 w-3 text-red-600" /> : undefined}
-                      value={analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
-                    />
-
-                    <StatCard
-                      label="Daily Average"
-                      value={userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
-                    />
+                  {/* Business KPI Row */}
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <StatCard title="Net Cash Flow" value={userCurrency ? formatCurrency(analyticsData.netCashFlow, userCurrency) : '...'} valueClassName={analyticsData.netCashFlow >=0 ? 'text-green-600':'text-red-600'} icon={<Briefcase className="h-3 w-3"/>} />
+                    <StatCard title="Monthly Burn Rate" value={userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : '...'} icon={<Zap className="h-3 w-3"/>} />
+                    <StatCard title="Runway" value={`${analyticsData.runwayMonths.toFixed(1)}`} unit=" mo" icon={<Gauge className="h-3 w-3"/>} />
+                    <StatCard title="Profit Margin" value={`${analyticsData.profitMargin.toFixed(1)}`} unit="%" icon={<TrendingUp className="h-3 w-3"/>} />
                   </div>
 
-                  {/* Second Row - Financial KPIs (clean style) */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <StatCard
-                      label="Net Cash Flow"
-                      value={`${analyticsData.netCashFlow >= 0 ? '+' : '-'}${userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}`}
-                      valueClassName={analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}
-                    />
-
-                    <StatCard
-                      label="Monthly Burn Rate"
-                      value={userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}
-                    />
-
-                    <StatCard
-                      label="Runway"
-                      value={analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}
-                    />
-
-                    <StatCard
-                      label="Profit Margin"
-                      value={`${analyticsData.profitMargin.toFixed(1)}%`}
-                    />
+                  {/* Standard Metrics Row */}
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mt-4">
+                    <StatCard title="Avg Monthly Income" value={userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyIncome, userCurrency) : '...'} icon={<TrendingUp className="h-3 w-3"/>} />
+                    <StatCard title="Avg Monthly Expenses" value={userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyExpenses, userCurrency) : '...'} icon={<TrendingDown className="h-3 w-3"/>} />
+                    <StatCard title="Daily Avg Expense" value={userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : '...'} icon={<DollarSign className="h-3 w-3"/>} />
+                    <StatCard title="Monthly Projection" value={userCurrency ? formatCurrency(analyticsData.insights.projectedMonthly, userCurrency) : '...'} icon={<BarChart2 className="h-3 w-3"/>} />
+                    <StatCard title="Top Expense Category" value={analyticsData.insights.topCategory} icon={<PieIcon className="h-3 w-3"/>} />
                   </div>
                 </div>
               )}
