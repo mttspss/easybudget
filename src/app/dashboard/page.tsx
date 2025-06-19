@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
   Plus,
-  BarChart3,
   Wallet,
   CreditCard,
   PiggyBank,
@@ -18,31 +17,11 @@ import {
   ChevronRight,
   Clock,
   DollarSign,
-  TrendingUp,
   AlertTriangle
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  ChartContainer,
-  ChartTooltip,
-  type ChartConfig,
-} from "@/components/ui/chart"
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  BarChart,
-  Bar,
-  Area,
-  AreaChart
-} from 'recharts'
+import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart"
+import { XAxis, YAxis, CartesianGrid, BarChart, Bar, Area, AreaChart } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
 import { useOnboarding } from "@/lib/onboarding-context"
@@ -99,7 +78,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [balancePeriod, setBalancePeriod] = useState("3months")
+  const [balancePeriod] = useState("3months")
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   const itemsPerPage = 5
 
@@ -473,48 +452,29 @@ export default function Dashboard() {
             {/* Quick Stats - More Compact */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {quickStats.map((stat, index) => (
-                <Card key={index} className="relative overflow-hidden border-0 shadow-sm">
-                  {/* Subtle gradient overlay based on icon color */}
-                  <div className="absolute inset-0 opacity-5">
-                    {stat.title === "Total Balance" && <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600"></div>}
-                    {stat.title === "Monthly Income" && <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-600"></div>}
-                    {stat.title === "Monthly Expenses" && <div className="w-full h-full bg-gradient-to-br from-pink-500 to-pink-600"></div>}
-                    {stat.title === "Savings Rate" && <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600"></div>}
-                  </div>
-                  <CardContent className="p-4 relative">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                        <p className="text-xs font-medium text-gray-500 mb-1">{stat.title}</p>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-2xl font-bold text-gray-900">
-                            {stat.title === "Savings Rate" 
-                              ? `${stat.amount.toFixed(1)}%` 
-                              : userCurrency 
-                                ? formatCurrency(stat.amount, userCurrency)
-                                : `€${stat.amount.toLocaleString()}`
-                            }
-                          </span>
-                          <div className={`flex items-center text-xs font-medium ${
-                              stat.changeType === 'increase' 
-                                ? 'text-[#53E489]' 
-                                : 'text-[#EF0465]'
-                            }`}>
-                            <span className="mr-1">{stat.changeType === 'increase' ? '↗' : '↘'}</span>
-                            {Math.abs(stat.change).toFixed(1)}% from last month
-                          </div>
-                        </div>
-                            </div>
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center ml-3">
-                        {stat.title === "Total Balance" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"><Wallet className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Monthly Income" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center"><DollarSign className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Monthly Expenses" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center"><CreditCard className="h-6 w-6 text-white" /></div>}
-                        {stat.title === "Savings Rate" && <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"><PiggyBank className="h-6 w-6 text-white" /></div>}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                <Card key={index} className="border-gray-200 shadow-sm">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                    <span className="text-muted-foreground"><stat.icon className="h-4 w-4" /></span>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {stat.title === "Savings Rate" 
+                        ? `${stat.amount.toFixed(1)}%` 
+                        : userCurrency 
+                          ? formatCurrency(stat.amount, userCurrency)
+                          : `€${stat.amount.toLocaleString()}`
+                      }
+                    </div>
+                    <p className={`text-xs ${
+                        stat.change >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                      {stat.change >= 0 ? '+' : ''}{stat.change.toFixed(1)}% from last month
+                    </p>
+                  </CardContent>
+                </Card>
               ))}
-              </div>
+            </div>
 
             {/* Main Dashboard Grid - Restructured */}
             <div className="space-y-3">
@@ -523,34 +483,17 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
                 {/* Total Balance Trend - Clean Area Chart */}
-                <Card className="relative overflow-hidden">
-                  {/* Improved Header */}
-                  <div className="absolute top-4 left-6 right-6 z-10 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-semibold text-gray-900">Total Balance</span>
-                    </div>
-                    <Select value={balancePeriod} onValueChange={setBalancePeriod}>
-                      <SelectTrigger className="w-28 h-7 text-xs bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1month">1 Month</SelectItem>
-                        <SelectItem value="3months">3 Months</SelectItem>
-                        <SelectItem value="6months">6 Months</SelectItem>
-                        <SelectItem value="12months">12 Months</SelectItem>
-                        <SelectItem value="alltime">All Time</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <CardContent className="pt-14 pb-4 px-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Total Balance</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pl-2">
                     {isLoading ? (
                         <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
                         <div className="h-72">
                         <ChartContainer config={balanceChartConfig}>
-                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                            <AreaChart data={stats?.balanceTrend || []} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
                             <defs>
                               <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="hsl(217.2 91.2% 59.8%)" stopOpacity={0.3}/>
@@ -609,20 +552,17 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Monthly Comparison - Bar Chart */}
-                <Card className="relative overflow-hidden">
-                  {/* Improved Header */}
-                  <div className="absolute top-4 left-6 right-6 z-10 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-indigo-600" />
-                    <span className="text-sm font-semibold text-gray-900">Monthly Comparison</span>
-                  </div>
-                  
-                  <CardContent className="pt-14 pb-4 px-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Monthly Comparison</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pl-2">
                     {isLoading ? (
                       <div className="h-72 bg-gray-100 animate-pulse rounded" />
                     ) : (
                       <div className="h-72">
                         <ChartContainer config={monthlyChartConfig}>
-                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                          <BarChart data={stats?.monthlyTrend || []} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                             <XAxis 
                               dataKey="month" 

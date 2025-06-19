@@ -501,7 +501,7 @@ export default function AnalyticsPage() {
                   </div>
 
                   {/* Standard Metrics Row */}
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mt-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
                     <StatCard title="Avg Monthly Income" value={userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyIncome, userCurrency) : '...'} icon={<TrendingUp className="h-3 w-3"/>} />
                     <StatCard title="Avg Monthly Expenses" value={userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyExpenses, userCurrency) : '...'} icon={<TrendingDown className="h-3 w-3"/>} />
                     <StatCard title="Daily Avg Expense" value={userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : '...'} icon={<DollarSign className="h-3 w-3"/>} />
