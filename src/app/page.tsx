@@ -146,7 +146,6 @@ export default function LandingPage() {
       features: [
         "Up to 100 transactions per month",
         "1 CSV import per month",
-        "Complete analytics dashboard",
         "Smart transaction categorization",
         "Track up to 5 financial goals",
         "Single personal account"
@@ -163,11 +162,11 @@ export default function LandingPage() {
       highlight: "Professional",
       popular: true,
       features: [
-        "Unlimited transactions",
+        "Up to 500 transactions",
         "Up to 3 CSV imports per month",
         "Advanced analytics & reporting",
         "Unlimited financial goals",
-        "Connect 1 business account",
+        "Connect 2 business accounts",
         "Priority email support"
       ],
       cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Pro",
@@ -185,7 +184,7 @@ export default function LandingPage() {
         "Unlimited CSV imports",
         "Full analytics suite",
         "Unlimited financial goals",
-        "Connect up to 5 business accounts",
+        "Connect up to 8 business accounts",
         "Priority support & mobile app access"
       ],
       cta: isCreatingCheckout === 'growth' ? "Processing..." : "Get Growth",
