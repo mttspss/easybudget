@@ -20,8 +20,7 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
-  BarChart2,
-  PieChart as PieIcon
+  BarChart2
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -68,6 +67,7 @@ interface AnalyticsData {
     nodes: { name: string }[]
     links: { source: number; target: number; value: number }[]
   }
+  incomeCategoryBreakdown: any[]
 }
 
 const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
@@ -83,6 +83,7 @@ export default function AnalyticsPage() {
   const [drillDownData, setDrillDownData] = useState<any>(null)
   const [topTransactionType, setTopTransactionType] = useState<'expenses' | 'income'>('expenses')
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
+  const [activeBreakdown, setActiveBreakdown] = useState<'expense' | 'income'>('expense');
 
   // Load user currency
   useEffect(() => {
@@ -224,6 +225,35 @@ export default function AnalyticsPage() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 8) // Top 8 categories
 
+      // Generate income category breakdown
+      const incomeCategoryMap = new Map()
+      transactions.filter(t => t.type === 'income').forEach(t => {
+        const categoryName = t.categories?.name || 'Uncategorized'
+        const categoryColor = t.categories?.color || '#6B7280'
+        
+        if (incomeCategoryMap.has(categoryName)) {
+          incomeCategoryMap.get(categoryName).value += Number(t.amount)
+          incomeCategoryMap.get(categoryName).count += 1
+        } else {
+          incomeCategoryMap.set(categoryName, {
+            name: categoryName,
+            value: Number(t.amount),
+            count: 1,
+            color: categoryColor,
+            percentage: 0
+          })
+        }
+      })
+
+      const totalIncomeForBreakdown = Array.from(incomeCategoryMap.values()).reduce((sum, cat) => sum + cat.value, 0)
+      const incomeCategoryBreakdown = Array.from(incomeCategoryMap.values())
+        .map(cat => ({
+          ...cat,
+          percentage: totalIncomeForBreakdown > 0 ? (cat.value / totalIncomeForBreakdown) * 100 : 0
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 8)
+
       // Generate weekly patterns
       const weeklyPatterns = []
       const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -339,7 +369,8 @@ export default function AnalyticsPage() {
           projectedMonthly,
           avgMonthlyIncome,
           avgMonthlyExpenses
-        }
+        },
+        incomeCategoryBreakdown,
       })
     } catch (error) {
       console.error('Error fetching analytics data:', error)
@@ -475,7 +506,6 @@ export default function AnalyticsPage() {
                     <StatCard title="Avg Monthly Expenses" value={userCurrency ? formatCurrency(analyticsData.insights.avgMonthlyExpenses, userCurrency) : '...'} icon={<TrendingDown className="h-3 w-3"/>} />
                     <StatCard title="Daily Avg Expense" value={userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : '...'} icon={<DollarSign className="h-3 w-3"/>} />
                     <StatCard title="Monthly Projection" value={userCurrency ? formatCurrency(analyticsData.insights.projectedMonthly, userCurrency) : '...'} icon={<BarChart2 className="h-3 w-3"/>} />
-                    <StatCard title="Top Expense Category" value={analyticsData.insights.topCategory} icon={<PieIcon className="h-3 w-3"/>} />
                   </div>
                 </div>
               )}
@@ -509,14 +539,23 @@ export default function AnalyticsPage() {
                 <div className="lg:col-span-2">
                   <Card className="h-full">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        {activeChart === 'trends' && <Activity className="h-5 w-5 text-blue-600" />}
-                        {activeChart === 'categories' && <PieChart className="h-5 w-5 text-purple-600" />}
-                        {activeChart === 'patterns' && <BarChart3 className="h-5 w-5 text-green-600" />}
-                        {activeChart === 'trends' && 'Income vs Expenses Trend'}
-                        {activeChart === 'categories' && 'Expense Categories'}
-                        {activeChart === 'patterns' && 'Weekly Spending Patterns'}
-                      </CardTitle>
+                      {activeChart === 'categories' ? (
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <PieChart className="h-5 w-5 text-purple-600" />
+                            {activeBreakdown === 'expense' ? 'Expense Categories' : 'Income Sources'}
+                          </CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Button variant={activeBreakdown === 'expense' ? 'default' : 'outline'} size="sm" onClick={() => setActiveBreakdown('expense')}>Expenses</Button>
+                            <Button variant={activeBreakdown === 'income' ? 'default' : 'outline'} size="sm" onClick={() => setActiveBreakdown('income')}>Income</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <CardTitle className="flex items-center gap-2">
+                          {activeChart === 'trends' && <><Activity className="h-5 w-5 text-blue-600" /><span>Income vs Expenses Trend</span></>}
+                          {activeChart === 'patterns' && <><BarChart3 className="h-5 w-5 text-green-600" /><span>Weekly Spending Patterns</span></>}
+                        </CardTitle>
+                      )}
                     </CardHeader>
                     <CardContent>
                       {isLoading ? (
@@ -584,7 +623,7 @@ export default function AnalyticsPage() {
                             <ResponsiveContainer width="100%" height="100%">
                               <RechartsPieChart>
                                 <Pie
-                                  data={analyticsData.categoryBreakdown}
+                                  data={activeBreakdown === 'expense' ? analyticsData.categoryBreakdown : analyticsData.incomeCategoryBreakdown}
                                   cx="50%"
                                   cy="50%"
                                   outerRadius={120}
@@ -592,7 +631,7 @@ export default function AnalyticsPage() {
                                   onClick={(data) => handleChartClick(data, 'category')}
                                   style={{ cursor: 'pointer' }}
                                 >
-                                  {analyticsData.categoryBreakdown.map((entry, index) => (
+                                  {(activeBreakdown === 'expense' ? analyticsData.categoryBreakdown : analyticsData.incomeCategoryBreakdown).map((entry, index) => (
                                     <Cell 
                                       key={`cell-${index}`} 
                                       fill={entry.color || COLORS[index % COLORS.length]} 
@@ -676,11 +715,13 @@ export default function AnalyticsPage() {
                   {!isLoading && analyticsData && activeChart === 'categories' && (
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Top Categories</CardTitle>
+                        <CardTitle className="text-lg">
+                          {activeBreakdown === 'expense' ? 'Top Categories' : 'Top Income Sources'}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="p-4">
                         <div className="space-y-3">
-                          {analyticsData.categoryBreakdown.slice(0, 5).map((category, index) => (
+                          {(activeBreakdown === 'expense' ? analyticsData.categoryBreakdown : analyticsData.incomeCategoryBreakdown).slice(0, 5).map((category, index) => (
                             <div key={index} className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div 
@@ -688,15 +729,15 @@ export default function AnalyticsPage() {
                                   style={{ backgroundColor: category.color }}
                                 />
                                 <span className="text-sm text-gray-900">{category.name}</span>
-                    </div>
+                              </div>
                               <div className="text-right">
                                 <div className="text-sm font-medium text-gray-900">
                                   {userCurrency ? formatCurrency(category.value, userCurrency) : `€${category.value.toLocaleString()}`}
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {category.percentage.toFixed(1)}%
-                    </div>
-                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -716,12 +757,16 @@ export default function AnalyticsPage() {
                             <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-600">Total Transactions</span>
                               <span className="font-medium">
-                                {analyticsData.monthlyTrends.reduce((sum, month) => sum + month.transactionCount, 0)}
+                                {analyticsData.monthlyTrends?.reduce((sum, month) => sum + month.transactionCount, 0) || 0}
                               </span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-600">Categories Used</span>
-                              <span className="font-medium">{analyticsData.categoryBreakdown.length}</span>
+                              <span className="font-medium">
+                                {activeBreakdown === 'expense' 
+                                ? analyticsData.categoryBreakdown.length 
+                                : analyticsData.incomeCategoryBreakdown.length}
+                              </span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-600">Most Active Day</span>
@@ -733,9 +778,9 @@ export default function AnalyticsPage() {
                             </div>
                           </>
                         )}
-                </div>
-              </CardContent>
-            </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
 
@@ -755,7 +800,7 @@ export default function AnalyticsPage() {
                         variant={topTransactionType === 'expenses' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setTopTransactionType('expenses')}
-                        className="text-sm px-3 py-2 h-8"
+                        className="h-8 px-3 py-2 text-sm"
                       >
                         Expenses
                       </Button>
@@ -763,7 +808,7 @@ export default function AnalyticsPage() {
                         variant={topTransactionType === 'income' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setTopTransactionType('income')}
-                        className="text-sm px-3 py-2 h-8"
+                        className="h-8 px-3 py-2 text-sm"
                       >
                         Income
                       </Button>
