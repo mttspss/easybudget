@@ -17,7 +17,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   FolderOpen,
-  MoreHorizontal
+  MoreHorizontal,
+  Lock
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -49,6 +50,7 @@ import { IconSelector } from "@/components/ui/icon-selector"
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
+import { useSubscription } from "@/lib/subscription-context"
 
 interface Category {
   id: string
@@ -68,6 +70,7 @@ const colorOptions = [
 export default function CategoriesPage() {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { plan } = useSubscription()
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -340,11 +343,17 @@ export default function CategoriesPage() {
                           icon: "FolderOpen"
                         })
                       }}
+                      disabled={!plan.canEditCategories}
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Create Category
                     </Button>
                   </DialogTrigger>
+                  {!plan.canEditCategories && (
+                    <p className="text-xs text-red-500 ml-2">
+                      Upgrade to a paid plan to manage categories.
+                    </p>
+                  )}
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-lg">
@@ -560,8 +569,8 @@ export default function CategoriesPage() {
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                  <MoreHorizontal className="h-3 w-3" />
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!plan.canEditCategories}>
+                                  {plan.canEditCategories ? <MoreHorizontal className="h-3 w-3" /> : <Lock className="h-3 w-3 text-gray-400" />}
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
@@ -656,8 +665,8 @@ export default function CategoriesPage() {
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                  <MoreHorizontal className="h-3 w-3" />
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!plan.canEditCategories}>
+                                  {plan.canEditCategories ? <MoreHorizontal className="h-3 w-3" /> : <Lock className="h-3 w-3 text-gray-400" />}
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">

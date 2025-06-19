@@ -13,6 +13,7 @@ export interface Plan {
   maxCsvImports: number;
   maxGoals: number;
   hasAdvancedAnalytics: boolean;
+  canEditCategories: boolean;
 }
 
 // Define all available plans
@@ -25,6 +26,7 @@ const PLANS: Record<string, Plan> = {
     maxCsvImports: 1,
     maxGoals: 5,
     hasAdvancedAnalytics: false,
+    canEditCategories: true,
   },
   pro: {
     id: 'pro',
@@ -34,6 +36,7 @@ const PLANS: Record<string, Plan> = {
     maxCsvImports: 3,
     maxGoals: Infinity,
     hasAdvancedAnalytics: true,
+    canEditCategories: true,
   },
   growth: {
     id: 'growth',
@@ -43,15 +46,17 @@ const PLANS: Record<string, Plan> = {
     maxCsvImports: Infinity,
     maxGoals: Infinity,
     hasAdvancedAnalytics: true,
+    canEditCategories: true,
   },
   free: { // Fallback for users without a plan or issues
     id: 'free',
     name: 'Free',
     maxDashboards: 0,
-    maxTransactions: 100,
-    maxCsvImports: 1,
-    maxGoals: 5,
+    maxTransactions: 5,
+    maxCsvImports: 0,
+    maxGoals: 1,
     hasAdvancedAnalytics: false,
+    canEditCategories: false,
   }
 };
 
