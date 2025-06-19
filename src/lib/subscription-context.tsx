@@ -60,9 +60,13 @@ interface SubscriptionContextType {
   status: string | null;
   isLoading: boolean;
   transactionsThisMonth: number;
+  csvImportsThisMonth: number;
+  goalsCount: number;
   canCreateDashboard: (currentCount: number) => boolean;
   canAddTransaction: () => boolean;
-  // Add other permission checks here later
+  canImportCsv: () => boolean;
+  canCreateGoal: () => boolean;
+  recordCsvImport: () => Promise<void>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
@@ -73,6 +77,8 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [status, setStatus] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [transactionsThisMonth, setTransactionsThisMonth] = useState(0);
+  const [csvImportsThisMonth, setCsvImportsThisMonth] = useState(0);
+  const [goalsCount, setGoalsCount] = useState(0);
 
   const fetchSubscription = useCallback(async () => {
     if (!user) {
@@ -122,6 +128,31 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setTransactionsThisMonth(count || 0);
       }
 
+      // Also fetch CSV import count for the current month
+      const { count: csvCount, error: csvCountError } = await supabase
+        .from('csv_imports')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', startDate);
+
+      if (csvCountError) {
+        console.error('Error fetching CSV import count:', csvCountError.message);
+      } else {
+        setCsvImportsThisMonth(csvCount || 0);
+      }
+
+      // Also fetch goals count
+      const { count: goalsCount, error: goalsCountError } = await supabase
+        .from('goals')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (goalsCountError) {
+        console.error('Error fetching goals count:', goalsCountError.message);
+      } else {
+        setGoalsCount(goalsCount || 0);
+      }
+
     } catch (error) {
       console.error('An unexpected error occurred:', error);
       setPlan(PLANS.free);
@@ -146,13 +177,40 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     return transactionsThisMonth < plan.maxTransactions;
   };
 
+  const canImportCsv = () => {
+    if (plan.maxCsvImports === Infinity) return true;
+    return csvImportsThisMonth < plan.maxCsvImports;
+  };
+
+  const canCreateGoal = () => {
+    if (plan.maxGoals === Infinity) return true;
+    return goalsCount < plan.maxGoals;
+  };
+
+  const recordCsvImport = async () => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('csv_imports').insert({ user_id: user.id });
+      if (error) throw error;
+      // Manually increment count to update UI immediately
+      setCsvImportsThisMonth(prev => prev + 1);
+    } catch (error) {
+      console.error("Error recording CSV import:", error);
+    }
+  };
+
   const value: SubscriptionContextType = {
     plan,
     status,
     isLoading,
     transactionsThisMonth,
+    csvImportsThisMonth,
+    goalsCount,
     canCreateDashboard,
     canAddTransaction,
+    canImportCsv,
+    canCreateGoal,
+    recordCsvImport,
   }
 
   return (

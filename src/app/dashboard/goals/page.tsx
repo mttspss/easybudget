@@ -32,6 +32,7 @@ import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 import confetti from 'canvas-confetti'
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
+import { useSubscription } from "@/lib/subscription-context"
 
 interface Goal {
   id: string
@@ -45,6 +46,7 @@ interface Goal {
 
 export default function GoalsPage() {
   const { user, loading } = useAuth()
+  const { plan, goalsCount, canCreateGoal } = useSubscription()
   const [goals, setGoals] = useState<Goal[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -292,11 +294,16 @@ export default function GoalsPage() {
               <div className="flex items-center gap-2">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" onClick={() => setEditingGoal(null)}>
+                    <Button size="sm" onClick={() => setEditingGoal(null)} disabled={!canCreateGoal()}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add Goal
                     </Button>
                   </DialogTrigger>
+                  {!canCreateGoal() && (
+                    <p className="text-xs text-red-500 ml-2">
+                      Goal limit reached ({goalsCount}/{plan.maxGoals}).
+                    </p>
+                  )}
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-lg">
@@ -377,7 +384,7 @@ export default function GoalsPage() {
                         }}>
                           Cancel
                         </Button>
-                        <Button type="submit" size="sm">
+                        <Button type="submit" size="sm" disabled={!canCreateGoal() && !editingGoal}>
                           {editingGoal ? 'Update' : 'Create'} Goal
                         </Button>
                       </DialogFooter>
@@ -652,10 +659,15 @@ export default function GoalsPage() {
                     <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No goals found</h3>
                     <p className="text-xs text-gray-500 mb-4">Set your first financial goal to start tracking your progress</p>
-                    <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+                    <Button size="sm" onClick={() => setIsDialogOpen(true)} disabled={!canCreateGoal()}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Goal
                     </Button>
+                    {!canCreateGoal() && (
+                       <p className="text-xs text-red-500 mt-2">
+                        Goal limit reached ({goalsCount}/{plan.maxGoals}). Please upgrade to add more.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

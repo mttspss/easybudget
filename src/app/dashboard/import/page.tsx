@@ -42,6 +42,7 @@ import { toast } from "sonner"
 import { createDefaultCategories } from "@/lib/default-categories"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
+import { useSubscription } from "@/lib/subscription-context"
 
 interface ParsedTransaction {
   id: string
@@ -79,6 +80,7 @@ interface ImportState {
 export default function ImportPage() {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { plan, csvImportsThisMonth, canImportCsv, recordCsvImport } = useSubscription()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [importState, setImportState] = useState<ImportState>({
@@ -579,6 +581,8 @@ export default function ImportPage() {
       }))
 
       if (imported > 0) {
+        // Record the successful import
+        await recordCsvImport()
         toast.success(`Import completed! ${imported} transactions imported to ${activeDashboard?.name || 'Main Dashboard'}.`)
       } else {
         toast.error(`Import failed. ${skipped} transactions had errors.`)
@@ -785,7 +789,7 @@ export default function ImportPage() {
                         
                         <Button 
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={isProcessing}
+                          disabled={isProcessing || !canImportCsv()}
                           className="w-full"
                         >
                           {isProcessing ? (
@@ -800,6 +804,16 @@ export default function ImportPage() {
                             </>
                           )}
                         </Button>
+
+                        {!canImportCsv() ? (
+                          <p className="text-xs text-red-500 mt-2">
+                            You have reached your monthly limit of {plan.maxCsvImports} CSV import(s). Please upgrade for more.
+                          </p>
+                        ) : (
+                          <div className="text-xs text-gray-500">
+                            You have {plan.maxCsvImports - csvImportsThisMonth} import(s) remaining this month.
+                          </div>
+                        )}
 
                         <div className="text-xs text-gray-500">
                           Supported formats: CSV, Excel (.xlsx, .xls)

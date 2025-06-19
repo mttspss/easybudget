@@ -43,6 +43,8 @@ import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
 import { StatCard } from "@/components/ui/stat-card"
+import { useSubscription } from "@/lib/subscription-context"
+import { useRouter } from "next/navigation"
 
 interface AnalyticsData {
   monthlyTrends: any[]
@@ -75,6 +77,8 @@ const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'
 export default function AnalyticsPage() {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { plan, isLoading: isSubscriptionLoading } = useSubscription()
+  const router = useRouter()
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("3months")
@@ -385,7 +389,7 @@ export default function AnalyticsPage() {
     }
   }, [user, fetchAnalyticsData])
 
-  if (loading) {
+  if (loading || isSubscriptionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -395,6 +399,28 @@ export default function AnalyticsPage() {
 
   if (!user) {
     redirect("/")
+  }
+
+  // Block access for starter plan
+  if (plan.id === 'starter') {
+    return (
+      <div className="flex h-screen bg-gray-50/50">
+        <Sidebar />
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+          <div className="bg-white p-8 rounded-lg shadow-md border border-yellow-200">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <TrendingUp className="h-8 w-8 text-yellow-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Upgrade to Unlock Analytics</h2>
+            <p className="text-gray-600 mb-6">The Analytics page is a premium feature. Upgrade your plan to gain access to advanced insights.</p>
+            <Button onClick={() => router.push('/#pricing')}>
+              <TrendingUp className="h-4 w-4 mr-2" />
+              View Plans
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const handleChartClick = (data: any, chartType: string) => {
