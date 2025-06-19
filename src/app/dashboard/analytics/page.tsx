@@ -37,6 +37,7 @@ import {
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
+import { StatCard } from "@/components/ui/stat-card"
 
 interface AnalyticsData {
   monthlyTrends: any[]
@@ -454,82 +455,53 @@ export default function AnalyticsPage() {
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
                 <div className="space-y-3">
-                  {/* First Row - Primary Metrics (clean style) */}
+                  {/* First Row - Primary Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {/* Top Category */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <div className="flex items-start justify-between">
-                          <p className="text-xs font-medium text-gray-600">Top Category</p>
-                        </div>
-                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.insights.topCategory}</p>
-                      </CardContent>
-                    </Card>
+                    <StatCard 
+                      label="Top Category"
+                      value={analyticsData.insights.topCategory}
+                      icon={<PieChart className="h-3 w-3" />}
+                    />
 
-                    {/* Trend */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <div className="flex items-start justify-between">
-                          <p className="text-xs font-medium text-gray-600">Trend</p>
-                        </div>
-                        <div className="flex items-center gap-1 text-2xl font-semibold">
-                          {analyticsData.insights.trendDirection === 'up' && (
-                            <ArrowUpRight className="h-4 w-4 text-green-600" />
-                          )}
-                          {analyticsData.insights.trendDirection === 'down' && (
-                            <ArrowDownRight className="h-4 w-4 text-red-600" />
-                          )}
-                          <span>{analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Trend"
+                      value={
+                        <span className="flex items-center gap-1">
+                          {analyticsData.insights.trendDirection === 'up' && <ArrowUpRight className="h-4 w-4 text-green-600" />}
+                          {analyticsData.insights.trendDirection === 'down' && <ArrowDownRight className="h-4 w-4 text-red-600" />}
+                          {analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
+                        </span>
+                      }
+                    />
 
-                    {/* Daily Average */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <div className="flex items-start justify-between">
-                          <p className="text-xs font-medium text-gray-600">Daily Average</p>
-                        </div>
-                        <p className="text-2xl font-semibold text-gray-900">
-                          {userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Daily Average"
+                      value={userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
+                    />
                   </div>
 
                   {/* Second Row - Financial KPIs (clean style) */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    {/* Net Cash Flow */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <p className="text-xs font-medium text-gray-600">Net Cash Flow</p>
-                        <p className={`text-2xl font-semibold ${analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>{analyticsData.netCashFlow >= 0 ? '+' : '-'}{userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}</p>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Net Cash Flow"
+                      value={`${analyticsData.netCashFlow >= 0 ? '+' : '-'}${userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}`}
+                      valueClassName={analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}
+                    />
 
-                    {/* Monthly Burn Rate */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <p className="text-xs font-medium text-gray-600">Monthly Burn Rate</p>
-                        <p className="text-2xl font-semibold text-gray-900">{userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}</p>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Monthly Burn Rate"
+                      value={userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}
+                    />
 
-                    {/* Runway */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <p className="text-xs font-medium text-gray-600">Runway</p>
-                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}</p>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Runway"
+                      value={analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}
+                    />
 
-                    {/* Profit Margin */}
-                    <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-4 h-full flex flex-col justify-between">
-                        <p className="text-xs font-medium text-gray-600">Profit Margin</p>
-                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.profitMargin.toFixed(1)}%</p>
-                      </CardContent>
-                    </Card>
+                    <StatCard
+                      label="Profit Margin"
+                      value={`${analyticsData.profitMargin.toFixed(1)}%`}
+                    />
                   </div>
                 </div>
               )}
