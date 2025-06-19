@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context"
 import { useDashboards } from "@/lib/dashboard-context"
+import { useSubscription } from "@/lib/subscription-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -86,6 +87,7 @@ interface ExpensesPageProps {
 function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { plan, transactionsThisMonth, canAddTransaction } = useSubscription()
   const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -518,11 +520,16 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
                 </Button>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" onClick={() => setEditingTransaction(null)}>
+                    <Button size="sm" onClick={() => setEditingTransaction(null)} disabled={!canAddTransaction()}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add Expense
                     </Button>
                   </DialogTrigger>
+                  {!canAddTransaction() && (
+                    <p className="text-xs text-red-500 ml-2">
+                      Transaction limit reached ({transactionsThisMonth}/{plan.maxTransactions})
+                    </p>
+                  )}
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-lg">
@@ -616,7 +623,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
                         }}>
                           Cancel
                         </Button>
-                        <Button type="submit" size="sm">
+                        <Button type="submit" size="sm" disabled={!canAddTransaction() && !editingTransaction}>
                           {editingTransaction ? 'Update' : 'Add'} Expense
                         </Button>
                       </DialogFooter>
@@ -911,10 +918,15 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
                     <ArrowDownRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No expenses found</h3>
                     <p className="text-xs text-gray-500 mb-3">Start tracking your expenses by adding your first transaction</p>
-                    <Button onClick={() => setIsDialogOpen(true)} size="sm">
+                    <Button onClick={() => setIsDialogOpen(true)} size="sm" disabled={!canAddTransaction()}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add Expense
                     </Button>
+                    {!canAddTransaction() && (
+                      <p className="text-xs text-red-500 mt-2">
+                        Transaction limit reached ({transactionsThisMonth}/{plan.maxTransactions}).<br/> Please upgrade your plan.
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>

@@ -5,8 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
-import { useSubscription } from "@/lib/use-subscription"  // Back to normal version
-// import { useSubscriptionDebug } from "@/lib/use-subscription-debug"  // DEBUG VERSION
+import { useSubscription } from "@/lib/subscription-context"
 import { Button } from "@/components/ui/button"
 import { 
   BarChart3,
@@ -17,7 +16,6 @@ import {
   TrendingUp,
   Upload,
   Settings,
-  Layers,
   User,
   LogOut,
   HelpCircle,
@@ -79,8 +77,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const router = useRouter()
-  const { planType, loading: subscriptionLoading, error } = useSubscription(user?.id) // Normal version
-  // const { subscription, loading: subscriptionLoading, error } = useSubscriptionDebug(user?.id) // DEBUG
+  const { plan, isLoading: subscriptionLoading } = useSubscription()
 
   const handleProfileSettings = () => {
     router.push('/dashboard/profile')
@@ -152,31 +149,22 @@ export function Sidebar() {
 
       {/* Bottom section */}
       <div className="p-4 space-y-3">
-        {/* Monthly Budget */}
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1 bg-white rounded-lg shadow-sm">
-              <Layers className="h-4 w-4 text-gray-600" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-gray-900">Monthly Budget</div>
-              <div className="text-xs text-gray-500">Track your spending</div>
-            </div>
+        
+        {/* Upgrade Button */}
+        {!subscriptionLoading && plan.id !== 'growth' && (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-4 text-center border border-blue-200">
+            <h4 className="font-bold text-sm text-gray-800 mb-1">Upgrade to Pro</h4>
+            <p className="text-xs text-gray-600 mb-3">Unlock advanced features and remove all limits.</p>
+            <Button 
+              size="sm" 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => router.push('/#pricing')}
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Upgrade Plan
+            </Button>
           </div>
-          
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-bold text-gray-900">$3,847</span>
-              <span className="text-xs text-gray-500">of $5,500</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full w-3/4 relative">
-                <div className="absolute right-0 top-0 w-2 h-2 bg-blue-600 rounded-full"></div>
-              </div>
-            </div>
-            <div className="text-xs text-gray-600">$1,653 remaining this month</div>
-          </div>
-        </div>
+        )}
 
         {/* User Profile - Enhanced with 3-dot menu */}
         <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
@@ -192,8 +180,7 @@ export function Sidebar() {
             </div>
             <div className="text-xs text-gray-500">
               {subscriptionLoading ? 'Loading...' : 
-               planType && planType !== 'free' ? `${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan` : 'Free Plan'}
-              {error && <div className="text-red-500 text-xs">Error: {error}</div>}
+               plan ? `${plan.name} Plan` : 'Free Plan'}
             </div>
           </div>
           <DropdownMenu>

@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context"
 import { useDashboards } from "@/lib/dashboard-context"
+import { useSubscription } from "@/lib/subscription-context"
 import { supabase } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -89,6 +90,7 @@ interface IncomePageProps {
 function IncomePageContent({ initialCategory }: IncomePageProps) {
   const { user, loading } = useAuth()
   const { activeDashboard } = useDashboards()
+  const { plan, transactionsThisMonth, canAddTransaction } = useSubscription()
   const searchParams = useSearchParams()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -534,6 +536,11 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                       Add Income
                     </Button>
                   </DialogTrigger>
+                  {!canAddTransaction() && (
+                    <p className="text-xs text-red-500 ml-2">
+                      Transaction limit reached ({transactionsThisMonth}/{plan.maxTransactions})
+                    </p>
+                  )}
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-lg">
@@ -627,7 +634,7 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                         }}>
                           Cancel
                         </Button>
-                        <Button type="submit" size="sm">
+                        <Button type="submit" size="sm" disabled={!canAddTransaction() && !editingTransaction}>
                           {editingTransaction ? 'Update' : 'Add'} Income
                         </Button>
                       </DialogFooter>
@@ -922,10 +929,15 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                     <ArrowUpRight className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <h3 className="text-sm font-medium text-gray-900 mb-1">No income found</h3>
                     <p className="text-xs text-gray-500 mb-3">Start tracking your income by adding your first transaction</p>
-                    <Button onClick={() => setIsDialogOpen(true)} size="sm">
+                    <Button onClick={() => setIsDialogOpen(true)} size="sm" disabled={!canAddTransaction()}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add Income
                     </Button>
+                    {!canAddTransaction() && (
+                      <p className="text-xs text-red-500 mt-2">
+                        Transaction limit reached ({transactionsThisMonth}/{plan.maxTransactions}).<br/> Please upgrade your plan.
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>

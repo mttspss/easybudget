@@ -166,7 +166,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               </TooltipTrigger>
               {!canCreateDashboard(dashboards.length) && (
                 <TooltipContent>
-                  <p>Upgrade to the Pro plan to create custom dashboards.</p>
+                  <p>Upgrade your plan to create more dashboards.</p>
                 </TooltipContent>
               )}
             </Tooltip>

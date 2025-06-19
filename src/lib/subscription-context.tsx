@@ -30,7 +30,7 @@ const PLANS: Record<string, Plan> = {
     id: 'pro',
     name: 'Pro',
     maxDashboards: 2,
-    maxTransactions: Infinity,
+    maxTransactions: 500,
     maxCsvImports: 3,
     maxGoals: Infinity,
     hasAdvancedAnalytics: true,
@@ -38,7 +38,7 @@ const PLANS: Record<string, Plan> = {
   growth: {
     id: 'growth',
     name: 'Growth',
-    maxDashboards: 10,
+    maxDashboards: 8,
     maxTransactions: Infinity,
     maxCsvImports: Infinity,
     maxGoals: Infinity,
@@ -59,7 +59,9 @@ interface SubscriptionContextType {
   plan: Plan;
   status: string | null;
   isLoading: boolean;
+  transactionsThisMonth: number;
   canCreateDashboard: (currentCount: number) => boolean;
+  canAddTransaction: () => boolean;
   // Add other permission checks here later
 }
 
@@ -70,6 +72,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [plan, setPlan] = useState<Plan>(PLANS.free)
   const [status, setStatus] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [transactionsThisMonth, setTransactionsThisMonth] = useState(0);
 
   const fetchSubscription = useCallback(async () => {
     if (!user) {
@@ -102,6 +105,22 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setPlan(PLANS.free);
         setStatus(null);
       }
+      
+      // Also fetch transaction count for the current month
+      const today = new Date();
+      const startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+      
+      const { count, error: countError } = await supabase
+        .from('transactions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('date', startDate);
+
+      if (countError) {
+        console.error('Error fetching transaction count:', countError.message);
+      } else {
+        setTransactionsThisMonth(count || 0);
+      }
 
     } catch (error) {
       console.error('An unexpected error occurred:', error);
@@ -122,11 +141,18 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     return currentCount < plan.maxDashboards;
   };
   
+  const canAddTransaction = () => {
+    if (plan.maxTransactions === Infinity) return true;
+    return transactionsThisMonth < plan.maxTransactions;
+  };
+
   const value: SubscriptionContextType = {
     plan,
     status,
     isLoading,
+    transactionsThisMonth,
     canCreateDashboard,
+    canAddTransaction,
   }
 
   return (
