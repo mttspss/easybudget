@@ -9,18 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker"
 import { 
-  TrendingUp,
   PieChart,
   BarChart3,
   Activity,
   Download,
   ArrowUpRight,
   ArrowDownRight,
-  Eye,
-  Banknote,
-  Flame,
-  Timer,
-  Percent
+  Eye
 } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -37,8 +32,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  Brush,
-  Sankey
+  Brush
 } from 'recharts'
 import { IconRenderer } from "@/components/ui/icon-renderer"
 import { getUserCurrency, formatCurrency, formatCurrencyShort, type CurrencyConfig } from "@/lib/currency"
@@ -460,132 +454,80 @@ export default function AnalyticsPage() {
               {/* Key Insights Cards */}
               {!isLoading && analyticsData && (
                 <div className="space-y-3">
-                  {/* First Row - Primary Metrics */}
+                  {/* First Row - Primary Metrics (clean style) */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Card className="bg-gradient-to-br from-blue-50/50 via-white to-white border border-blue-200/30">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Top Category</p>
-                            <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {analyticsData.insights.topCategory}
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                            <PieChart className="h-5 w-5 text-white" />
-                          </div>
+                    {/* Top Category */}
+                    <Card className="border border-gray-200 bg-white">
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <div className="flex items-start justify-between">
+                          <p className="text-xs font-medium text-gray-600">Top Category</p>
+                        </div>
+                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.insights.topCategory}</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Trend */}
+                    <Card className="border border-gray-200 bg-white">
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <div className="flex items-start justify-between">
+                          <p className="text-xs font-medium text-gray-600">Trend</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-2xl font-semibold">
+                          {analyticsData.insights.trendDirection === 'up' && (
+                            <ArrowUpRight className="h-4 w-4 text-green-600" />
+                          )}
+                          {analyticsData.insights.trendDirection === 'down' && (
+                            <ArrowDownRight className="h-4 w-4 text-red-600" />
+                          )}
+                          <span>{analyticsData.insights.trendDirection === 'up' ? 'Improving' : analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}</span>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-green-50/50 via-white to-white border border-green-200/30">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Trend</p>
-                            <div className="flex items-center gap-1 mt-1">
-                              {analyticsData.insights.trendDirection === 'up' ? (
-                                <ArrowUpRight className="h-3 w-3 text-green-600" />
-                              ) : analyticsData.insights.trendDirection === 'down' ? (
-                                <ArrowDownRight className="h-3 w-3 text-red-600" />
-                              ) : null}
-                              <span className="text-sm font-semibold text-gray-900">
-                                {analyticsData.insights.trendDirection === 'up' ? 'Improving' : 
-                                 analyticsData.insights.trendDirection === 'down' ? 'Declining' : 'Stable'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                            <TrendingUp className="h-5 w-5 text-white" />
-                          </div>
+                    {/* Daily Average */}
+                    <Card className="border border-gray-200 bg-white">
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <div className="flex items-start justify-between">
+                          <p className="text-xs font-medium text-gray-600">Daily Average</p>
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gradient-to-br from-purple-50/50 via-white to-white border border-purple-200/30">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Daily Average</p>
-                            <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
-                            <Activity className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
+                        <p className="text-2xl font-semibold text-gray-900">
+                          {userCurrency ? formatCurrency(analyticsData.insights.averageDaily, userCurrency) : `€${analyticsData.insights.averageDaily.toFixed(0)}`}
+                        </p>
                       </CardContent>
                     </Card>
                   </div>
 
-                  {/* Second Row - Financial Metrics - Replaced with Business KPIs */}
+                  {/* Second Row - Financial KPIs (clean style) */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     {/* Net Cash Flow */}
                     <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Net Cash Flow</p>
-                            <p className={`text-sm font-semibold mt-1 ${analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {analyticsData.netCashFlow >= 0 ? '+' : '-'}{userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
-                            <Banknote className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <p className="text-xs font-medium text-gray-600">Net Cash Flow</p>
+                        <p className={`text-2xl font-semibold ${analyticsData.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>{analyticsData.netCashFlow >= 0 ? '+' : '-'}{userCurrency ? formatCurrency(Math.abs(analyticsData.netCashFlow), userCurrency) : `€${Math.abs(analyticsData.netCashFlow).toLocaleString()}`}</p>
                       </CardContent>
                     </Card>
 
                     {/* Monthly Burn Rate */}
                     <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Monthly Burn Rate</p>
-                            <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
-                            <Flame className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <p className="text-xs font-medium text-gray-600">Monthly Burn Rate</p>
+                        <p className="text-2xl font-semibold text-gray-900">{userCurrency ? formatCurrency(analyticsData.monthlyBurnRate, userCurrency) : `€${analyticsData.monthlyBurnRate.toLocaleString()}`}</p>
                       </CardContent>
                     </Card>
 
                     {/* Runway */}
                     <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Runway</p>
-                            <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                            <Timer className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <p className="text-xs font-medium text-gray-600">Runway</p>
+                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.runwayMonths > 0 ? `${analyticsData.runwayMonths.toFixed(1)} mo` : '—'}</p>
                       </CardContent>
                     </Card>
 
                     {/* Profit Margin */}
                     <Card className="border border-gray-200 bg-white">
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">Profit Margin</p>
-                            <p className="text-sm font-semibold text-gray-900 mt-1">
-                              {analyticsData.profitMargin.toFixed(1)}%
-                            </p>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
-                            <Percent className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
+                      <CardContent className="p-4 h-full flex flex-col justify-between">
+                        <p className="text-xs font-medium text-gray-600">Profit Margin</p>
+                        <p className="text-2xl font-semibold text-gray-900">{analyticsData.profitMargin.toFixed(1)}%</p>
                       </CardContent>
                     </Card>
                   </div>
@@ -891,7 +833,7 @@ export default function AnalyticsPage() {
                     </div>
                   ) : (analyticsData?.topExpenses && analyticsData.topExpenses.length > 0) || (analyticsData?.topIncome && analyticsData.topIncome.length > 0) ? (
                     <>
-                      <div className="px-4 py-3 border-b border-gray-200/60 bg-gray-50/30">
+                      <div className="px-6 py-3 border-b border-gray-200/60 bg-gray-50/30">
                         <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
                           <div className="col-span-4 flex items-center">Description</div>
                           <div className="col-span-2 flex items-center">Date</div>
@@ -901,7 +843,7 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="divide-y divide-gray-100/60">
                         {(topTransactionType === 'expenses' ? analyticsData?.topExpenses : analyticsData?.topIncome)?.slice(0, 10).map((transaction, index) => (
-                          <div key={index} className="px-4 py-3 hover:bg-gray-50/50 transition-colors">
+                          <div key={index} className="px-6 py-4 hover:bg-gray-50 transition-colors">
                             <div className="grid grid-cols-12 gap-4 items-center">
                               <div className="col-span-4">
                                 <div className="flex items-center gap-3">
@@ -949,32 +891,7 @@ export default function AnalyticsPage() {
               </Card>
             </div>
 
-            {/* Cash Flow Sankey Chart */}
-            {!isLoading && analyticsData && analyticsData.sankeyData.nodes.length > 1 && (
-              <div className="mt-6">
-                <Card className="border border-gray-200">
-                  <CardHeader className="pb-2 px-4 pt-4">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <PieChart className="h-5 w-5 text-blue-600" />
-                      Cash Flow Overview
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <div className="h-96 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <Sankey
-                          data={analyticsData.sankeyData}
-                          nodePadding={40}
-                          nodeWidth={20}
-                          link={{ stroke: "#d1d5db" }}
-                          node={{ cursor: 'pointer' }}
-                        />
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+            {/* Cash Flow Sankey Chart removed as per user request */}
 
           </div>
         </main>
