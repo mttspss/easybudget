@@ -383,7 +383,8 @@ export default function LandingPage() {
               </button>
               <button 
                 onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
+                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                disabled
               >
                 Watch Demo
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
