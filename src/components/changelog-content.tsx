@@ -6,9 +6,9 @@ import {
   ArrowLeft,
   Calendar,
   Sparkles,
-  Zap
-  // Code,
-  // BarChart3
+  Zap,
+  Code,
+  BarChart3
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -76,12 +76,10 @@ const typeConfig = {
   feature: {
     icon: Sparkles,
     color: "bg-green-500",
-    label: "New Feature"
   },
   improvement: {
     icon: Zap,
     color: "bg-blue-500", 
-    label: "Improvement"
   },
 }
 
@@ -186,26 +184,20 @@ export default function ChangelogPageContent() {
             Help shape the future of EasyBudget by sharing your feedback and feature requests.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {/* <Button 
+            <Button 
               onClick={() => router.push('/dashboard')}
               className="bg-[#60ea8b] hover:bg-[#50da7b] text-white"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Go to Dashboard
-            </Button> */}
-            <Button 
-              onClick={() => window.open('mailto:noreply@easybudget.ing')}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Share Your Feedback
             </Button>
-            {/* <Button 
+            <Button 
               variant="outline"
               onClick={() => window.open('https://github.com/mttspss/easybudget', '_blank')}
             >
               <Code className="h-4 w-4 mr-2" />
               View on GitHub
-            </Button> */}
+            </Button>
           </div>
         </div>
       </div>
