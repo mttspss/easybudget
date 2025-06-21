@@ -14,8 +14,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "easybudget - Professional Financial Management Platform",
-  description: "Stop managing money in spreadsheets. Get complete financial visibility and insights in one professional dashboard.",
+  title: "easybudget.ing | From Financial Chaos to Clarity in Seconds",
+  description: "Stop guessing where your money goes. Easybudget turns your messy bank statements into a simple, beautiful dashboard. See everything, track goals, and finally feel in control.",
   icons: {
     icon: [
       { url: '/favicon1.png', type: 'image/png' },
@@ -23,6 +23,27 @@ export const metadata: Metadata = {
       { url: '/favicon1.png', type: 'image/png', sizes: '16x16' },
     ],
     apple: '/favicon1.png',
+  },
+  openGraph: {
+    title: 'easybudget.ing | From Financial Chaos to Clarity in Seconds',
+    description: 'Stop guessing where your money goes. Easybudget turns your messy bank statements into a simple, beautiful dashboard.',
+    url: 'https://easybudget.ing',
+    siteName: 'easybudget.ing',
+    images: [
+      {
+        url: 'https://easybudget.ing/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'easybudget.ing | From Financial Chaos to Clarity in Seconds',
+    description: 'Stop guessing where your money goes. Easybudget turns your messy bank statements into a simple, beautiful dashboard.',
+    images: ['https://easybudget.ing/og-image.png'],
   },
 };
 
@@ -46,6 +67,26 @@ export default function RootLayout({
             </DashboardProvider>
           </AuthProvider>
         </ThemeProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "easybudget.ing",
+            "operatingSystem": "WEB",
+            "applicationCategory": "FinanceApplication",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "ratingCount": "88"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "14.00",
+              "priceCurrency": "USD"
+            }
+          })}}
+        />
       </body>
     </html>
   );

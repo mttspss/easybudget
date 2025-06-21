@@ -1,0 +1,10 @@
+# Block crawler access to all dashboard-related paths
+User-agent: *
+Disallow: /dashboard/
+Disallow: /dashboard/*
+
+# Allow access to everything else
+Allow: /
+
+# Point to the sitemap
+Sitemap: https://easybudget.ing/sitemap.xml 
