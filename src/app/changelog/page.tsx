@@ -10,9 +10,22 @@ import {
   Bug,
   BarChart3,
   Shield,
-  Zap
+  Zap,
+  Smartphone,
+  Users,
+  Recycle,
+  Banknote
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ChangelogEntry {
   version: string
@@ -23,103 +36,67 @@ interface ChangelogEntry {
   changes: string[]
 }
 
-const changelogData: ChangelogEntry[] = [
+const roadmapData: {
+  version: string
+  date: string
+  type: 'feature' | 'improvement'
+  title: string
+  description: string
+  changes: string[]
+  icon: React.ElementType
+}[] = [
   {
-    version: "2.1.0",
-    date: "2024-01-15",
+    version: "3.0.0",
+    date: "Est. Q4 2024",
     type: "feature",
-    title: "Dashboard Preview Component",
-    description: "Added interactive dashboard preview section to homepage with tabbed interface showcasing key features.",
+    title: "Mobile App & API Integrations",
+    description: "Bringing EasyBudget to your pocket and connecting it with the tools you already use.",
     changes: [
-      "Interactive dashboard preview with 4 tabs (Overview, Analytics, Transactions, Goals)",
-      "Browser-style frame with realistic mock data",
-      "Responsive design for all screen sizes",
-      "Brand color integration throughout preview"
-    ]
+      "Native iOS & Android apps for on-the-go transaction management.",
+      "Public API release for developers to build on the EasyBudget platform.",
+      "Official Zapier integration to connect with thousands of other apps without code."
+    ],
+    icon: Smartphone
   },
   {
-    version: "2.0.5",
-    date: "2024-01-14",
-    type: "improvement",
-    title: "Dynamic Currency System",
-    description: "Complete implementation of currency system across all pages with user preferences.",
-    changes: [
-      "Added 8 supported currencies (EUR, USD, GBP, JPY, CAD, AUD, CHF, CNY)",
-      "Currency symbols with correct positioning",
-      "Caching system for performance optimization",
-      "Updated all pages: Dashboard, Analytics, Income, Expenses, Categories, Goals"
-    ]
-  },
-  {
-    version: "2.0.4",
-    date: "2024-01-13",
-    type: "improvement",
-    title: "UI/UX Improvements",
-    description: "Enhanced headers and user experience across preferences and profile pages.",
-    changes: [
-      "Fixed preferences page header layout",
-      "Improved profile page with modern toast notifications",
-      "Consistent styling across all pages",
-      "Replaced basic alerts with Sonner notifications"
-    ]
-  },
-  {
-    version: "2.0.3",
-    date: "2024-01-12",
-    type: "improvement",
-    title: "Analytics Migration",
-    description: "Enhanced reports page with advanced analytics features and improved layout.",
-    changes: [
-      "Reports page migration to analytics with enhanced features",
-      "6-card analytics layout in 2x3 grid",
-      "Improved chart visualizations",
-      "Better data insights and metrics"
-    ]
-  },
-  {
-    version: "2.0.2",
-    date: "2024-01-11",
+    version: "2.5.0",
+    date: "Est. Q3 2024",
     type: "feature",
-    title: "Import CSV Enhancements",
-    description: "Improved CSV import functionality with better styling and bulk operations.",
+    title: "Collaboration & AI-Powered Insights",
+    description: "Introducing features for teams and leveraging AI to provide smarter financial forecasts.",
     changes: [
-      "Enhanced CSV import styling",
-      "Bulk category operations",
-      "Better error handling and validation",
-      "Improved user feedback during import"
-    ]
+      "Shared Dashboards: Invite team members or your accountant to collaborate.",
+      "User Roles & Permissions for shared dashboards.",
+      "AI-Powered Cash Flow Forecasting based on your historical data."
+    ],
+    icon: Users
   },
   {
-    version: "2.0.1",
-    date: "2024-01-10",
+    version: "2.4.0",
+    date: "Est. Q2 2024",
     type: "improvement",
-    title: "Dynamic Homepage",
-    description: "Added contextual buttons and improved user experience on homepage.",
+    title: "Advanced Data Management",
+    description: "More powerful ways to get your data in and out of EasyBudget.",
     changes: [
-      "Dynamic homepage buttons (Start Now/Dashboard based on auth state)",
-      "Improved call-to-action placement",
-      "Better user flow for authenticated users"
-    ]
+      "PDF Imports: Extract transaction data directly from PDF bank statements.",
+      "Export to PDF: Generate professional, shareable PDF reports from your analytics.",
+      "Automated Subscription Categorization for recurring payments."
+    ],
+    icon: Recycle
   },
   {
-    version: "2.0.0",
-    date: "2024-01-09",
+    version: "2.3.0",
+    date: "Est. Q1 2024",
     type: "feature",
-    title: "Major Release - EasyBudget 2.0",
-    description: "Complete application rewrite with modern architecture and comprehensive budgeting features.",
+    title: "Automatic Bank Connection",
+    description: "Securely connect your bank accounts for automatic transaction syncing.",
     changes: [
-      "Next.js 15 with TypeScript",
-      "Supabase backend integration",
-      "Modern React components with Tailwind CSS",
-      "Complete financial dashboard",
-      "Transaction management system",
-      "Category organization",
-      "Goals tracking",
-      "Analytics and reporting",
-      "User authentication and profiles",
-      "Responsive design for all devices"
-    ]
-  }
+      "Direct bank integration for real-time data synchronization.",
+      "Support for thousands of financial institutions worldwide.",
+      "End-to-end encryption to ensure your data remains secure."
+    ],
+    icon: Banknote
+  },
 ]
 
 const typeConfig = {
@@ -191,7 +168,7 @@ export default function ChangelogPage() {
           <div className="absolute left-8 top-0 bottom-0 w-px bg-gray-200"></div>
           
           <div className="space-y-8">
-            {changelogData.map((entry, index) => {
+            {roadmapData.map((entry, index) => {
               const config = typeConfig[entry.type]
               const IconComponent = config.icon
               

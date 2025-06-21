@@ -6,9 +6,11 @@ import {
   ArrowLeft,
   Calendar,
   Sparkles,
-  Zap
-  // Code,
-  // BarChart3
+  Zap,
+  Smartphone,
+  Users,
+  Recycle,
+  Banknote
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -19,6 +21,7 @@ interface ChangelogEntry {
   title: string
   description: string
   changes: string[]
+  icon: React.ElementType
 }
 
 const futureChangelogData: ChangelogEntry[] = [
@@ -32,7 +35,8 @@ const futureChangelogData: ChangelogEntry[] = [
       "Native iOS & Android apps for on-the-go transaction management.",
       "Public API release to allow developers to build on the EasyBudget platform.",
       "Official Zapier integration to connect with thousands of other apps without code."
-    ]
+    ],
+    icon: Smartphone
   },
   {
     version: "2.5.0",
@@ -44,7 +48,8 @@ const futureChangelogData: ChangelogEntry[] = [
       "Shared Dashboards: Invite team members, family, or your accountant to view and collaborate on specific dashboards.",
       "User Roles & Permissions for shared dashboards.",
       "AI-Powered Cash Flow Forecasting to predict future financial states based on historical data."
-    ]
+    ],
+    icon: Users
   },
   {
     version: "2.4.0",
@@ -56,7 +61,8 @@ const futureChangelogData: ChangelogEntry[] = [
       "PDF Imports: Extract transaction data directly from PDF bank statements.",
       "Export to PDF: Generate professional, shareable PDF reports from your analytics.",
       "Automated Subscription Categorization: Automatically detect and categorize recurring subscriptions like Netflix, Spotify, etc."
-    ]
+    ],
+    icon: Recycle
   },
   {
     version: "2.3.0",
@@ -68,7 +74,8 @@ const futureChangelogData: ChangelogEntry[] = [
       "Direct bank integration for real-time data synchronization.",
       "Support for thousands of financial institutions worldwide.",
       "End-to-end encryption to ensure your financial data remains secure."
-    ]
+    ],
+    icon: Banknote
   },
 ]
 
@@ -118,7 +125,7 @@ export default function ChangelogPageContent() {
           <div className="space-y-8">
             {futureChangelogData.map((entry, index) => {
               const config = typeConfig[entry.type]
-              const IconComponent = config.icon
+              const IconComponent = entry.icon
               
               return (
                 <div key={index} className="relative">
@@ -185,28 +192,12 @@ export default function ChangelogPageContent() {
           <p className="text-gray-600 mb-6">
             Help shape the future of EasyBudget by sharing your feedback and feature requests.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {/* <Button 
-              onClick={() => router.push('/dashboard')}
-              className="bg-[#60ea8b] hover:bg-[#50da7b] text-white"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Go to Dashboard
-            </Button> */}
-            <Button 
-              onClick={() => window.open('mailto:noreply@easybudget.ing')}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Share Your Feedback
-            </Button>
-            {/* <Button 
-              variant="outline"
-              onClick={() => window.open('https://github.com/mttspss/easybudget', '_blank')}
-            >
-              <Code className="h-4 w-4 mr-2" />
-              View on GitHub
-            </Button> */}
-          </div>
+          <Button 
+            onClick={() => window.open('mailto:noreply@easybudget.ing')}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Share Your Feedback
+          </Button>
         </div>
       </div>
     </div>

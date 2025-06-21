@@ -230,11 +230,11 @@ export default function Dashboard() {
         .filter(t => new Date(t.date) <= lastMonthEnd)
         .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
       
-      let balanceChange = 0
-      if (Math.abs(lastMonthBalance) > 0) {
-        balanceChange = ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100
+      let balanceChange = 0;
+      if (lastMonthBalance !== 0) {
+        balanceChange = ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100;
       } else if (totalBalance !== 0) {
-        balanceChange = totalBalance > 0 ? 100 : -100
+        balanceChange = 100; // From 0 to any non-zero value is a 100% change
       }
 
       // Cap percentage changes to reasonable values (-200% to +200%)
