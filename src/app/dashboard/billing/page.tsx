@@ -1,29 +1,35 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-import { useSubscription } from "@/lib/use-subscription"
+import { useSubscription } from "@/lib/subscription-context"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { Progress } from "@/components/ui/progress"
 import { 
   CreditCard,
-  Calendar,
   ExternalLink,
   Settings,
   Crown,
   Zap,
   Rocket,
-  DollarSign
+  DollarSign,
+  Layers,
+  FileText,
+  Upload,
+  Target as TargetIcon
 } from "lucide-react"
 
 export default function BillingPage() {
   const { user, loading } = useAuth()
-  const { subscription, planType, loading: subscriptionLoading } = useSubscription(user?.id)
-  const [isLoading, setIsLoading] = useState(false)
+  const { plan, status, isLoading: subscriptionLoading, transactionsThisMonth, csvImportsThisMonth, goalsCount, dashboardsCount } = useSubscription()
+  const [isPortalLoading, setIsPortalLoading] = useState(false)
+  const router = useRouter()
 
   if (loading || subscriptionLoading) {
     return (
@@ -38,231 +44,148 @@ export default function BillingPage() {
   }
 
   const handleManageBilling = async () => {
-    setIsLoading(true)
+    setIsPortalLoading(true)
     try {
-      console.log('=== OPENING CUSTOMER PORTAL ===')
-      console.log('User ID:', user.id)
-      
       const response = await fetch('/api/stripe/customer-portal', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-        }),
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify({ userId: user.id, }),
       })
-
-      console.log('Response status:', response.status)
-      console.log('Response ok:', response.ok)
-
       const data = await response.json()
-      console.log('Response data:', data)
-
-      if (!response.ok) {
-        console.error('API Error:', data)
-        toast.error(data.error || 'Failed to create portal session')
-        return
-      }
-
       if (data.url) {
-        console.log('Redirecting to:', data.url)
         window.location.href = data.url
       } else {
-        console.error('No URL in response:', data)
-        toast.error('No portal URL received')
+        toast.error('Could not access the billing portal.')
       }
-    } catch (error) {
-      console.error('Error opening billing portal:', error)
-      toast.error('Network error: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    } catch (err) {
+      console.error('Error accessing billing portal:', err)
+      toast.error('Error accessing billing portal.')
     } finally {
-      setIsLoading(false)
+      setIsPortalLoading(false)
     }
   }
 
-  const getPlanIcon = (plan: string) => {
-    switch (plan) {
-      case 'starter': return <Zap className="h-5 w-5" />
-      case 'pro': return <Crown className="h-5 w-5" />
-      case 'growth': return <Rocket className="h-5 w-5" />
-      default: return <DollarSign className="h-5 w-5" />
+  const getPlanIcon = (planId: string) => {
+    switch (planId) {
+      case 'starter': return <Zap className="h-5 w-5" />;
+      case 'pro': return <Crown className="h-5 w-5" />;
+      case 'growth': return <Rocket className="h-5 w-5" />;
+      default: return <DollarSign className="h-5 w-5" />;
     }
   }
 
-  const getPlanColor = (plan: string) => {
-    switch (plan) {
-      case 'starter': return 'bg-blue-100 text-blue-800 border-blue-300'
-      case 'pro': return 'bg-purple-100 text-purple-800 border-purple-300'
-      case 'growth': return 'bg-green-100 text-green-800 border-green-300'
-      default: return 'bg-gray-100 text-gray-800 border-gray-300'
+  const getPlanColor = (planId: string) => {
+    switch (planId) {
+      case 'starter': return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'pro': return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'growth': return 'bg-green-100 text-green-800 border-green-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+  
+  const usageStats = [
+    {
+      title: 'Transactions',
+      icon: FileText,
+      current: transactionsThisMonth,
+      limit: plan.maxTransactions,
+    },
+    {
+      title: 'Custom Dashboards',
+      icon: Layers,
+      current: dashboardsCount, 
+      limit: plan.maxDashboards,
+    },
+     {
+      title: 'CSV Imports this month',
+      icon: Upload,
+      current: csvImportsThisMonth,
+      limit: plan.maxCsvImports,
+    },
+    {
+      title: 'Financial Goals',
+      icon: TargetIcon,
+      current: goalsCount,
+      limit: plan.maxGoals,
+    },
+  ]
 
   return (
     <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
-      
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-3">
-          <div className="max-w-5xl mx-auto space-y-2">
+          <div className="max-w-5xl mx-auto space-y-4">
             
-            {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Billing & Subscription</h1>
-                <p className="text-gray-600 text-xs">Manage your subscription, billing, and payment methods</p>
-              </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Billing & Subscription</h1>
+              <p className="text-gray-600 text-xs">Manage your plan, see your usage, and view billing history.</p>
             </div>
 
-            {/* Current Plan */}
             <Card className="bg-white border-0 shadow-sm">
               <CardHeader className="border-b border-gray-100 py-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <CreditCard className="h-4 w-4 text-gray-600" />
-                  Current Plan
+                  Your Current Plan
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${getPlanColor(planType)}`}>
-                      {getPlanIcon(planType)}
+                    <div className={`p-2 rounded-lg ${getPlanColor(plan.id)}`}>
+                      {getPlanIcon(plan.id)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {planType.charAt(0).toUpperCase() + planType.slice(1)} Plan
-                        </h3>
-                        <Badge className={getPlanColor(planType)}>
-                          {subscription?.status || 'active'}
-                        </Badge>
+                        <h3 className="text-lg font-semibold text-gray-900">{plan.name} Plan</h3>
+                        <Badge className={getPlanColor(plan.id)}>{status || 'active'}</Badge>
                       </div>
-                      {subscription?.billing_interval && (
-                        <p className="text-gray-600 text-sm mt-0.5">
-                          Billed {subscription.billing_interval}ly
-                        </p>
-                      )}
+                      <p className="text-gray-600 text-sm mt-0.5">
+                        {plan.id === 'free' ? "Upgrade to unlock powerful features." : `You have access to all ${plan.name} features.`}
+                      </p>
                     </div>
                   </div>
                   
-                  {planType !== 'free' && (
-                    <Button 
-                      onClick={handleManageBilling}
-                      disabled={isLoading}
-                      className="flex items-center gap-2"
-                      size="sm"
-                    >
-                      <Settings className="h-4 w-4" />
-                      {isLoading ? 'Loading...' : 'Manage Billing'}
-                      <ExternalLink className="h-4 w-4" />
+                  {plan.id !== 'free' ? (
+                    <Button onClick={handleManageBilling} disabled={isPortalLoading} size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      {isPortalLoading ? 'Loading...' : 'Manage Subscription'}
+                    </Button>
+                  ) : (
+                     <Button onClick={() => router.push('/#pricing')} size="sm" className="bg-green-500 hover:bg-green-600 text-white">
+                       Upgrade Plan <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Subscription Details */}
-            {subscription && planType !== 'free' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="h-4 w-4 text-blue-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Current Period</p>
-                        <p className="text-xs text-gray-600 mt-0.5">
-                          {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}
-                        </p>
+            <div className="pt-2">
+               <h2 className="text-base font-semibold text-gray-900 mb-2">Your Usage</h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {usageStats.map((stat) => (
+                  <Card key={stat.title} className="bg-white border-0 shadow-sm">
+                    <CardContent className="p-4">
+                       <div className="flex items-center gap-3">
+                        <stat.icon className="h-5 w-5 text-gray-500" />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                            <p className="text-sm font-medium text-gray-800">{stat.title}</p>
+                            <p className="text-sm font-semibold">
+                              {stat.current}
+                              <span className="text-gray-500"> / {stat.limit === Infinity ? 'Unlimited' : stat.limit}</span>
+                            </p>
+                          </div>
+                          {stat.limit !== Infinity && (
+                            <Progress value={(stat.current / stat.limit) * 100} className="h-2 mt-2" />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <CreditCard className="h-4 w-4 text-green-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Status</p>
-                        <p className="text-xs text-gray-600 capitalize mt-0.5">
-                          {subscription.status}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Settings className="h-4 w-4 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Subscription ID</p>
-                        <p className="text-xs text-gray-600 font-mono mt-0.5">
-                          {subscription.subscription_id?.slice(-12) || 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            )}
-
-            {/* Free Plan Upgrade */}
-            {planType === 'free' && (
-              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-                <CardContent className="p-4">
-                  <div className="text-center">
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">
-                      Ready to unlock more features?
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-3">
-                      Upgrade to a paid plan to access advanced analytics, unlimited transactions, and priority support.
-                    </p>
-                    <Button 
-                      onClick={() => window.location.href = '/#pricing'}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                      size="sm"
-                    >
-                      View Plans
-                      <ExternalLink className="h-4 w-4 ml-2" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Help Section */}
-            <Card className="bg-white border-0 shadow-sm">
-              <CardHeader className="border-b border-gray-100 py-3">
-                <CardTitle className="text-base">Need Help?</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <p className="text-gray-600 text-sm">
-                    • <strong>Change Plan:</strong> Use the &ldquo;Manage Billing&rdquo; button to upgrade, downgrade, or cancel
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    • <strong>Update Payment:</strong> Add or change your payment method in the billing portal
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    • <strong>Download Invoices:</strong> Access all your invoices and receipts
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    • <strong>Support:</strong> Contact us at support@easybudget.ing for any billing questions
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </main>
       </div>
