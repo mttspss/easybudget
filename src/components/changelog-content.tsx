@@ -6,9 +6,7 @@ import {
   ArrowLeft,
   Calendar,
   Sparkles,
-  Zap,
-  Code,
-  BarChart3
+  Zap
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -24,7 +22,7 @@ interface ChangelogEntry {
 const futureChangelogData: ChangelogEntry[] = [
   {
     version: "3.0.0",
-    date: "Est. Q4 2024",
+    date: "Est. Q4 2025",
     type: "feature",
     title: "Mobile App Launch & API Integrations",
     description: "Bringing EasyBudget to your pocket and connecting it to the tools you already use.",
@@ -36,7 +34,7 @@ const futureChangelogData: ChangelogEntry[] = [
   },
   {
     version: "2.5.0",
-    date: "Est. Q3 2024",
+    date: "Est. Q3 2025",
     type: "feature",
     title: "Collaboration & AI-Powered Insights",
     description: "Introducing features for teams and leveraging AI to provide smarter financial forecasts.",
@@ -48,7 +46,7 @@ const futureChangelogData: ChangelogEntry[] = [
   },
   {
     version: "2.4.0",
-    date: "Est. Q2 2024",
+    date: "Est. Q2 2025",
     type: "improvement",
     title: "Advanced Data Management",
     description: "More powerful ways to get your data in and out of EasyBudget.",
@@ -60,7 +58,7 @@ const futureChangelogData: ChangelogEntry[] = [
   },
   {
     version: "2.3.0",
-    date: "Est. Q1 2024",
+    date: "Est. Q1 2025",
     type: "feature",
     title: "Automatic Bank Connection",
     description: "Securely connect your bank accounts for automatic transaction syncing, eliminating the need for manual CSV imports.",
@@ -142,9 +140,6 @@ export default function ChangelogPageContent() {
                                   <Calendar className="h-4 w-4" />
                                   {entry.date}
                                 </div>
-                                <span className="text-sm font-medium text-gray-900">
-                                  v{entry.version}
-                                </span>
                               </div>
                             </div>
                           </div>
@@ -183,22 +178,12 @@ export default function ChangelogPageContent() {
           <p className="text-gray-600 mb-6">
             Help shape the future of EasyBudget by sharing your feedback and feature requests.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button 
-              onClick={() => router.push('/dashboard')}
-              className="bg-[#60ea8b] hover:bg-[#50da7b] text-white"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Go to Dashboard
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => window.open('https://github.com/mttspss/easybudget', '_blank')}
-            >
-              <Code className="h-4 w-4 mr-2" />
-              View on GitHub
-            </Button>
-          </div>
+          <Button 
+            onClick={() => window.open('mailto:noreply@easybudget.ing')}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Share Your Feedback
+          </Button>
         </div>
       </div>
     </div>
