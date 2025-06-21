@@ -173,32 +173,28 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      q: "How secure is my financial data?", 
-      a: "We use bank-level security with 256-bit SSL encryption and SOC 2 Type II compliance. Your banking credentials are never stored on our servers, and all data is encrypted both in transit and at rest." 
+      q: "Is my financial data secure with EasyBudget?",
+      a: "Yes. Security is our top priority. We use Supabase for our backend, which provides robust, enterprise-grade security. Your data is encrypted both in transit and at rest. We never store sensitive credentials and rely on secure authentication methods."
     },
-    { 
-      q: "How quickly can I get started?", 
-      a: "You can be up and running in under 5 minutes. Simply create an account, connect your bank accounts or upload a CSV file, and start tracking your finances immediately." 
+    {
+      q: "What file formats can I import?",
+      a: "Currently, we support importing transaction data from any CSV file. Our smart import system is designed to automatically detect the correct columns for date, description, and amount, regardless of your bank's format."
     },
-    { 
-      q: "How accurate is the automated categorization?", 
-      a: "Our machine learning algorithms achieve 99.2% accuracy in transaction categorization. The system continuously improves as it learns from your specific spending patterns." 
+    {
+      q: "Can I use EasyBudget for both personal and business finances?",
+      a: "Absolutely. Our Pro and Growth plans allow you to create multiple dashboards, so you can keep your personal finances completely separate from your business accounts, all while managing them from a single login."
     },
-    { 
-      q: "Can I integrate with my existing business tools?", 
-      a: "Yes, we offer RESTful APIs for seamless integration with accounting software, CRM systems, and business intelligence tools. Enterprise plans include custom integration support." 
+    {
+      q: "What happens if I exceed my plan's limits?",
+      a: "The application will prevent you from performing actions that exceed your plan's limits. For example, if you reach your monthly transaction limit on the Starter plan, you won't be able to add new transactions until the next month or until you upgrade your plan. You will see clear messages in the app indicating your current usage."
     },
-    { 
-      q: "What happens to my data if I decide to leave?", 
-      a: "You can export all your data in standard formats (CSV, Excel, PDF) at any time. We provide a 30-day grace period for data retrieval after cancellation, and your data is permanently deleted thereafter." 
+    {
+      q: "Can I change or cancel my plan at any time?",
+      a: "Yes. You can manage your subscription, upgrade, downgrade, or cancel at any time through your billing page. Changes will take effect from the next billing cycle."
     },
-    { 
-      q: "Do you offer customer support?", 
-      a: "Yes! Professional plans include email support with 24-hour response time. Business plans get priority support, and Enterprise customers have access to a dedicated account manager." 
-    },
-    { 
-      q: "Can I cancel my subscription anytime?", 
-      a: "Absolutely. You can cancel your subscription at any time with no cancellation fees. Your service continues until the end of your current billing period." 
+    {
+      q: "Do you offer customer support?",
+      a: "Yes! All users can access support via our community channels. Users on our paid plans (Pro and Growth) get access to priority email support for faster response times."
     }
   ]
 

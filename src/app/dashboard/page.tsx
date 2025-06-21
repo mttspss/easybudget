@@ -468,22 +468,22 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {stat.title === "Savings Rate" 
-                        ? `${stat.amount.toFixed(1)}%` 
-                        : userCurrency 
-                          ? formatCurrency(stat.amount, userCurrency)
-                          : `€${stat.amount.toLocaleString()}`
-                      }
+                            {stat.title === "Savings Rate" 
+                              ? `${stat.amount.toFixed(1)}%` 
+                              : userCurrency 
+                                ? formatCurrency(stat.amount, userCurrency)
+                                : `€${stat.amount.toLocaleString()}`
+                            }
                     </div>
                     <p className={`text-xs ${
                         stat.change >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                            }`}>
                       {stat.change >= 0 ? '+' : ''}{stat.change.toFixed(1)}% from last month
                     </p>
-                  </CardContent>
-                </Card>
+                      </CardContent>
+                    </Card>
               ))}
-            </div>
+              </div>
 
             {/* Main Dashboard Grid - Restructured */}
             <div className="space-y-3">
@@ -581,7 +581,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                         <BarChart3 className="h-4 w-4 text-gray-500" />
                         <CardTitle className="text-base font-semibold">Monthly Comparison</CardTitle>
-                    </div>
+                  </div>
                   </CardHeader>
                   <CardContent className="pl-2 pt-4">
                     {isLoading ? (
