@@ -971,7 +971,7 @@ export default function LandingPage() {
                 </svg>
               </button>
               <button 
-                onClick={() => window.open('mailto:sales@easybudget.ing')}
+                onClick={() => window.open('mailto:noreply@easybudget.ing')}
                 style={{
                   fontFamily: 'inherit',
                   fontSize: '18px',
@@ -1110,7 +1110,7 @@ export default function LandingPage() {
                   </a>
                 </div>
                 <span className="text-slate-600">
-                  hello@easybudget.ing
+                  noreply@easybudget.ing
                 </span>
               </div>
             </div>

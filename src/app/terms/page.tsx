@@ -231,8 +231,8 @@ export default function TermsOfServicePage() {
               </p>
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-gray-700">
-                  <strong>Email:</strong> legal@easybudget.ing<br />
-                  <strong>Support:</strong> hello@easybudget.ing<br />
+                  <strong>Email:</strong> noreply@easybudget.ing<br />
+                  <strong>Support:</strong> noreply@easybudget.ing<br />
                   <strong>Address:</strong> EasyBudget Legal Department<br />
                   <strong>Response Time:</strong> We will respond to legal inquiries within 5 business days
                 </p>
@@ -290,10 +290,10 @@ export default function TermsOfServicePage() {
                 </p>
                 <div className="space-y-2 text-slate-600">
                   <p>
-                    <strong>Legal:</strong> legal@easybudget.ing
+                    <strong>Legal:</strong> noreply@easybudget.ing
                   </p>
                   <p>
-                    <strong>Support:</strong> hello@easybudget.ing
+                    <strong>Support:</strong> noreply@easybudget.ing
                   </p>
                 </div>
                 <Button 
@@ -328,7 +328,7 @@ export default function TermsOfServicePage() {
                   </a>
                 </div>
                 <span className="text-slate-600">
-                  hello@easybudget.ing
+                  noreply@easybudget.ing
                 </span>
               </div>
             </div>

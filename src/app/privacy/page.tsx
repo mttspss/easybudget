@@ -172,7 +172,7 @@ export default function PrivacyPolicyPage() {
               </p>
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-gray-700">
-                  <strong>Email:</strong> privacy@easybudget.ing<br />
+                  <strong>Email:</strong> noreply@easybudget.ing<br />
                   <strong>Address:</strong> EasyBudget Privacy Office<br />
                   <strong>Response Time:</strong> We will respond to privacy inquiries within 30 days
                 </p>
@@ -230,10 +230,10 @@ export default function PrivacyPolicyPage() {
                 </p>
                 <div className="space-y-2 text-slate-600">
                   <p>
-                    <strong>Email:</strong> privacy@easybudget.ing
+                    <strong>Email:</strong> noreply@easybudget.ing
                   </p>
                   <p>
-                    <strong>Support:</strong> hello@easybudget.ing
+                    <strong>Support:</strong> noreply@easybudget.ing
                   </p>
                 </div>
                 <Button 
@@ -268,7 +268,7 @@ export default function PrivacyPolicyPage() {
                   </a>
                 </div>
                 <span className="text-slate-600">
-                  hello@easybudget.ing
+                  noreply@easybudget.ing
                 </span>
               </div>
             </div>
