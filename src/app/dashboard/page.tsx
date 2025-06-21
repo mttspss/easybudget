@@ -230,11 +230,11 @@ export default function Dashboard() {
         .filter(t => new Date(t.date) <= lastMonthEnd)
         .reduce((sum, t) => sum + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0)
       
-      let balanceChange = 0;
-      if (lastMonthBalance !== 0) {
-        balanceChange = ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100;
+      let balanceChange = 0
+      if (Math.abs(lastMonthBalance) > 0) {
+        balanceChange = ((totalBalance - lastMonthBalance) / Math.abs(lastMonthBalance)) * 100
       } else if (totalBalance !== 0) {
-        balanceChange = 100; // From 0 to any non-zero value is a 100% change
+        balanceChange = totalBalance > 0 ? 100 : -100
       }
 
       // Cap percentage changes to reasonable values (-200% to +200%)
@@ -419,7 +419,7 @@ export default function Dashboard() {
       change: stats?.balanceChange || 0,
       changeType: (stats?.balanceChange || 0) >= 0 ? "increase" : "decrease",
       icon: Wallet,
-      color: "text-blue-500"
+      color: "bg-blue-500"
     },
     {
       title: "Monthly Income",
@@ -478,7 +478,8 @@ export default function Dashboard() {
                     <p className={`text-xs ${
                         stat.change >= 0 ? 'text-green-600' : 'text-red-600'
                             }`}>
-                      {stat.change >= 0 ? '+' : ''}{stat.change.toFixed(1)}% from last month
+                      <span className="mr-1">{stat.changeType === 'increase' ? '↗' : '↘'}</span>
+                      {Math.abs(stat.change).toFixed(1)}% from last month
                     </p>
                       </CardContent>
                     </Card>
