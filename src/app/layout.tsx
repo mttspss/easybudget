@@ -7,6 +7,7 @@ import { OnboardingProvider } from "@/lib/onboarding-context";
 import { DashboardProvider } from '@/lib/dashboard-context';
 import { SubscriptionProvider } from '@/lib/subscription-context';
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -67,6 +68,7 @@ export default function RootLayout({
             </DashboardProvider>
           </AuthProvider>
         </ThemeProvider>
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
