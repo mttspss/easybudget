@@ -15,6 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://easybudget.ing'),
   title: "easybudget.ing | From Financial Chaos to Clarity in Seconds",
   description: "Stop guessing where your money goes. Easybudget turns your messy bank statements into a simple, beautiful dashboard. See everything, track goals, and finally feel in control.",
   icons: {
