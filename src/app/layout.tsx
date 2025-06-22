@@ -75,16 +75,37 @@ export default function RootLayout({
             "name": "easybudget.ing",
             "operatingSystem": "WEB",
             "applicationCategory": "FinanceApplication",
+            "logo": "https://easybudget.ing/newicon1.png",
+            "url": "https://easybudget.ing",
+            "author": {
+              "@type": "Organization",
+              "name": "EasyBudget"
+            },
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.9",
               "ratingCount": "88"
             },
-            "offers": {
-              "@type": "Offer",
-              "price": "14.00",
-              "priceCurrency": "USD"
-            }
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Starter",
+                "price": "14.00",
+                "priceCurrency": "USD"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro",
+                "price": "29.00",
+                "priceCurrency": "USD"
+              },
+              {
+                "@type": "Offer",
+                "name": "Growth",
+                "price": "49.00",
+                "priceCurrency": "USD"
+              }
+            ]
           })}}
         />
       </body>
