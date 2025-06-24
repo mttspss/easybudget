@@ -33,16 +33,9 @@ function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
 
   useEffect(() => {
-    const getExpiryTime = () => {
-      let expiry = localStorage.getItem('discountExpiry');
-      if (!expiry) {
-        expiry = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
-        localStorage.setItem('discountExpiry', expiry);
-      }
-      return new Date(expiry);
-    };
-
-    const expiryTime = getExpiryTime();
+    // Set a fixed expiry date for everyone.
+    // Example: June 23, 2025 at 17:40:00 UTC
+    const expiryTime = new Date('2025-06-23T17:40:00Z');
 
     const interval = setInterval(() => {
       const now = new Date();
