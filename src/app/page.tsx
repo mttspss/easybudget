@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardPreview } from "@/components/ui/dashboard-preview"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { 
   Mail,
   ChevronDown, 
@@ -24,7 +25,8 @@ import {
   Upload,
   Twitter,
   Linkedin,
-  CreditCard
+  CreditCard,
+  TicketPercent
 } from "lucide-react"
 
 export default function LandingPage() {
@@ -268,6 +270,19 @@ export default function LandingPage() {
               <span className="text-black font-bold">easybudget</span>
               <span style={{color: '#60ea8b'}} className="font-bold">.ing</span>
             </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="cursor-pointer ml-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md">
+                    <TicketPercent className="h-3 w-3" />
+                    <span>40% OFF</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Use code: <span className="font-bold">50USERS</span></p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
@@ -382,14 +397,10 @@ export default function LandingPage() {
                 </svg>
               </button>
               <button 
-                onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
-                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-                disabled
+                onClick={() => router.push('/auth/register')}
+                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
               >
-                Watch Demo
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m10 8 6 4-6 4V8z"></path>
-                </svg>
+                Start for free
               </button>
             </div>
 
