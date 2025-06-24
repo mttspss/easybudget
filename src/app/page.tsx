@@ -413,9 +413,21 @@ export default function LandingPage() {
       <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center">
-            <a className="text-gray-600 font-medium text-sm px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 mb-8">
-              All Your Finances in One Dashboard
-            </a>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="cursor-pointer mb-8 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md">
+                    <TicketPercent className="h-4 w-4" />
+                    <span>40% OFF</span>
+                    <span className="mx-1 text-purple-200">|</span>
+                    <CountdownTimer />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Limited time offer for new users! Use code: <span className="font-bold">50USERS</span></p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
               Track your entire money life,<br />
