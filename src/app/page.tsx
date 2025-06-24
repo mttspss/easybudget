@@ -34,8 +34,8 @@ function CountdownTimer() {
 
   useEffect(() => {
     // Set a fixed expiry date for everyone.
-    // Example: June 23, 2025 at 17:40:00 UTC
-    const expiryTime = new Date('2025-06-23T17:40:00Z');
+    // Expires on June 25, 2025, at 17:40 Rome time (15:40 UTC)
+    const expiryTime = new Date('2025-06-25T15:40:00Z');
 
     const interval = setInterval(() => {
       const now = new Date();
