@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -28,6 +28,52 @@ import {
   CreditCard,
   TicketPercent
 } from "lucide-react"
+
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
+
+  useEffect(() => {
+    const getExpiryTime = () => {
+      let expiry = localStorage.getItem('discountExpiry');
+      if (!expiry) {
+        expiry = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+        localStorage.setItem('discountExpiry', expiry);
+      }
+      return new Date(expiry);
+    };
+
+    const expiryTime = getExpiryTime();
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const distance = expiryTime.getTime() - now.getTime();
+
+      if (distance < 0) {
+        clearInterval(interval);
+        setTimeLeft({ hours: '00', minutes: '00', seconds: '00' });
+        return;
+      }
+
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / 1000 / 60) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+
+      setTimeLeft({
+        hours: hours.toString().padStart(2, '0'),
+        minutes: minutes.toString().padStart(2, '0'),
+        seconds: seconds.toString().padStart(2, '0'),
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="font-mono text-xs tracking-widest">
+      {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
+    </span>
+  );
+}
 
 export default function LandingPage() {
   const { user, signOut } = useAuth()
@@ -273,13 +319,15 @@ export default function LandingPage() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-pointer ml-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md">
-                    <TicketPercent className="h-3 w-3" />
+                  <div className="cursor-pointer ml-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md">
+                    <TicketPercent className="h-4 w-4" />
                     <span>40% OFF</span>
+                    <span className="mx-1 text-purple-200">|</span>
+                    <CountdownTimer />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Use code: <span className="font-bold">50USERS</span></p>
+                  <p>Limited time offer for new users! Use code: <span className="font-bold">50USERS</span></p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
