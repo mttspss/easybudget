@@ -326,11 +326,11 @@ export default function LandingPage() {
             </TooltipProvider>
           </div>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-            <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-            <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
-            <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors">Changelog</a>
+          <div className="hidden md:flex items-center justify-center flex-1">
+            <a href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Features</a>
+            <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Pricing</a>
+            <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors px-4">FAQ</a>
+            <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Changelog</a>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -426,7 +426,7 @@ export default function LandingPage() {
               Your money deserves better than Excel. Easybudget turns every account, transaction, goal, and income stream into one live dashboard—giving you a complete financial overview in seconds.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <div className="flex justify-center mb-12">
               <button 
                 onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
                 className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105 bg-green-500 hover:bg-green-600"
@@ -436,12 +436,6 @@ export default function LandingPage() {
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>
                 </svg>
-              </button>
-              <button 
-                onClick={() => router.push('/auth/register')}
-                className="bg-white text-gray-700 text-lg font-medium px-12 py-5 rounded-full shadow-md transition-all duration-300 inline-flex items-center justify-center gap-3 border border-gray-300 hover:border-gray-400"
-              >
-                Start for free
               </button>
             </div>
 
