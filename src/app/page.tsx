@@ -309,21 +309,6 @@ export default function LandingPage() {
               <span className="text-black font-bold">easybudget</span>
               <span style={{color: '#60ea8b'}} className="font-bold">.ing</span>
             </span>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="cursor-pointer ml-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md">
-                    <TicketPercent className="h-4 w-4" />
-                    <span>40% OFF</span>
-                    <span className="mx-1 text-purple-200">|</span>
-                    <CountdownTimer />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Limited time offer for new users! Use code: <span className="font-bold">50USERS</span></p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </div>
 
           <div className="hidden md:flex items-center justify-center flex-1">
