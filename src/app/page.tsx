@@ -562,26 +562,28 @@ export default function LandingPage() {
       <section id="comparison" className="py-20 px-6 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-16">
-            Budgeting apps are built for&nbsp;
-            <span className="italic text-pink-400">spreadsheet power-users</span>, not&nbsp;
-            <span className="italic" style={{color:'#60ea8b'}}>entrepreneurs</span>
+            Budgeting&nbsp;
+            <span className="italic text-pink-400">shouldn&apos;t require formulas</span> or&nbsp;
+            <span className="italic" style={{color:'#60ea8b'}}>hours in Excel</span>
           </h2>
-
+          <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-20">
+            Ditch complicated spreadsheets and fragmented apps. EasyBudget gives you real-time clarity with zero manual work.
+          </p>
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Other Apps */}
+            {/* Spreadsheets & old methods */}
             <div className="relative p-8 rounded-3xl border border-pink-400/60 bg-slate-900/40">
               <h3 className="text-2xl font-bold text-pink-300 mb-4 flex items-center gap-2">
-                Other apps
+                Spreadsheets &amp; DIY
                 <span className="flex items-center justify-center w-7 h-7 rounded-full bg-pink-500/20">
                   <X className="w-4 h-4 text-pink-400" />
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-pink-400">
-                <li>Manual categorization &amp; limited automation</li>
-                <li>Clunky interfaces designed for accountants</li>
-                <li>No AI insights or cash-flow predictions</li>
-                <li>Separate dashboards for every account</li>
-                <li>Hidden fees for additional imports</li>
+                <li>Endless copy-paste and fragile formulas</li>
+                <li>No real-time sync with your bank accounts</li>
+                <li>Difficult to track goals &amp; trends visually</li>
+                <li>Time-consuming monthly maintenance</li>
+                <li>Zero automation, zero insights</li>
               </ul>
             </div>
 
@@ -594,11 +596,11 @@ export default function LandingPage() {
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-green-400">
-                <li>AI-powered auto-categorization in seconds</li>
-                <li>Unified dashboard for every bank &amp; card</li>
-                <li>Real-time insights and predictive cash-flow</li>
-                <li>Unlimited goals &amp; advanced analytics</li>
-                <li>Transparent pricing—no hidden fees</li>
+                <li>Bank-level sync &amp; instant auto-categorization</li>
+                <li>Beautiful charts that update in real-time</li>
+                <li>AI forecasts your cash-flow &amp; savings path</li>
+                <li>Set unlimited goals and track progress visually</li>
+                <li>No formulas, no maintenance—just clarity</li>
               </ul>
             </div>
           </div>
