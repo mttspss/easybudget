@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardPreview } from "@/components/ui/dashboard-preview"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   Mail,
   ChevronDown,
@@ -16,48 +15,8 @@ import {
   Menu,
   ArrowRight,
   Twitter,
-  Linkedin,
-  TicketPercent
+  Linkedin
 } from "lucide-react"
-
-function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
-
-  useEffect(() => {
-    // Set a fixed expiry date for everyone.
-    // Expires on June 25, 2025, at 17:40 Rome time (15:40 UTC)
-    const expiryTime = new Date('2025-06-25T15:40:00Z');
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const distance = expiryTime.getTime() - now.getTime();
-
-      if (distance < 0) {
-        clearInterval(interval);
-        setTimeLeft({ hours: '00', minutes: '00', seconds: '00' });
-        return;
-      }
-
-      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((distance / 1000 / 60) % 60);
-      const seconds = Math.floor((distance / 1000) % 60);
-
-      setTimeLeft({
-        hours: hours.toString().padStart(2, '0'),
-        minutes: minutes.toString().padStart(2, '0'),
-        seconds: seconds.toString().padStart(2, '0'),
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <span className="font-mono text-xs tracking-widest">
-      {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
-    </span>
-  );
-}
 
 export default function LandingPage() {
   const { user, signOut } = useAuth()
@@ -311,22 +270,6 @@ export default function LandingPage() {
       <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="cursor-pointer mb-8 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md">
-                    <TicketPercent className="h-4 w-4" />
-                    <span>40% OFF</span>
-                    <span className="mx-1 text-purple-200">|</span>
-                    <CountdownTimer />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Limited time offer for new users! Use code: <span className="font-bold">50USERS</span></p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
               Track your entire money life,<br />
               in one view<span className="inline-block w-3 h-3 bg-green-500 rounded-full ml-2"></span>
@@ -792,110 +735,6 @@ export default function LandingPage() {
                 )}
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-20 relative border-t border-gray-100">
-        <div className="relative max-w-5xl mx-auto px-6 text-center">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-                Start Your Financial 
-                <span className="block" style={{color: '#60ea8b'}}>
-                  Transformation Today
-                </span>
-              </h2>
-              <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                Join 2,847+ professionals who have simplified their financial management. 
-                Get complete visibility and control over your money in minutes.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')}
-                style={{
-                  fontFamily: 'inherit',
-                  fontSize: '18px',
-                  background: 'linear-gradient(to bottom, #60ea8b 0%, #4ade80 100%)',
-                  color: 'white',
-                  padding: '0.8em 1.2em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  border: 'none',
-                  borderRadius: '25px',
-                  boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-                  transition: 'all 0.3s',
-                  fontWeight: 'bold',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.2)';
-                }}
-                onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'scale(0.95)';
-                  e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.2)';
-                }}
-                onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)';
-                }}
-              >
-                {user ? 'Dashboard' : 'Start Now'}
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              </button>
-              <button 
-                onClick={() => window.open('mailto:noreply@easybudget.ing')}
-                style={{
-                  fontFamily: 'inherit',
-                  fontSize: '18px',
-                  background: 'white',
-                  color: '#374151',
-                  padding: '0.8em 1.2em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '25px',
-                  boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
-                  transition: 'all 0.3s',
-                  fontWeight: 'bold',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
-                  e.currentTarget.style.background = '#f9fafb';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '0px 5px 10px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.background = 'white';
-                }}
-                onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'scale(0.95)';
-                  e.currentTarget.style.boxShadow = '0px 2px 5px rgba(0, 0, 0, 0.1)';
-                }}
-                onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.2)';
-                }}
-              >
-                Talk to Sales
-              </button>
-            </div>
           </div>
         </div>
       </section>
