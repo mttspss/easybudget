@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -15,8 +15,10 @@ import {
   Menu,
   ArrowRight,
   Twitter,
-  Linkedin
+  Linkedin,
+  TicketPercent
 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function LandingPage() {
   const { user, signOut } = useAuth()
@@ -168,10 +170,75 @@ export default function LandingPage() {
     }
   }
 
+  // Reusable discount banner with 24-hour countdown
+  function CountdownTimer24h() {
+    const [timeLeft, setTimeLeft] = useState<{hours:string;minutes:string;seconds:string}>({ hours: '00', minutes: '00', seconds: '00' })
+
+    useEffect(() => {
+      const calcExpiry = () => {
+        const now = new Date()
+        const expiry = new Date()
+        expiry.setHours(24,0,0,0) // midnight next 24h window
+        if (expiry.getTime() <= now.getTime()) {
+          expiry.setDate(expiry.getDate() + 1)
+        }
+        return expiry
+      }
+
+      let expiryTime = calcExpiry()
+
+      const interval = setInterval(() => {
+        const now = new Date()
+        const distance = expiryTime.getTime() - now.getTime()
+
+        if (distance <= 0) {
+          expiryTime = calcExpiry()
+        }
+
+        const hours = Math.floor((distance / (1000*60*60)) % 24)
+        const minutes = Math.floor((distance / (1000*60)) % 60)
+        const seconds = Math.floor((distance / 1000) % 60)
+
+        setTimeLeft({
+          hours: hours.toString().padStart(2,'0'),
+          minutes: minutes.toString().padStart(2,'0'),
+          seconds: seconds.toString().padStart(2,'0')
+        })
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [])
+
+    return <span className="font-mono text-xs tracking-widest">{timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}</span>
+  }
+
+  function DiscountBanner() {
+    return (
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="cursor-pointer mb-8 bg-gradient-to-r from-pink-500 to-green-500 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md animate-pulse hover:animate-none">
+              <TicketPercent className="h-4 w-4" />
+              <span>43% OFF</span>
+              <span className="mx-1 text-pink-100">|</span>
+              <CountdownTimer24h />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Risparmia il 43% su qualsiasi piano con il codice&nbsp;
+              <span className="font-bold">SUMMER25</span>
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Simple Navbar */}
-      <nav className="px-6 py-4">
+      {/* Sticky Navbar */}
+      <nav className="sticky top-0 z-50 px-6 py-4 bg-white/80 backdrop-blur supports-backdrop-blur:bg-white/30">
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
@@ -184,7 +251,6 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center justify-center flex-1">
-            <a href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Pricing</a>
             <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors px-4">FAQ</a>
             <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Changelog</a>
@@ -237,7 +303,6 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden pt-4 border-t border-gray-200 mt-3">
             <div className="flex flex-col space-y-4">
-              <a href="#benefits" className="text-gray-600 hover:text-gray-900 px-2 py-1">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-2 py-1">Pricing</a>
               <a href="#faq" className="text-gray-600 hover:text-gray-900 px-2 py-1">FAQ</a>
               <a href="/changelog" className="text-gray-600 hover:text-gray-900 px-2 py-1">Changelog</a>
@@ -489,6 +554,53 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Comparison Section */}
+      <section id="comparison" className="py-20 px-6 bg-slate-900 text-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-16">
+            Budgeting apps are built for&nbsp;
+            <span className="italic text-pink-400">spreadsheet power-users</span>, not&nbsp;
+            <span className="italic" style={{color:'#60ea8b'}}>entrepreneurs</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Other Apps */}
+            <div className="relative p-8 rounded-3xl border border-pink-400/60 bg-slate-900/40">
+              <h3 className="text-2xl font-bold text-pink-300 mb-4 flex items-center gap-2">
+                Other apps
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-pink-500/20">
+                  <X className="w-4 h-4 text-pink-400" />
+                </span>
+              </h3>
+              <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-pink-400">
+                <li>Manual categorization &amp; limited automation</li>
+                <li>Clunky interfaces designed for accountants</li>
+                <li>No AI insights or cash-flow predictions</li>
+                <li>Separate dashboards for every account</li>
+                <li>Hidden fees for additional imports</li>
+              </ul>
+            </div>
+
+            {/* EasyBudget */}
+            <div className="relative p-8 rounded-3xl border border-green-400/60 bg-slate-900/40">
+              <h3 className="text-2xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                EasyBudget
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20">
+                  <Check className="w-4 h-4 text-green-400" />
+                </span>
+              </h3>
+              <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-green-400">
+                <li>AI-powered auto-categorization in seconds</li>
+                <li>Unified dashboard for every bank &amp; card</li>
+                <li>Real-time insights and predictive cash-flow</li>
+                <li>Unlimited goals &amp; advanced analytics</li>
+                <li>Transparent pricing—no hidden fees</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Dashboard Preview Section */}
       <DashboardPreview />
 
@@ -600,6 +712,11 @@ export default function LandingPage() {
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
             
+            {/* Discount banner inside pricing */}
+            <div className="flex justify-center mt-6">
+              <DiscountBanner />
+            </div>
+
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-3 mt-6">
               <span className={`text-sm font-medium ${billingInterval === 'monthly' ? 'text-slate-900' : 'text-slate-500'}`}>
@@ -747,7 +864,6 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Product</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="#benefits" className="hover:text-slate-900 transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
                 <li><a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a></li>
                 <li><a href="/dashboard" className="hover:text-slate-900 transition-colors">Dashboard</a></li>
