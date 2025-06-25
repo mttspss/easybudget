@@ -8,24 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardPreview } from "@/components/ui/dashboard-preview"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { 
+import {
   Mail,
-  ChevronDown, 
-  Check, 
-  Brain,
-  Activity,
-  X, 
+  ChevronDown,
+  Check,
+  X,
   Menu,
   ArrowRight,
-  TrendingUp,
-  Home,
-  User,
-  Target,
-  BarChart3,
-  Upload,
   Twitter,
   Linkedin,
-  CreditCard,
   TicketPercent
 } from "lucide-react"
 
@@ -76,84 +67,6 @@ export default function LandingPage() {
   const router = useRouter()
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
-
-  const benefits = [
-    {
-      icon: Upload,
-      title: "Simple CSV Import & Organization", 
-      desc: "Upload your bank statements in any CSV format. Our smart system automatically detects columns and organizes your transactions in a clean, unified dashboard."
-    },
-    {
-      icon: Brain,
-      title: "Smart Transaction Categorization",
-      desc: "Automatically categorize your expenses into meaningful categories like Food, Transport, Entertainment. Customize categories to match your spending habits."
-    },
-    {
-      icon: BarChart3,
-      title: "Beautiful Analytics Dashboard",
-      desc: "Visualize your spending patterns with interactive charts and graphs. Track your balance trends, monthly comparisons, and expense breakdowns at a glance."
-    },
-    {
-      icon: Target,
-      title: "Financial Goals Tracking",
-      desc: "Set savings goals and track your progress with visual indicators. Whether it's an emergency fund or vacation savings, stay motivated with clear milestones."
-    },
-    {
-      icon: Activity,
-      title: "Real-Time Financial Insights",
-      desc: "Monitor your income vs expenses, monthly trends, and spending patterns. Get instant insights into your financial health without complex spreadsheets."
-    },
-    {
-      icon: CreditCard,
-      title: "Multi Account Management",
-      desc: "Manage multiple bank accounts, credit cards, and business accounts in one unified dashboard. Track all your finances across different institutions seamlessly."
-    }
-  ]
-
-  const journeyTypes = [
-    {
-      icon: User,
-      title: "For Individuals",
-      desc: "Perfect for students, young professionals, and anyone starting their financial journey.",
-      color: "bg-blue-50 border-blue-200",
-      iconColor: "bg-blue-100 text-blue-600",
-      features: [
-        "Single dashboard for all personal accounts",
-        "Easy CSV import from any bank",
-        "Personal goals & emergency fund tracking",
-        "Subscription management"
-      ]
-    },
-    {
-      icon: TrendingUp,
-      title: "For Entrepreneurs",
-      desc: "Manage multiple businesses and personal finances without the complexity.",
-      color: "bg-white border-2 border-slate-900 shadow-lg",
-      iconColor: "bg-slate-100 text-slate-700",
-      features: [
-        "Multiple account dashboards (4+ credit cards, 2+ businesses)",
-        "Separate business & personal tracking",
-        "Advanced reporting & analytics",
-        "Cash flow predictions for each business"
-      ],
-      highlighted: true
-    },
-    {
-      icon: Home,
-      title: "For Families",
-      desc: "Coordinate household finances and teach kids about money management.",
-      color: "bg-purple-50 border-purple-200",
-      iconColor: "bg-purple-100 text-purple-600",
-      features: [
-        "Multiple account management",
-        "Advanced analytics & insights", 
-        "Goal tracking with milestones",
-        "Built for families",
-        "Export financial reports",
-        "Premium customer support"
-      ]
-    }
-  ]
 
   const plans = [
     {
@@ -722,76 +635,6 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits/Features */}
-      <section id="benefits" className="py-12 relative bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-gray-200 mb-4">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500"></div>
-              <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Features</span>
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
-              Everything You Need to Take
-              <span className="block" style={{color: '#60ea8b'}}>
-                Control of Your Finances
-              </span>
-            </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Stop juggling multiple apps and spreadsheets. Get complete financial visibility and insights in one place.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="group p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300/60 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60 transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <benefit.icon className="w-6 h-6 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">{benefit.title}</h3>
-                <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{benefit.desc}</p>
-                
-                {/* Subtle accent line */}
-                <div className="mt-4 w-12 h-1 bg-gradient-to-r from-blue-500 to-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Built for Every Financial Journey */}
-      <section id="journey" className="py-12 relative">
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Built for Every Financial Journey
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              From students tracking their first budget to entrepreneurs managing multiple businesses
-            </p>
-          </div>
-          <div className="grid lg:grid-cols-3 gap-6">
-            {journeyTypes.map((type, index) => (
-              <div key={index} className={`rounded-xl p-6 ${type.color} transition-all hover:shadow-lg shadow-md bg-white/70 backdrop-blur-sm border border-gray-200`}>
-                <div className="text-center mb-6">
-                  <div className={`w-12 h-12 ${type.iconColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                    <type.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{type.desc}</p>
-                </div>
-                <ul className="space-y-3">
-                  {type.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <Check className="w-4 h-4 text-green-600 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-700 text-sm leading-relaxed">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
         </div>
       </section>
