@@ -212,21 +212,24 @@ export default function LandingPage() {
     return <span className="font-mono text-xs tracking-widest">{timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}</span>
   }
 
-  function DiscountBanner() {
+  function DiscountBanner({large=false}:{large?:boolean}) {
     return (
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="cursor-pointer mb-8 bg-gradient-to-r from-pink-500 to-green-500 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md animate-pulse hover:animate-none">
+            <div className={`cursor-pointer mb-8 bg-gradient-to-r from-pink-500 to-green-500 text-white ${large ? 'px-4 py-2 text-base' : 'px-3 py-1.5 text-sm'} rounded-full font-bold flex items-center gap-2 shadow-md animate-pulse hover:animate-none`}>
               <TicketPercent className="h-4 w-4" />
               <span>43% OFF</span>
               <span className="mx-1 text-pink-100">|</span>
               <CountdownTimer24h />
+              {large && (
+                <span className="ml-2 bg-white/20 px-2 py-0.5 rounded font-mono">SUMMER25</span>
+              )}
             </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>
-              Risparmia il 43% su qualsiasi piano con il codice&nbsp;
+              Save 43% on any plan with code&nbsp;
               <span className="font-bold">SUMMER25</span>
             </p>
           </TooltipContent>
@@ -335,6 +338,7 @@ export default function LandingPage() {
       <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center">
+            <DiscountBanner />
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
               Track your entire money life,<br />
               in one view<span className="inline-block w-3 h-3 bg-green-500 rounded-full ml-2"></span>
@@ -714,7 +718,7 @@ export default function LandingPage() {
             
             {/* Discount banner inside pricing */}
             <div className="flex justify-center mt-6">
-              <DiscountBanner />
+              <DiscountBanner large />
             </div>
 
             {/* Billing Toggle */}
