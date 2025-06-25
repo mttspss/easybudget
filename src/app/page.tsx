@@ -561,13 +561,11 @@ export default function LandingPage() {
       {/* Comparison Section */}
       <section id="comparison" className="py-20 px-6 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-16">
-            Budgeting&nbsp;
-            <span className="italic text-pink-400">shouldn&apos;t require formulas</span> or&nbsp;
-            <span className="italic" style={{color:'#60ea8b'}}>hours in Excel</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-10">
+            Budgeting shouldn&apos;t feel like a math exam
           </h2>
-          <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-20">
-            Ditch complicated spreadsheets and fragmented apps. EasyBudget gives you real-time clarity with zero manual work.
+          <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-16">
+            Forget giant spreadsheets. EasyBudget shows what comes in and what goes out in plain English, in seconds.
           </p>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Spreadsheets & old methods */}
@@ -579,11 +577,11 @@ export default function LandingPage() {
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-pink-400">
-                <li>Endless copy-paste and fragile formulas</li>
-                <li>No real-time sync with your bank accounts</li>
-                <li>Difficult to track goals &amp; trends visually</li>
-                <li>Time-consuming monthly maintenance</li>
-                <li>Zero automation, zero insights</li>
+                <li>You type every number by hand</li>
+                <li>No automatic link to your bank</li>
+                <li>Hard to see where money really goes</li>
+                <li>Hours of work every month</li>
+                <li>No alerts before you overspend</li>
               </ul>
             </div>
 
@@ -596,11 +594,11 @@ export default function LandingPage() {
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-green-400">
-                <li>Bank-level sync &amp; instant auto-categorization</li>
-                <li>Beautiful charts that update in real-time</li>
-                <li>AI forecasts your cash-flow &amp; savings path</li>
-                <li>Set unlimited goals and track progress visually</li>
-                <li>No formulas, no maintenance—just clarity</li>
+                <li>Connects to your bank and fills itself</li>
+                <li>Sorts every expense for you, automatically</li>
+                <li>Simple charts that refresh live</li>
+                <li>Shows if you&apos;re on track with your goals</li>
+                <li>Done in minutes—no formulas, no fuss</li>
               </ul>
             </div>
           </div>
