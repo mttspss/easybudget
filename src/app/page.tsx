@@ -364,7 +364,7 @@ export default function LandingPage() {
             {/* Featured On Section - moved below buttons */}
             <div>
               <p className="text-sm text-gray-500 mb-4 font-medium">FEATURED ON</p>
-              <div className="flex items-center justify-center gap-8 opacity-60 grayscale">
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 opacity-60 grayscale">
                 {/* Product Hunt */}
                 <div className="flex items-center gap-2">
                   <svg width="20" height="20" viewBox="0 0 240 240" fill="#da552f">
@@ -562,7 +562,7 @@ export default function LandingPage() {
       <section id="comparison" className="py-20 px-6 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-10">
-            Budgeting is for&nbsp;<span className="text-pink-400">everyone</span>,<br className="hidden md:block"/> not just spreadsheet pros.
+            <span className="text-green-400">Budgeting</span> is for&nbsp;<span className="text-pink-400">everyone</span>,<br className="hidden md:block"/> not just spreadsheet pros.
           </h2>
           <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-16">
             A clear budget means fewer surprises and better sleep. Let EasyBudget crunch the numbers so you can focus on life, not formulas.
@@ -613,7 +613,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Column - Visual */}
-            <div className="relative">
+            <div className="relative order-2 lg:order-1">
               <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
                 {/* Before State - Messy Transactions */}
                 <div className="mb-8">
@@ -669,7 +669,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column - Content */}
-            <div className="space-y-6">
+            <div className="space-y-6 order-1 lg:order-2">
               <div className="space-y-4">
                 <h3 className="text-4xl font-bold underline" style={{color: '#60ea8b'}}>
                   The Spreadsheet Killer

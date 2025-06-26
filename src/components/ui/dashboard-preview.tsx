@@ -114,8 +114,8 @@ export function DashboardPreview() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mb-12">
-          <div className="flex flex-wrap gap-2 justify-center mb-12">
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-nowrap sm:flex-wrap overflow-x-auto gap-2 justify-start sm:justify-center mb-8 sm:mb-12 pb-2 scrollbar-hide">
             {dashboardTabs.map((tab) => (
               <button
                 key={tab.id}
@@ -138,7 +138,7 @@ export function DashboardPreview() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
             {/* Left side - Info */}
-            <div className="space-y-6">
+            <div className="space-y-6 sm:order-1 order-2 hidden sm:block">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-[#60ea8b]/10 flex items-center justify-center">
@@ -180,7 +180,7 @@ export function DashboardPreview() {
             </div>
 
             {/* Right side - Dashboard Preview */}
-            <div className="relative">
+            <div className="relative sm:order-2 order-1">
               <Card className="overflow-hidden border-2 border-gray-200 shadow-xl">
                 <CardContent className="p-0">
                   {/* Browser Bar */}
