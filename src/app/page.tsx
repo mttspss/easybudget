@@ -562,26 +562,26 @@ export default function LandingPage() {
       <section id="comparison" className="py-20 px-6 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center leading-tight mb-10">
-            Budgeting shouldn&apos;t feel like a math exam
+            Budgeting is for&nbsp;<span className="text-pink-400">everyone</span>,<br className="hidden md:block"/> not just spreadsheet pros.
           </h2>
           <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-16">
-            Forget giant spreadsheets. EasyBudget shows what comes in and what goes out in plain English, in seconds.
+            A clear budget means fewer surprises and better sleep. Let EasyBudget crunch the numbers so you can focus on life, not formulas.
           </p>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Spreadsheets & old methods */}
             <div className="relative p-8 rounded-3xl border border-pink-400/60 bg-slate-900/40">
               <h3 className="text-2xl font-bold text-pink-300 mb-4 flex items-center gap-2">
-                Spreadsheets &amp; DIY
+                Excel &amp; paper
                 <span className="flex items-center justify-center w-7 h-7 rounded-full bg-pink-500/20">
                   <X className="w-4 h-4 text-pink-400" />
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-pink-400">
-                <li>You type every number by hand</li>
-                <li>No automatic link to your bank</li>
-                <li>Hard to see where money really goes</li>
-                <li>Hours of work every month</li>
-                <li>No alerts before you overspend</li>
+                <li>Easy to make errors and miss expenses</li>
+                <li>Takes hours and constant updates</li>
+                <li>Numbers, not insights</li>
+                <li>Difficult to spot patterns</li>
+                <li>You do all the heavy lifting</li>
               </ul>
             </div>
 
@@ -594,11 +594,11 @@ export default function LandingPage() {
                 </span>
               </h3>
               <ul className="space-y-3 text-sm md:text-base list-disc pl-4 marker:text-green-400">
-                <li>Connects to your bank and fills itself</li>
-                <li>Sorts every expense for you, automatically</li>
-                <li>Simple charts that refresh live</li>
-                <li>Shows if you&apos;re on track with your goals</li>
-                <li>Done in minutes—no formulas, no fuss</li>
+                <li>Set it up once, then let it run</li>
+                <li>Your spending is organised for you</li>
+                <li>Friendly charts show trends at a glance</li>
+                <li>Know if it&apos;s safe to spend today</li>
+                <li>More clarity, less time on a screen</li>
               </ul>
             </div>
           </div>
