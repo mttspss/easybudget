@@ -20,14 +20,22 @@ export async function POST(request: NextRequest) {
 
     console.log('Creating checkout session for:', { priceId, userId })
 
-    // Determine base URL - use multiple fallbacks
+    // Determine base URL - PRIORITIZE PRODUCTION DOMAIN
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-                   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                   'https://easybudget.ing'
+                   'https://easybudget.ing'  // Always fallback to production domain
 
     console.log('Base URL:', baseUrl)
 
-    // Create checkout session without user verification for now
+    // Get plan details for metadata
+    const planType = getPlanType(priceId)
+    const billingInterval = getBillingInterval(priceId)
+
+    console.log('=== METADATA TO BE SET ===')
+    console.log('Plan Type:', planType)
+    console.log('Billing Interval:', billingInterval)
+    console.log('User ID:', userId)
+
+    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -41,14 +49,14 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}/#pricing`,
       metadata: {
         userId: userId,
-        planType: getPlanType(priceId),
-        billingInterval: getBillingInterval(priceId),
+        planType: planType,
+        billingInterval: billingInterval,
       },
       subscription_data: {
         metadata: {
           userId: userId,
-          planType: getPlanType(priceId),
-          billingInterval: getBillingInterval(priceId),
+          planType: planType,
+          billingInterval: billingInterval,
         },
       },
       allow_promotion_codes: true,
@@ -59,7 +67,7 @@ export async function POST(request: NextRequest) {
     console.log('Checkout URL:', session.url)
     console.log('Success URL:', session.success_url)
     console.log('Cancel URL:', session.cancel_url)
-    console.log('Metadata:', session.metadata)
+    console.log('Session Metadata:', session.metadata)
     
     return NextResponse.json({ url: session.url })
   } catch (error) {
