@@ -6,6 +6,7 @@ import { DashboardProvider } from "@/lib/dashboard-context"
 import { OnboardingProvider } from "@/lib/onboarding-context"
 import { Toaster } from "@/components/ui/sonner"
 import { WelcomeTour } from "@/components/onboarding/welcome-tour"
+import { MobileBlock } from "@/components/mobile-block"
 
 export default function DashboardLayout({
   children,
@@ -16,9 +17,11 @@ export default function DashboardLayout({
     <AuthProvider>
       <DashboardProvider>
         <OnboardingProvider>
-          {children}
-          <WelcomeTour />
-          <Toaster />
+          <MobileBlock>
+            {children}
+            <WelcomeTour />
+            <Toaster />
+          </MobileBlock>
         </OnboardingProvider>
       </DashboardProvider>
     </AuthProvider>

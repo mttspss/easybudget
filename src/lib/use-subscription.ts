@@ -66,33 +66,33 @@ export function useSubscription(userId: string | undefined) {
 
   const hasFeature = (feature: string): boolean => {
     try {
-      const planType = getPlanType()
+    const planType = getPlanType()
       
       // Safety checks to prevent crashes
       if (!PLANS || typeof PLANS !== 'object') return false
       
-      const plan = PLANS[planType]
+    const plan = PLANS[planType]
       if (!plan || !plan.features || !Array.isArray(plan.features)) return false
 
       // Safety check: ensure starter plan exists before checking features
       if (!PLANS.starter || !PLANS.starter.features || !Array.isArray(PLANS.starter.features)) return false
 
-      // Pro and Growth have all Starter features
-      if ((planType === 'pro' || planType === 'growth') && 
-          PLANS.starter.features.includes(feature)) {
-        return true
-      }
-      
-      // Growth has all Pro features
+    // Pro and Growth have all Starter features
+    if ((planType === 'pro' || planType === 'growth') && 
+        PLANS.starter.features.includes(feature)) {
+      return true
+    }
+    
+    // Growth has all Pro features
       if (planType === 'growth' && 
           PLANS.pro && 
           PLANS.pro.features && 
           Array.isArray(PLANS.pro.features) && 
           PLANS.pro.features.includes(feature)) {
-        return true
-      }
-      
-      return plan.features.includes(feature)
+      return true
+    }
+    
+    return plan.features.includes(feature)
     } catch (err) {
       console.error('Error in hasFeature:', err)
       return false

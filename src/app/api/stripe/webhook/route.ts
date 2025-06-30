@@ -183,7 +183,7 @@ async function upsertSubscription(subscription: Stripe.Subscription, userId: str
 
   const planType = getPlanType(priceId)
   const billingInterval = getBillingInterval(priceId)
-
+  
   // Convert timestamps from subscription item
   const toDateOrNull = (timestamp?: number | null) => 
     typeof timestamp === 'number' ? new Date(timestamp * 1000).toISOString() : null
