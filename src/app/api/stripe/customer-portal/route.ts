@@ -69,10 +69,11 @@ export async function POST(request: NextRequest) {
 
     console.log('Customer ID:', customerId)
 
-    // Determine base URL for return
+    // Determine base URL for return - PRIORITIZE PRODUCTION DOMAIN
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-                   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                   'https://easybudget.ing'
+                   'https://easybudget.ing'  // Always fallback to production domain
+
+    console.log('Customer Portal Base URL:', baseUrl)
 
     // Create customer portal session
     const portalSession = await stripe.billingPortal.sessions.create({
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
 
     console.log('=== CUSTOMER PORTAL CREATED ===')
     console.log('Portal URL:', portalSession.url)
+    console.log('Return URL:', `${baseUrl}/dashboard/billing`)
 
     return NextResponse.json({ url: portalSession.url })
   } catch (error) {
