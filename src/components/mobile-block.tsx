@@ -3,9 +3,8 @@
 import { useMobileDetection } from "@/lib/use-mobile-detection"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Monitor, Smartphone, X, Laptop, Download, Clock } from "lucide-react"
+import { Monitor, Smartphone, X, Download, Clock } from "lucide-react"
 import Image from "next/image"
-import { useState, useEffect } from "react"
 
 interface MobileBlockProps {
   children: React.ReactNode
@@ -13,19 +12,6 @@ interface MobileBlockProps {
 
 export function MobileBlock({ children }: MobileBlockProps) {
   const { isMobile, isLoading } = useMobileDetection()
-  const [forceDesktop, setForceDesktop] = useState(false)
-
-  // Controlla se l'utente ha già forzato la modalità desktop
-  useEffect(() => {
-    const forced = localStorage.getItem('easybudget_force_desktop') === 'true'
-    setForceDesktop(forced)
-  }, [])
-
-  // Funzione per forzare la modalità desktop
-  const handleForceDesktop = () => {
-    localStorage.setItem('easybudget_force_desktop', 'true')
-    setForceDesktop(true)
-  }
 
   // Mostra loading durante il controllo
   if (isLoading) {
@@ -36,12 +22,12 @@ export function MobileBlock({ children }: MobileBlockProps) {
     )
   }
 
-  // Se non è mobile o se ha forzato la modalità desktop, mostra il contenuto normale
-  if (!isMobile || forceDesktop) {
+  // Se non è mobile, mostra il contenuto normale
+  if (!isMobile) {
     return <>{children}</>
   }
 
-  // Se è mobile, mostra il messaggio di blocco
+  // Se è mobile, mostra il messaggio di blocco (SENZA opzione di bypass)
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#7aff01]/8 via-white to-[#7aff01]/4 relative overflow-hidden">
       {/* Subtle patterns */}
@@ -110,22 +96,13 @@ export function MobileBlock({ children }: MobileBlockProps) {
               </div>
             </div>
             
-            {/* Actions */}
+            {/* Actions - REMOVED "Continue Anyway" OPTION */}
             <div className="space-y-3">
               <Button 
                 onClick={() => window.location.href = '/'} 
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white"
               >
                 Back to Home
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                onClick={handleForceDesktop}
-                className="w-full border-orange-300 text-orange-700 hover:bg-orange-50"
-              >
-                <Laptop className="w-4 h-4 mr-2" />
-                Continue Anyway (Desktop Mode)
               </Button>
               
               <Button 
@@ -144,14 +121,6 @@ export function MobileBlock({ children }: MobileBlockProps) {
               >
                 Contact Support
               </Button>
-            </div>
-            
-            {/* Warning for force desktop */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <p className="text-orange-800 text-xs leading-relaxed">
-                ⚠️ <strong>Desktop Mode:</strong> Some features may not work properly on small screens. 
-                For the best experience, use a computer or tablet.
-              </p>
             </div>
             
             {/* Footer */}
