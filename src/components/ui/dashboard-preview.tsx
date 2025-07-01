@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { 
   BarChart3, 
   CreditCard, 
@@ -20,6 +21,10 @@ interface DashboardTab {
   description: string
   image: string
   features: string[]
+}
+
+interface DashboardPreviewProps {
+  user?: any
 }
 
 const dashboardTabs: DashboardTab[] = [
@@ -90,13 +95,22 @@ const dashboardTabs: DashboardTab[] = [
   }
 ]
 
-export function DashboardPreview() {
+export function DashboardPreview({ user }: DashboardPreviewProps) {
   const [activeTab, setActiveTab] = useState("overview")
   const [imageError, setImageError] = useState<Record<string, boolean>>({})
+  const router = useRouter()
   const activeTabData = dashboardTabs.find(tab => tab.id === activeTab)
 
   const handleImageError = (tabId: string) => {
     setImageError(prev => ({ ...prev, [tabId]: true }))
+  }
+
+  const handleTryFeature = () => {
+    if (user) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth/register')
+    }
   }
 
   return (
@@ -120,7 +134,7 @@ export function DashboardPreview() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer ${
                   activeTab === tab.id
                     ? 'bg-green-500 text-white shadow-lg'
                     : 'bg-white text-gray-600 hover:border-green-500 border border-gray-200'
@@ -170,10 +184,11 @@ export function DashboardPreview() {
               {/* CTA */}
               <div className="pt-4">
                 <Button 
+                  onClick={handleTryFeature}
                   size="lg"
-                  className="bg-[#60ea8b] hover:bg-[#50da7b] text-white px-8 py-3"
+                  className="bg-[#60ea8b] hover:bg-[#50da7b] text-white px-8 py-3 cursor-pointer"
                 >
-                  Try This Feature Now
+                  {user ? 'Go to Dashboard' : 'Try This Feature Now'}
                   <TrendingUp className="ml-2 h-4 w-4" />
                 </Button>
               </div>

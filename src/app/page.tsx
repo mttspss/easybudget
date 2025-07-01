@@ -254,9 +254,9 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center justify-center flex-1">
-            <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Pricing</a>
-            <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors px-4">FAQ</a>
-            <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors px-4">Changelog</a>
+            <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors px-4 cursor-pointer">Pricing</a>
+            <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors px-4 cursor-pointer">FAQ</a>
+            <a href="/changelog" className="text-gray-600 hover:text-gray-900 transition-colors px-4 cursor-pointer">Changelog</a>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -306,9 +306,9 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden pt-4 border-t border-gray-200 mt-3">
             <div className="flex flex-col space-y-4">
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-2 py-1">Pricing</a>
-              <a href="#faq" className="text-gray-600 hover:text-gray-900 px-2 py-1">FAQ</a>
-              <a href="/changelog" className="text-gray-600 hover:text-gray-900 px-2 py-1">Changelog</a>
+              <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-2 py-1 cursor-pointer">Pricing</a>
+              <a href="#faq" className="text-gray-600 hover:text-gray-900 px-2 py-1 cursor-pointer">FAQ</a>
+              <a href="/changelog" className="text-gray-600 hover:text-gray-900 px-2 py-1 cursor-pointer">Changelog</a>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
                 {user ? (
                   <>
@@ -606,7 +606,7 @@ export default function LandingPage() {
       </section>
 
       {/* Dashboard Preview Section */}
-      <DashboardPreview />
+      <DashboardPreview user={user} />
 
       {/* Transaction Transformation Section */}
       <section className="py-20 px-6 bg-gray-50">
@@ -729,7 +729,7 @@ export default function LandingPage() {
               <div className="relative">
                 <button
                   onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
-                  className={`w-12 h-6 rounded-full transition-colors duration-300 ${
+                  className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer ${
                     billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
                   }`}
                 >
@@ -838,7 +838,7 @@ export default function LandingPage() {
             {faqs.map((faq, index) => (
               <div key={index} className="border border-gray-200 rounded-lg overflow-hidden bg-white/70 backdrop-blur-sm">
                 <button 
-                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-gray-50/50 transition-colors" 
+                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-gray-50/50 transition-colors cursor-pointer" 
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
                 >
                   <span className="font-semibold text-slate-900 pr-4">{faq.q}</span>
@@ -863,9 +863,9 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Product</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a></li>
-                <li><a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a></li>
-                <li><a href="/dashboard" className="hover:text-slate-900 transition-colors">Dashboard</a></li>
+                <li><a href="#pricing" className="hover:text-slate-900 transition-colors cursor-pointer">Pricing</a></li>
+                <li><a href="#faq" className="hover:text-slate-900 transition-colors cursor-pointer">FAQ</a></li>
+                <li><a href="/dashboard" className="hover:text-slate-900 transition-colors cursor-pointer">Dashboard</a></li>
               </ul>
             </div>
 
@@ -873,9 +873,9 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Company</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
-                <li><a href="/changelog" className="hover:text-slate-900 transition-colors">Changelog</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors cursor-pointer">About</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors cursor-pointer">Blog</a></li>
+                <li><a href="/changelog" className="hover:text-slate-900 transition-colors cursor-pointer">Changelog</a></li>
               </ul>
             </div>
 
@@ -883,9 +883,9 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Legal</h4>
               <ul className="space-y-4 text-slate-600">
-                <li><a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-slate-900 transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Compliance</a></li>
+                <li><a href="/privacy" className="hover:text-slate-900 transition-colors cursor-pointer">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-slate-900 transition-colors cursor-pointer">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-slate-900 transition-colors cursor-pointer">Compliance</a></li>
               </ul>
             </div>
 
@@ -942,10 +942,10 @@ export default function LandingPage() {
               
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-4">
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
                     <Linkedin className="w-5 h-5" />
                   </a>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">
+                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
                     <Twitter className="w-5 h-5" />
                   </a>
                 </div>
