@@ -140,7 +140,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
 
   // Auto-open dialog if add=true in URL
   useEffect(() => {
-    const shouldAdd = searchParams.get('add')
+    const shouldAdd = searchParams?.get('add')
     if (shouldAdd === 'true') {
       setIsDialogOpen(true)
       // Clean the URL by removing the add parameter
