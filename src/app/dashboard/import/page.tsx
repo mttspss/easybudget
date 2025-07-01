@@ -125,7 +125,18 @@ export default function ImportPage() {
       console.log(`   Type: "${type}"`)
       console.log(`   User ID: "${user.id}"`)
       
-      // Search for existing transactions with same description and type
+      // First try: Simple query to see what's in the database
+      const { data: allTransactions, error: allError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .ilike('description', `%${description.trim()}%`)
+        .limit(10)
+
+      console.log(`🔍 DEBUG: All matching transactions (any type):`, allTransactions)
+      console.log(`🔍 DEBUG: All transactions error:`, allError)
+
+      // Second try: With categories join
       const { data, error } = await supabase
         .from('transactions')
         .select(`
@@ -140,11 +151,10 @@ export default function ImportPage() {
         `)
         .eq('user_id', user.id)
         .eq('type', type)
-        .ilike('description', `%${description.trim()}%`) // Case-insensitive partial match
-        .not('category_id', 'is', null) // Only get transactions that HAVE categories
-        .limit(50) // Limit to recent matches
+        .ilike('description', `%${description.trim()}%`)
+        .limit(50)
 
-      console.log(`🔍 DEBUG: Query result:`, { data, error, count: data?.length || 0 })
+      console.log(`🔍 DEBUG: Query with categories join:`, { data, error, count: data?.length || 0 })
       
       if (error) {
         console.error('🚨 DEBUG: Supabase query error:', error)
@@ -158,23 +168,35 @@ export default function ImportPage() {
 
       console.log(`✅ DEBUG: Found ${data.length} existing transactions:`)
       data.forEach((tx, index) => {
-        console.log(`   ${index + 1}. "${tx.description}" → ${tx.categories?.[0]?.name || 'NO CATEGORY'}`)
+        const categoryData = Array.isArray(tx.categories) ? tx.categories[0] : tx.categories
+        console.log(`   ${index + 1}. "${tx.description}" → category_id: ${tx.category_id} → category: ${categoryData?.name || 'NO CATEGORY'}`)
       })
+
+      // Filter transactions that actually have categories
+      const categorizedTransactions = data.filter(tx => tx.category_id && tx.categories)
+      console.log(`🎯 DEBUG: Transactions with categories: ${categorizedTransactions.length}`)
+
+      if (categorizedTransactions.length === 0) {
+        console.log(`❌ DEBUG: No categories found in existing transactions`)
+        return null
+      }
 
       // Count category usage
       const categoryCount = new Map<string, { name: string, count: number, id: string }>()
       
-      data.forEach(transaction => {
-        const category = transaction.categories?.[0] // Keep array access for TypeScript compatibility
-        if (category?.name) {
-          const existing = categoryCount.get(category.name) || { name: category.name, count: 0, id: category.id }
+      categorizedTransactions.forEach(transaction => {
+        const category = transaction.categories
+        // Handle both single object and array cases
+        const categoryData = Array.isArray(category) ? category[0] : category
+        if (categoryData?.name) {
+          const existing = categoryCount.get(categoryData.name) || { name: categoryData.name, count: 0, id: categoryData.id }
           existing.count++
-          categoryCount.set(category.name, existing)
+          categoryCount.set(categoryData.name, existing)
         }
       })
 
       if (categoryCount.size === 0) {
-        console.log(`❌ DEBUG: No categories found in existing transactions`)
+        console.log(`❌ DEBUG: No categories found after processing`)
         return null
       }
 
@@ -184,7 +206,7 @@ export default function ImportPage() {
       )
 
       // Calculate confidence based on usage
-      const totalTransactions = data.length
+      const totalTransactions = categorizedTransactions.length
       const confidence = Math.min(0.95, 0.5 + (mostUsed.count / totalTransactions) * 0.4)
 
       console.log(`🎯 DEBUG: Most used category: "${mostUsed.name}" (${mostUsed.count}/${totalTransactions} times, ${Math.round(confidence * 100)}% confidence)`)
