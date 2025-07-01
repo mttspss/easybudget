@@ -43,6 +43,7 @@ import { createDefaultCategories } from "@/lib/default-categories"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
 import { useSubscription } from "@/lib/subscription-context"
+import { suggestCategoryWithAI } from "@/lib/ai/category-analyzer"
 
 interface ParsedTransaction {
   id: string
@@ -274,7 +275,40 @@ export default function ImportPage() {
     return mapping
   }
 
-  const suggestCategory = (description: string): { category: string, confidence: number } => {
+  const suggestCategory = async (description: string, amount: number, type: 'income' | 'expense'): Promise<{ category: string, confidence: number }> => {
+    // Check if AI is enabled via environment variable
+    const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
+    
+    if (aiEnabled) {
+      try {
+        // Use AI for categorization
+        const aiRequest = {
+          description,
+          amount,
+          type,
+          availableCategories: importState.categories.map(cat => ({ 
+            name: cat.name, 
+            type: cat.type 
+          })),
+          userContext: {
+            country: 'International', // Will be auto-detected by AI from transaction content
+            currency: userCurrency?.code || 'USD'
+          }
+        }
+        
+        const aiResult = await suggestCategoryWithAI(aiRequest)
+        return { 
+          category: aiResult.category, 
+          confidence: aiResult.confidence 
+        }
+        
+      } catch (aiError) {
+        console.warn('AI categorization failed, falling back to pattern matching:', aiError)
+        // Fall through to legacy method
+      }
+    }
+    
+    // Legacy pattern matching (fallback)
     const desc = description.toLowerCase()
     
     const patterns = [
@@ -409,11 +443,12 @@ export default function ImportPage() {
     }
   }
 
-  const parseTransactions = () => {
+  const parseTransactions = async () => {
     const { rawData, columnMapping } = importState
     const transactions: ParsedTransaction[] = []
 
-    rawData.forEach((row, index) => {
+    for (let index = 0; index < rawData.length; index++) {
+      const row = rawData[index]
       const errors: string[] = []
       
       const description = row[columnMapping.description] || `Transaction ${index + 1}`
@@ -459,7 +494,7 @@ export default function ImportPage() {
         }
       }
 
-      const { category: suggestedCategory, confidence } = suggestCategory(description)
+      const { category: suggestedCategory, confidence } = await suggestCategory(description, amount, type)
 
       transactions.push({
         id: `temp_${index}`,
@@ -472,7 +507,7 @@ export default function ImportPage() {
         row_index: index + 1,
         errors
       })
-    })
+    }
 
     setImportState(prev => ({
       ...prev,
