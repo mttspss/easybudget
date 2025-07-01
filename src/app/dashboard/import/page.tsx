@@ -120,23 +120,7 @@ export default function ImportPage() {
     if (!user) return null
     
     try {
-      console.log(`🔍 DEBUG: Searching for existing transactions...`)
-      console.log(`   Description: "${description}"`)
-      console.log(`   Type: "${type}"`)
-      console.log(`   User ID: "${user.id}"`)
-      
-      // First try: Simple query to see what's in the database
-      const { data: allTransactions, error: allError } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .ilike('description', `%${description.trim()}%`)
-        .limit(10)
-
-      console.log(`🔍 DEBUG: All matching transactions (any type):`, allTransactions)
-      console.log(`🔍 DEBUG: All transactions error:`, allError)
-
-      // Second try: With categories join
+      // Search for existing transactions with same description and type
       const { data, error } = await supabase
         .from('transactions')
         .select(`
@@ -154,30 +138,14 @@ export default function ImportPage() {
         .ilike('description', `%${description.trim()}%`)
         .limit(50)
 
-      console.log(`🔍 DEBUG: Query with categories join:`, { data, error, count: data?.length || 0 })
-      
-      if (error) {
-        console.error('🚨 DEBUG: Supabase query error:', error)
+      if (error || !data || data.length === 0) {
         return null
       }
-
-      if (!data || data.length === 0) {
-        console.log(`❌ DEBUG: No existing transactions found for "${description}"`)
-        return null
-      }
-
-      console.log(`✅ DEBUG: Found ${data.length} existing transactions:`)
-      data.forEach((tx, index) => {
-        const categoryData = Array.isArray(tx.categories) ? tx.categories[0] : tx.categories
-        console.log(`   ${index + 1}. "${tx.description}" → category_id: ${tx.category_id} → category: ${categoryData?.name || 'NO CATEGORY'}`)
-      })
 
       // Filter transactions that actually have categories
       const categorizedTransactions = data.filter(tx => tx.category_id && tx.categories)
-      console.log(`🎯 DEBUG: Transactions with categories: ${categorizedTransactions.length}`)
 
       if (categorizedTransactions.length === 0) {
-        console.log(`❌ DEBUG: No categories found in existing transactions`)
         return null
       }
 
@@ -196,7 +164,6 @@ export default function ImportPage() {
       })
 
       if (categoryCount.size === 0) {
-        console.log(`❌ DEBUG: No categories found after processing`)
         return null
       }
 
@@ -209,14 +176,12 @@ export default function ImportPage() {
       const totalTransactions = categorizedTransactions.length
       const confidence = Math.min(0.95, 0.5 + (mostUsed.count / totalTransactions) * 0.4)
 
-      console.log(`🎯 DEBUG: Most used category: "${mostUsed.name}" (${mostUsed.count}/${totalTransactions} times, ${Math.round(confidence * 100)}% confidence)`)
-
       return {
         category: mostUsed.name,
         confidence
       }
     } catch (error) {
-      console.error('🚨 DEBUG: Error searching transaction history:', error)
+      console.error('Error searching transaction history:', error)
       return null
     }
   }, [user])
@@ -582,9 +547,6 @@ export default function ImportPage() {
 
     // Show progress for AI processing
     setIsProcessing(true)
-    let processed = 0
-
-    console.log(`Starting optimized AI categorization for ${rawData.length} transactions...`)
 
     // Process in batches for efficiency
     const BATCH_SIZE = 10
@@ -647,7 +609,6 @@ export default function ImportPage() {
               // Double check: if it's supposed to be income but amount is negative, force expense
               if (isNegative || amount < 0) {
                 type = 'expense'
-                console.warn(`Forcing expense for negative amount despite type column suggesting income: ${description}`)
               } else {
                 type = 'income'
               }
@@ -670,17 +631,13 @@ export default function ImportPage() {
             if (userPattern) {
               suggestedCategory = userPattern.category
               confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
-              console.log(`✅ Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence)`)
             }
             // Then check current session cache
             else if (categoryHistory.has(normalizedDesc)) {
               const prevCategorization = categoryHistory.get(normalizedDesc)!
               suggestedCategory = prevCategorization.category
               confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
-              console.log(`🔄 Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
             } else {
-              console.log(`🤖 No user pattern found for "${normalizedDesc}|${type}". Using AI categorization...`)
-              
               // Build context from current session
               const contextExamplesStr = Array.from(categoryHistory.entries())
                 .slice(-2) // Last 2 session categorizations
@@ -703,12 +660,10 @@ export default function ImportPage() {
               )
               if (matchingCategory) {
                 categoryId = matchingCategory.id
-                console.log(`Auto-applied category: ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
               }
             }
 
-          } catch (error) {
-            console.warn(`AI categorization failed for transaction ${globalIndex + 1}:`, error)
+          } catch {
             suggestedCategory = type === 'income' ? 'Other Income' : 'Other Expenses'
           }
 
@@ -732,18 +687,9 @@ export default function ImportPage() {
       // Process batch in parallel
       const batchResults = await Promise.all(batchPromises)
       transactions.push(...batchResults)
-
-      processed += batch.length
-      console.log(`AI processing: ${processed}/${rawData.length} transactions (batch ${batchIndex + 1}/${batches.length})`)
-      
-      // Small delay between batches to prevent rate limiting
-      if (batchIndex < batches.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-      }
     }
 
     setIsProcessing(false)
-    console.log(`AI categorization completed! Processed ${rawData.length} transactions with ${categoryHistory.size} unique descriptions`)
 
     setImportState(prev => ({
       ...prev,
