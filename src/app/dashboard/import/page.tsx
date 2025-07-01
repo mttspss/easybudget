@@ -114,6 +114,9 @@ export default function ImportPage() {
   })
 
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
+  
+  // User categorization patterns for learning
+  const [userCategorizationPatterns, setUserCategorizationPatterns] = useState<Map<string, {category: string, confidence: number, count: number}>>(new Map())
 
   const fetchCategories = useCallback(async () => {
     if (!user) return
@@ -172,6 +175,75 @@ export default function ImportPage() {
 
     loadCurrency()
   }, [user])
+
+  // Fetch user's previous categorization patterns
+  const fetchUserCategorizationPatterns = useCallback(async () => {
+    if (!user) return
+    
+    try {
+      // Get user's transaction history to learn patterns
+      const { data } = await supabase
+        .from('transactions')
+        .select(`
+          description,
+          type,
+          categories!inner (
+            name
+          )
+        `)
+        .eq('user_id', user.id)
+        .limit(1000) // Get last 1000 transactions for pattern learning
+
+      const patterns = new Map<string, {category: string, confidence: number, count: number}>()
+      
+      if (data) {
+        // Count categorization patterns
+        const patternCounts = new Map<string, Map<string, number>>()
+        
+        data.forEach(transaction => {
+          const key = `${transaction.description.toLowerCase().trim()}|${transaction.type}`
+          const category = transaction.categories?.[0]?.name
+          
+          if (!category) return // Skip if no category
+          
+          if (!patternCounts.has(key)) {
+            patternCounts.set(key, new Map())
+          }
+          
+          const categoryMap = patternCounts.get(key)!
+          categoryMap.set(category, (categoryMap.get(category) || 0) + 1)
+        })
+        
+        // Convert to final patterns with confidence
+        patternCounts.forEach((categoryMap, key) => {
+          const totalCount = Array.from(categoryMap.values()).reduce((sum, count) => sum + count, 0)
+          const mostUsedCategory = Array.from(categoryMap.entries()).reduce((max, [cat, count]) => 
+            count > max.count ? {category: cat, count} : max, {category: '', count: 0}
+          )
+          
+          if (totalCount >= 2) { // Only consider patterns with at least 2 occurrences
+            const confidence = Math.min(0.95, 0.5 + (mostUsedCategory.count / totalCount) * 0.4)
+            patterns.set(key, {
+              category: mostUsedCategory.category,
+              confidence,
+              count: totalCount
+            })
+          }
+        })
+      }
+      
+      setUserCategorizationPatterns(patterns)
+      console.log(`Loaded ${patterns.size} user categorization patterns for learning`)
+    } catch (error) {
+      console.error('Error fetching user categorization patterns:', error)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      fetchUserCategorizationPatterns()
+    }
+  }, [user, fetchUserCategorizationPatterns])
 
   if (loading) {
     return (
@@ -528,16 +600,25 @@ export default function ImportPage() {
 
           let type: 'income' | 'expense' = 'expense'
           
+          // Robust type detection - NEVER allow negative amounts to be income
           if (amountStr) {
-            if (!isNegative) {
-              type = 'income'
+            if (isNegative || amount < 0) {
+              type = 'expense' // Negative amount = ALWAYS expense
             } else {
-              type = 'expense'
+              type = 'income'  // Positive amount = income
             }
           } else if (typeStr) {
             const typeValue = typeStr.toString().toLowerCase()
             if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
-              type = 'income'
+              // Double check: if it's supposed to be income but amount is negative, force expense
+              if (isNegative || amount < 0) {
+                type = 'expense'
+                console.warn(`Forcing expense for negative amount despite type column suggesting income: ${description}`)
+              } else {
+                type = 'income'
+              }
+            } else {
+              type = 'expense'
             }
           }
 
@@ -549,17 +630,36 @@ export default function ImportPage() {
           try {
             // Check if we've seen this exact description before
             const normalizedDesc = description.toLowerCase().trim()
-            if (categoryHistory.has(normalizedDesc)) {
+            const userPatternKey = `${normalizedDesc}|${type}`
+            
+            // First, check user's historical patterns (highest priority)
+            if (userCategorizationPatterns.has(userPatternKey)) {
+              const userPattern = userCategorizationPatterns.get(userPatternKey)!
+              suggestedCategory = userPattern.category
+              confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
+              console.log(`Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence, used ${userPattern.count} times)`)
+            }
+            // Then check current session cache
+            else if (categoryHistory.has(normalizedDesc)) {
               const prevCategorization = categoryHistory.get(normalizedDesc)!
               suggestedCategory = prevCategorization.category
               confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
               console.log(`Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
             } else {
-              // Build context from previous categorizations
-              const contextExamples = Array.from(categoryHistory.entries())
-                .slice(-5) // Last 5 categorizations
+              // Build context from both user patterns and current session
+              const userContextExamples = Array.from(userCategorizationPatterns.entries())
+                .filter(([key]) => key.endsWith(`|${type}`)) // Same type only
+                .slice(-3) // Last 3 user patterns
+                .map(([key, pattern]) => {
+                  const desc = key.split('|')[0]
+                  return `"${desc}" → ${pattern.category} (used ${pattern.count}x)`
+                })
+                
+              const sessionContextExamples = Array.from(categoryHistory.entries())
+                .slice(-2) // Last 2 session categorizations
                 .map(([desc, cat]) => `"${desc}" → ${cat.category}`)
-                .join('\n')
+                
+              const contextExamples = [...userContextExamples, ...sessionContextExamples].join('\n')
 
               const result = await suggestCategoryWithContext(description, amount, type, contextExamples)
               suggestedCategory = result.category
@@ -569,14 +669,15 @@ export default function ImportPage() {
               categoryHistory.set(normalizedDesc, { category: suggestedCategory, confidence })
             }
 
-            // Auto-apply high-confidence suggestions
-            if (confidence >= 0.8) {
+            // Auto-apply high-confidence suggestions (especially user patterns)
+            const autoApplyThreshold = userCategorizationPatterns.has(userPatternKey) ? 0.7 : 0.8
+            if (confidence >= autoApplyThreshold) {
               const matchingCategory = importState.categories.find(cat => 
                 cat.type === type && cat.name.toLowerCase() === suggestedCategory.toLowerCase()
               )
               if (matchingCategory) {
                 categoryId = matchingCategory.id
-                console.log(`Auto-applied high-confidence category: ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
+                console.log(`Auto-applied category: ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
               }
             }
 
@@ -623,6 +724,35 @@ export default function ImportPage() {
       step: 'mapping',
       parsedTransactions: transactions
     }))
+  }
+
+  // Bulk categorization function
+  const applyBulkCategorization = (sourceTransactionIndex: number, categoryId: string) => {
+    const sourceTransaction = importState.parsedTransactions[sourceTransactionIndex]
+    if (!sourceTransaction) return
+
+    const updated = [...importState.parsedTransactions]
+    let appliedCount = 0
+
+    // Find all transactions with same description and type
+    const normalizedSourceDesc = sourceTransaction.description.toLowerCase().trim()
+    
+    updated.forEach((transaction, index) => {
+      const normalizedDesc = transaction.description.toLowerCase().trim()
+      if (normalizedDesc === normalizedSourceDesc && 
+          transaction.type === sourceTransaction.type && 
+          index !== sourceTransactionIndex) {
+        transaction.category_id = categoryId
+        appliedCount++
+      }
+    })
+
+    setImportState(prev => ({ ...prev, parsedTransactions: updated }))
+    
+    if (appliedCount > 0) {
+      const categoryName = importState.categories.find(cat => cat.id === categoryId)?.name || 'Unknown'
+      toast.success(`Applied "${categoryName}" to ${appliedCount + 1} similar transactions`)
+    }
   }
 
   const processImport = async () => {
@@ -1243,6 +1373,27 @@ export default function ImportPage() {
                                           ))}
                                       </SelectContent>
                                     </Select>
+                                    
+                                    {/* Bulk Apply Button */}
+                                    {transaction.category_id && (() => {
+                                      const similarCount = importState.parsedTransactions.filter(t => 
+                                        t.description.toLowerCase().trim() === transaction.description.toLowerCase().trim() &&
+                                        t.type === transaction.type
+                                      ).length
+                                      
+                                      return similarCount > 1 && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => applyBulkCategorization(index, transaction.category_id!)}
+                                          className="shrink-0 text-xs"
+                                          title={`Apply to ${similarCount} similar transactions`}
+                                        >
+                                          <RefreshCw className="h-3 w-3 mr-1" />
+                                          Apply to {similarCount}
+                                        </Button>
+                                      )
+                                    })()}
                                     
                                     <Button
                                       variant="outline"
