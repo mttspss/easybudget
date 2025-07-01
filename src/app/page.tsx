@@ -743,11 +743,6 @@ export default function LandingPage() {
               <span className={`text-sm font-medium ${billingInterval === 'yearly' ? 'text-slate-900' : 'text-slate-500'}`}>
                 Yearly
               </span>
-              {billingInterval === 'yearly' && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
-                  Up to 4 months free
-                </span>
-              )}
             </div>
           </div>
           <div className="grid lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
