@@ -43,7 +43,6 @@ import { createDefaultCategories } from "@/lib/default-categories"
 import { getUserCurrency, formatCurrency, type CurrencyConfig } from "@/lib/currency"
 import { DashboardIndicator } from "@/components/dashboard-indicator"
 import { useSubscription } from "@/lib/subscription-context"
-import { suggestCategoryWithAI } from "@/lib/ai/category-analyzer"
 
 interface ParsedTransaction {
   id: string
@@ -281,54 +280,98 @@ export default function ImportPage() {
     
     if (aiEnabled) {
       try {
-        // Use AI for categorization
-        const aiRequest = {
-          description,
-          amount,
-          type,
-          availableCategories: importState.categories.map(cat => ({ 
-            name: cat.name, 
-            type: cat.type 
-          })),
-          userContext: {
-            country: 'International', // Will be auto-detected by AI from transaction content
-            currency: userCurrency?.code || 'USD'
-          }
+        // Call our secure server-side API endpoint
+        const response = await fetch('/api/ai/categorize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            description,
+            amount,
+            type,
+            availableCategories: importState.categories.map(cat => ({ 
+              name: cat.name, 
+              type: cat.type 
+            })),
+            userContext: {
+              country: 'International', // Will be auto-detected by AI from transaction content
+              currency: userCurrency?.code || 'USD'
+            }
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
         }
+
+        const result = await response.json()
         
-        const aiResult = await suggestCategoryWithAI(aiRequest)
-        return { 
-          category: aiResult.category, 
-          confidence: aiResult.confidence 
+        return {
+          category: result.category,
+          confidence: result.confidence
         }
-        
-      } catch (aiError) {
-        console.warn('AI categorization failed, falling back to pattern matching:', aiError)
-        // Fall through to legacy method
+      } catch (error) {
+        console.warn('AI categorization failed, using fallback:', error)
+        // Fall through to pattern matching fallback
       }
     }
-    
-    // Legacy pattern matching (fallback)
-    const desc = description.toLowerCase()
+
+    // Fallback: Simple pattern matching (original logic)
+    const lowerDesc = description.toLowerCase()
     
     const patterns = [
-      { keywords: ['grocery', 'food', 'restaurant', 'cafe', 'dining'], category: 'Food & Dining', confidence: 0.9 },
-      { keywords: ['gas', 'fuel', 'station', 'shell', 'exxon'], category: 'Transportation', confidence: 0.85 },
-      { keywords: ['amazon', 'store', 'shop', 'market'], category: 'Shopping', confidence: 0.8 },
-      { keywords: ['salary', 'payroll', 'income', 'wages'], category: 'Income', confidence: 0.95 },
-      { keywords: ['rent', 'mortgage', 'utilities', 'electric', 'water'], category: 'Home', confidence: 0.9 },
-      { keywords: ['netflix', 'spotify', 'entertainment', 'movie'], category: 'Entertainment', confidence: 0.85 }
+      // Food & Dining
+      { keywords: ['restaurant', 'cafe', 'food', 'dining', 'lunch', 'dinner', 'mcdonald', 'burger', 'pizza'], category: 'Food & Dining', confidence: 0.8 },
+      
+      // Transportation  
+      { keywords: ['gas', 'fuel', 'taxi', 'uber', 'parking', 'metro', 'transport'], category: 'Transportation', confidence: 0.8 },
+      
+      // Shopping
+      { keywords: ['amazon', 'shop', 'store', 'purchase', 'buy', 'market'], category: 'Shopping', confidence: 0.8 },
+      
+      // Bills
+      { keywords: ['electric', 'internet', 'phone', 'bill', 'utility', 'subscription'], category: 'Bills & Utilities', confidence: 0.8 },
+      
+      // Entertainment
+      { keywords: ['netflix', 'spotify', 'cinema', 'movie', 'gaming', 'entertainment'], category: 'Entertainment', confidence: 0.8 },
+      
+      // Healthcare
+      { keywords: ['pharmacy', 'hospital', 'doctor', 'medical', 'health'], category: 'Healthcare', confidence: 0.8 },
+      
+      // Income patterns
+      { keywords: ['salary', 'payroll', 'wage', 'income', 'bonus'], category: 'Salary', confidence: 0.9 },
+      { keywords: ['freelance', 'contract', 'consulting'], category: 'Freelancing', confidence: 0.8 },
     ]
 
     for (const pattern of patterns) {
       for (const keyword of pattern.keywords) {
-        if (desc.includes(keyword)) {
-          return { category: pattern.category, confidence: pattern.confidence }
+        if (lowerDesc.includes(keyword)) {
+          // Check if category exists in user's categories
+          const matchingCategory = importState.categories.find(cat => 
+            cat.type === type && cat.name.toLowerCase() === pattern.category.toLowerCase()
+          )
+          
+          if (matchingCategory) {
+            return { 
+              category: matchingCategory.name, 
+              confidence: pattern.confidence 
+            }
+          }
         }
       }
     }
 
-    return { category: 'Uncategorized', confidence: 0.1 }
+    // Default fallback
+    const defaultCategories = importState.categories.filter(cat => cat.type === type)
+    const defaultCategory = type === 'expense' 
+      ? defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
+      : defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
+
+    return { 
+      category: defaultCategory?.name || (type === 'expense' ? 'Other Expenses' : 'Other Income'), 
+      confidence: 0.1 
+    }
   }
 
   const parseDate = (dateStr: string): string | null => {
