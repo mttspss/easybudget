@@ -115,8 +115,61 @@ export default function ImportPage() {
 
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
   
-  // User categorization patterns for learning
-  const [userCategorizationPatterns, setUserCategorizationPatterns] = useState<Map<string, {category: string, confidence: number, count: number}>>(new Map())
+  // Simple function to find category from existing transactions
+  const findCategoryFromHistory = useCallback(async (description: string, type: 'income' | 'expense'): Promise<{ category: string, confidence: number } | null> => {
+    if (!user) return null
+    
+    try {
+      // Search for existing transactions with same description and type
+      const { data } = await supabase
+        .from('transactions')
+        .select(`
+          categories!inner (
+            name,
+            id
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('type', type)
+        .ilike('description', `%${description.trim()}%`) // Case-insensitive partial match
+        .limit(50) // Limit to recent matches
+
+      if (!data || data.length === 0) return null
+
+      // Count category usage
+      const categoryCount = new Map<string, { name: string, count: number, id: string }>()
+      
+      data.forEach(transaction => {
+        const category = transaction.categories?.[0] // Take first category from array
+        if (category?.name) {
+          const existing = categoryCount.get(category.name) || { name: category.name, count: 0, id: category.id }
+          existing.count++
+          categoryCount.set(category.name, existing)
+        }
+      })
+
+      if (categoryCount.size === 0) return null
+
+      // Find most used category
+      const mostUsed = Array.from(categoryCount.values()).reduce((max, current) => 
+        current.count > max.count ? current : max
+      )
+
+      // Calculate confidence based on usage
+      const totalTransactions = data.length
+      const confidence = Math.min(0.95, 0.5 + (mostUsed.count / totalTransactions) * 0.4)
+
+      console.log(`🔍 Found ${totalTransactions} existing transactions for "${description}": ${mostUsed.name} used ${mostUsed.count} times (${Math.round(confidence * 100)}% confidence)`)
+
+      return {
+        category: mostUsed.name,
+        confidence
+      }
+    } catch (error) {
+      console.error('Error searching transaction history:', error)
+      return null
+    }
+  }, [user])
 
   const fetchCategories = useCallback(async () => {
     if (!user) return
@@ -175,98 +228,6 @@ export default function ImportPage() {
 
     loadCurrency()
   }, [user])
-
-  // Fetch user's previous categorization patterns
-  const fetchUserCategorizationPatterns = useCallback(async (showToast = false) => {
-    if (!user) return
-    
-    try {
-      // Get user's transaction history to learn patterns
-      const { data } = await supabase
-        .from('transactions')
-        .select(`
-          description,
-          type,
-          categories!inner (
-            name
-          )
-        `)
-        .eq('user_id', user.id)
-        .limit(1000) // Get last 1000 transactions for pattern learning
-
-      const patterns = new Map<string, {category: string, confidence: number, count: number}>()
-      
-      if (data) {
-        // Count categorization patterns
-        const patternCounts = new Map<string, Map<string, number>>()
-        
-        data.forEach(transaction => {
-          const key = `${transaction.description.toLowerCase().trim()}|${transaction.type}`
-          const category = transaction.categories?.[0]?.name
-          
-          if (!category) return // Skip if no category
-          
-          if (!patternCounts.has(key)) {
-            patternCounts.set(key, new Map())
-          }
-          
-          const categoryMap = patternCounts.get(key)!
-          categoryMap.set(category, (categoryMap.get(category) || 0) + 1)
-        })
-        
-        // Convert to final patterns with confidence
-        patternCounts.forEach((categoryMap, key) => {
-          const totalCount = Array.from(categoryMap.values()).reduce((sum, count) => sum + count, 0)
-          const mostUsedCategory = Array.from(categoryMap.entries()).reduce((max, [cat, count]) => 
-            count > max.count ? {category: cat, count} : max, {category: '', count: 0}
-          )
-          
-          if (totalCount >= 1) { // Learn from even 1 occurrence for faster learning
-            const confidence = Math.min(0.95, 0.4 + (mostUsedCategory.count / totalCount) * 0.4) // Slightly lower base confidence for single occurrences
-            patterns.set(key, {
-              category: mostUsedCategory.category,
-              confidence,
-              count: totalCount
-            })
-          }
-        })
-      }
-      
-      setUserCategorizationPatterns(patterns)
-      console.log(`Loaded ${patterns.size} user categorization patterns for learning`)
-      
-      // Debug: Log all loaded patterns
-      if (patterns.size > 0) {
-        console.log('📊 User categorization patterns loaded:')
-        patterns.forEach((pattern, key) => {
-          console.log(`  "${key}" → ${pattern.category} (${Math.round(pattern.confidence * 100)}% confidence, used ${pattern.count}x)`)
-        })
-        
-        // Show success toast for manual refresh
-        if (showToast) {
-          toast.success(`🧠 Loaded ${patterns.size} learning patterns from your transaction history`)
-        }
-      } else {
-        console.log('⚠️ No user categorization patterns found. System will use AI/fallback only.')
-        
-        // Show info toast for manual refresh
-        if (showToast) {
-          toast.info('No learning patterns found yet. Import some transactions first!')
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching user categorization patterns:', error)
-      if (showToast) {
-        toast.error('Failed to load learning patterns')
-      }
-    }
-  }, [user])
-
-  useEffect(() => {
-    if (user) {
-      fetchUserCategorizationPatterns()
-    }
-  }, [user, fetchUserCategorizationPatterns])
 
   if (loading) {
     return (
@@ -653,14 +614,13 @@ export default function ImportPage() {
           try {
             // Check if we've seen this exact description before
             const normalizedDesc = description.toLowerCase().trim()
-            const userPatternKey = `${normalizedDesc}|${type}`
             
-            // First, check user's historical patterns (highest priority)
-            if (userCategorizationPatterns.has(userPatternKey)) {
-              const userPattern = userCategorizationPatterns.get(userPatternKey)!
+            // First, check user's historical transactions (highest priority)
+            const userPattern = await findCategoryFromHistory(normalizedDesc, type)
+            if (userPattern) {
               suggestedCategory = userPattern.category
               confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
-              console.log(`✅ Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence, used ${userPattern.count} times)`)
+              console.log(`✅ Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence)`)
             }
             // Then check current session cache
             else if (categoryHistory.has(normalizedDesc)) {
@@ -670,24 +630,14 @@ export default function ImportPage() {
               console.log(`🔄 Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
             } else {
               console.log(`🤖 No user pattern found for "${normalizedDesc}|${type}". Using AI categorization...`)
-              console.log(`📋 Available user patterns: ${userCategorizationPatterns.size} total`)
               
-              // Build context from both user patterns and current session
-              const userContextExamples = Array.from(userCategorizationPatterns.entries())
-                .filter(([key]) => key.endsWith(`|${type}`)) // Same type only
-                .slice(-3) // Last 3 user patterns
-                .map(([key, pattern]) => {
-                  const desc = key.split('|')[0]
-                  return `"${desc}" → ${pattern.category} (used ${pattern.count}x)`
-                })
-                
-              const sessionContextExamples = Array.from(categoryHistory.entries())
+              // Build context from current session
+              const contextExamplesStr = Array.from(categoryHistory.entries())
                 .slice(-2) // Last 2 session categorizations
                 .map(([desc, cat]) => `"${desc}" → ${cat.category}`)
-                
-              const contextExamples = [...userContextExamples, ...sessionContextExamples].join('\n')
+                .join('\n')
 
-              const result = await suggestCategoryWithContext(description, amount, type, contextExamples)
+              const result = await suggestCategoryWithContext(description, amount, type, contextExamplesStr)
               suggestedCategory = result.category
               confidence = result.confidence
               
@@ -696,7 +646,7 @@ export default function ImportPage() {
             }
 
             // Auto-apply high-confidence suggestions (especially user patterns)
-            const autoApplyThreshold = userCategorizationPatterns.has(userPatternKey) ? 0.7 : 0.8
+            const autoApplyThreshold = userPattern ? 0.7 : 0.8
             if (confidence >= autoApplyThreshold) {
               const matchingCategory = importState.categories.find(cat => 
                 cat.type === type && cat.name.toLowerCase() === suggestedCategory.toLowerCase()
@@ -884,10 +834,6 @@ export default function ImportPage() {
         // Record the successful import
         await recordCsvImport()
         
-        // Refresh user categorization patterns to learn from new transactions
-        console.log('🔄 Refreshing user categorization patterns after import...')
-        await fetchUserCategorizationPatterns(true)
-        
         toast.success(`Import completed! ${imported} transactions imported to ${activeDashboard?.name || 'Main Dashboard'}.`)
       } else {
         toast.error(`Import failed. ${skipped} transactions had errors.`)
@@ -1030,10 +976,6 @@ export default function ImportPage() {
                     <Download className="h-4 w-4 mr-2" />
                     Download Template
                   </Button>
-                  <Button variant="outline" onClick={() => fetchUserCategorizationPatterns(true)} title="Refresh learning patterns from your transaction history">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh Learning
-                  </Button>
                   <Button variant="outline" onClick={resetImport}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Restart
@@ -1154,9 +1096,6 @@ export default function ImportPage() {
                                 🤖 AI categorizing transactions...
                               </p>
                             )}
-                            <p className="text-xs text-gray-500 mt-1">
-                              🧠 Learning from {userCategorizationPatterns.size} historical patterns
-                            </p>
                           </div>
                           <Button onClick={parseTransactions} disabled={isProcessing}>
                             {isProcessing ? (
