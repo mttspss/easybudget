@@ -132,7 +132,8 @@ export default function ImportPage() {
           id,
           description,
           type,
-          categories!inner (
+          category_id,
+          categories (
             name,
             id
           )
@@ -140,6 +141,7 @@ export default function ImportPage() {
         .eq('user_id', user.id)
         .eq('type', type)
         .ilike('description', `%${description.trim()}%`) // Case-insensitive partial match
+        .not('category_id', 'is', null) // Only get transactions that HAVE categories
         .limit(50) // Limit to recent matches
 
       console.log(`🔍 DEBUG: Query result:`, { data, error, count: data?.length || 0 })
@@ -163,7 +165,7 @@ export default function ImportPage() {
       const categoryCount = new Map<string, { name: string, count: number, id: string }>()
       
       data.forEach(transaction => {
-        const category = transaction.categories?.[0] // Take first category from array
+        const category = transaction.categories?.[0] // Keep array access for TypeScript compatibility
         if (category?.name) {
           const existing = categoryCount.get(category.name) || { name: category.name, count: 0, id: category.id }
           existing.count++
