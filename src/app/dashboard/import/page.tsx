@@ -120,10 +120,18 @@ export default function ImportPage() {
     if (!user) return null
     
     try {
+      console.log(`🔍 DEBUG: Searching for existing transactions...`)
+      console.log(`   Description: "${description}"`)
+      console.log(`   Type: "${type}"`)
+      console.log(`   User ID: "${user.id}"`)
+      
       // Search for existing transactions with same description and type
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('transactions')
         .select(`
+          id,
+          description,
+          type,
           categories!inner (
             name,
             id
@@ -134,7 +142,22 @@ export default function ImportPage() {
         .ilike('description', `%${description.trim()}%`) // Case-insensitive partial match
         .limit(50) // Limit to recent matches
 
-      if (!data || data.length === 0) return null
+      console.log(`🔍 DEBUG: Query result:`, { data, error, count: data?.length || 0 })
+      
+      if (error) {
+        console.error('🚨 DEBUG: Supabase query error:', error)
+        return null
+      }
+
+      if (!data || data.length === 0) {
+        console.log(`❌ DEBUG: No existing transactions found for "${description}"`)
+        return null
+      }
+
+      console.log(`✅ DEBUG: Found ${data.length} existing transactions:`)
+      data.forEach((tx, index) => {
+        console.log(`   ${index + 1}. "${tx.description}" → ${tx.categories?.[0]?.name || 'NO CATEGORY'}`)
+      })
 
       // Count category usage
       const categoryCount = new Map<string, { name: string, count: number, id: string }>()
@@ -148,7 +171,10 @@ export default function ImportPage() {
         }
       })
 
-      if (categoryCount.size === 0) return null
+      if (categoryCount.size === 0) {
+        console.log(`❌ DEBUG: No categories found in existing transactions`)
+        return null
+      }
 
       // Find most used category
       const mostUsed = Array.from(categoryCount.values()).reduce((max, current) => 
@@ -159,14 +185,14 @@ export default function ImportPage() {
       const totalTransactions = data.length
       const confidence = Math.min(0.95, 0.5 + (mostUsed.count / totalTransactions) * 0.4)
 
-      console.log(`🔍 Found ${totalTransactions} existing transactions for "${description}": ${mostUsed.name} used ${mostUsed.count} times (${Math.round(confidence * 100)}% confidence)`)
+      console.log(`🎯 DEBUG: Most used category: "${mostUsed.name}" (${mostUsed.count}/${totalTransactions} times, ${Math.round(confidence * 100)}% confidence)`)
 
       return {
         category: mostUsed.name,
         confidence
       }
     } catch (error) {
-      console.error('Error searching transaction history:', error)
+      console.error('🚨 DEBUG: Error searching transaction history:', error)
       return null
     }
   }, [user])
