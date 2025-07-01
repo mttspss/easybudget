@@ -490,6 +490,12 @@ export default function ImportPage() {
     const { rawData, columnMapping } = importState
     const transactions: ParsedTransaction[] = []
 
+    // Show progress for AI processing
+    setIsProcessing(true)
+    let processed = 0
+
+    console.log(`Starting AI categorization for ${rawData.length} transactions...`)
+
     for (let index = 0; index < rawData.length; index++) {
       const row = rawData[index]
       const errors: string[] = []
@@ -537,7 +543,19 @@ export default function ImportPage() {
         }
       }
 
-      const { category: suggestedCategory, confidence } = await suggestCategory(description, amount, type)
+      // AI Categorization with progress tracking
+      let suggestedCategory = 'Other Expenses'
+      let confidence = 0.1
+      
+      try {
+        const result = await suggestCategory(description, amount, type)
+        suggestedCategory = result.category
+        confidence = result.confidence
+      } catch (error) {
+        console.warn(`AI categorization failed for transaction ${index + 1}:`, error)
+        // Fallback to simple categorization
+        suggestedCategory = type === 'income' ? 'Other Income' : 'Other Expenses'
+      }
 
       transactions.push({
         id: `temp_${index}`,
@@ -550,7 +568,18 @@ export default function ImportPage() {
         row_index: index + 1,
         errors
       })
+
+      // Update progress
+      processed++
+      if (processed % 10 === 0 || processed === rawData.length) {
+        console.log(`AI processing: ${processed}/${rawData.length} transactions`)
+        // Force a small delay to prevent UI blocking
+        await new Promise(resolve => setTimeout(resolve, 10))
+      }
     }
+
+    setIsProcessing(false)
+    console.log(`AI categorization completed for ${rawData.length} transactions`)
 
     setImportState(prev => ({
       ...prev,
@@ -918,10 +947,24 @@ export default function ImportPage() {
                           <div>
                             <p className="font-medium">{importState.file?.name}</p>
                             <p className="text-sm text-gray-600">{importState.rawData.length} rows found</p>
+                            {isProcessing && (
+                              <p className="text-sm text-blue-600 mt-1">
+                                🤖 AI categorizing transactions...
+                              </p>
+                            )}
                           </div>
-                          <Button onClick={parseTransactions}>
-                            Continue to Mapping
-                            <ArrowRight className="h-4 w-4 ml-2" />
+                          <Button onClick={parseTransactions} disabled={isProcessing}>
+                            {isProcessing ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                AI Processing...
+                              </>
+                            ) : (
+                              <>
+                                Continue to Mapping
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </>
+                            )}
                           </Button>
                         </div>
 
