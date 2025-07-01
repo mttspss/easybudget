@@ -425,8 +425,8 @@ export default function ImportPage() {
       }
     } catch (error) {
       console.log(`⚠️ Standard parsing failed: ${error}`)
-    }
-    
+        }
+        
     // AI fallback for problematic dates
     const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
     if (aiEnabled) {
@@ -706,7 +706,7 @@ export default function ImportPage() {
                 type = 'expense'
               } else {
           type = 'income'
-              }
+        }
             } else {
               type = 'expense'
             }

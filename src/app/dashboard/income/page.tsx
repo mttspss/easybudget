@@ -341,6 +341,12 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
 
   const confirmDelete = async () => {
     try {
+      // Store current pagination info before deletion
+      const currentTotalItems = filteredTransactions.length
+      const itemsToDelete = deleteConfirmDialog.type === 'single' ? 1 : selectedItems.size
+      const newTotalItems = currentTotalItems - itemsToDelete
+      const newTotalPages = Math.ceil(newTotalItems / itemsPerPage)
+      
       if (deleteConfirmDialog.type === 'single' && deleteConfirmDialog.transactionId) {
         const { error } = await supabase
           .from('transactions')
@@ -361,6 +367,17 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
       }
       
       setDeleteConfirmDialog({ open: false, type: 'single' })
+      
+      // Smart page adjustment after deletion
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        // If current page becomes invalid, go to last valid page
+        setCurrentPage(newTotalPages)
+      } else if (newTotalItems === 0) {
+        // If no items left, go to page 1
+        setCurrentPage(1)
+      }
+      // Otherwise keep current page
+      
       fetchData()
     } catch (error: any) {
       console.error('Error deleting transaction(s):', error)
@@ -890,11 +907,38 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                             Previous
                           </Button>
                           
-                          {/* Page Numbers */}
+                          {/* Smart Page Numbers */}
                           <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                              const pageNum = i + 1;
-                              return (
+                            {/* Always show page 1 */}
+                            {totalPages > 0 && (
+                              <Button
+                                variant={currentPage === 1 ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setCurrentPage(1)}
+                                className="h-7 w-7 text-xs"
+                              >
+                                1
+                              </Button>
+                            )}
+                            
+                            {/* Show dots if current page is far from start */}
+                            {currentPage > 4 && totalPages > 6 && (
+                              <span className="text-xs text-gray-600 px-1">...</span>
+                            )}
+                            
+                            {/* Show pages around current page */}
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                              .filter(pageNum => {
+                                if (totalPages <= 6) {
+                                  // Show all pages if 6 or fewer
+                                  return pageNum !== 1 && pageNum !== totalPages
+                                } else {
+                                  // Show current page ± 1 (excluding first and last)
+                                  return pageNum !== 1 && pageNum !== totalPages && 
+                                         Math.abs(pageNum - currentPage) <= 1
+                                }
+                              })
+                              .map(pageNum => (
                                 <Button
                                   key={pageNum}
                                   variant={currentPage === pageNum ? "default" : "outline"}
@@ -904,10 +948,23 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                                 >
                                   {pageNum}
                                 </Button>
-                              );
-                            })}
-                            {totalPages > 5 && (
+                              ))}
+                            
+                            {/* Show dots if current page is far from end */}
+                            {currentPage < totalPages - 3 && totalPages > 6 && (
                               <span className="text-xs text-gray-600 px-1">...</span>
+                            )}
+                            
+                            {/* Always show last page (if more than 1 page) */}
+                            {totalPages > 1 && (
+                              <Button
+                                variant={currentPage === totalPages ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setCurrentPage(totalPages)}
+                                className="h-7 w-7 text-xs"
+                              >
+                                {totalPages}
+                              </Button>
                             )}
                           </div>
                           
@@ -923,6 +980,15 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
                           </Button>
                         </div>
                       </div>
+                      
+                      {/* Current Page Indicator for larger page numbers */}
+                      {totalPages > 10 && (
+                        <div className="flex items-center justify-center mt-2 pt-2 border-t border-gray-100">
+                          <span className="text-xs text-gray-500">
+                            Page {currentPage} of {totalPages}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (
