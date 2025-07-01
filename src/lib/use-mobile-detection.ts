@@ -2,71 +2,57 @@
 
 import { useState, useEffect } from 'react'
 
-export function useMobileDetection() {
+interface MobileDetectionResult {
+  isMobile: boolean
+  isLoading: boolean
+}
+
+export function useMobileDetection(): MobileDetectionResult {
   const [isMobile, setIsMobile] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const checkIfMobile = () => {
-      // Ottieni dimensioni schermo
-      const screenWidth = window.innerWidth
-      const screenHeight = window.innerHeight
-      const isLandscape = screenWidth > screenHeight
+    const checkMobile = () => {
+      // Check screen width
+      const isSmallScreen = window.innerWidth < 768
       
-      // Controlla user agent per dispositivi specifici
-      const userAgent = navigator.userAgent
-      const isIPhone = /iPhone/i.test(userAgent)
-      const isAndroidPhone = /Android/i.test(userAgent) && /Mobile/i.test(userAgent)
-      const isSmallTablet = /iPad/i.test(userAgent) || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent))
+      // Check user agent for mobile devices
+      const userAgent = navigator.userAgent.toLowerCase()
+      const mobileKeywords = [
+        'mobile',
+        'android',
+        'iphone',
+        'ipod',
+        'blackberry',
+        'windows phone',
+        'webos'
+      ]
       
-      // Controlla se è un touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isMobileDevice = mobileKeywords.some(keyword => 
+        userAgent.includes(keyword)
+      )
       
-      // Definisci le regole di blocco:
+      // Consider it mobile if either condition is true
+      const mobile = isSmallScreen || isMobileDevice
       
-      // 1. Blocca sempre iPhone e Android phone
-      if (isIPhone || isAndroidPhone) {
-        setIsMobile(true)
-        setIsLoading(false)
-        return
-      }
-      
-      // 2. Per tablet e dispositivi touch, controlla dimensioni schermo
-      if (isTouchDevice || isSmallTablet) {
-        // Blocca se schermo troppo piccolo
-        if (screenWidth < 768) {
-          setIsMobile(true)
-          setIsLoading(false)
-          return
-        }
-        
-        // Per tablet in portrait con larghezza < 1024px, blocca
-        if (!isLandscape && screenWidth < 1024) {
-          setIsMobile(true)
-          setIsLoading(false)
-          return
-        }
-      }
-      
-      // 3. Blocca schermi molto piccoli indipendentemente dal device
-      if (screenWidth < 640) {
-        setIsMobile(true)
-        setIsLoading(false)
-        return
-      }
-      
-      // Altrimenti permetti l'accesso
-      setIsMobile(false)
+      setIsMobile(mobile)
       setIsLoading(false)
     }
 
-    // Controlla immediatamente
-    checkIfMobile()
+    // Initial check
+    checkMobile()
 
-    // Controlla al resize della finestra (per rotazione tablet)
-    window.addEventListener('resize', checkIfMobile)
-    
-    return () => window.removeEventListener('resize', checkIfMobile)
+    // Listen for window resize
+    const handleResize = () => {
+      checkMobile()
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   return { isMobile, isLoading }

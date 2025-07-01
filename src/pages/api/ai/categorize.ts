@@ -21,6 +21,74 @@ interface CategoryRequest {
     country?: string
     currency?: string
     previousCategorizations?: string
+    task?: 'date_parsing'
+    dateString?: string
+    instruction?: string
+  }
+}
+
+async function parseDateWithAI(dateString: string): Promise<string> {
+  try {
+    const prompt = `You are a date parsing expert. Your task is to parse ANY date format and return a standardized date.
+
+INPUT DATE STRING: "${dateString}"
+
+INSTRUCTIONS:
+1. Parse the date from ANY format (DD/MM/YYYY, MM/DD/YYYY, DD.MM.YYYY, YYYY-MM-DD, etc.)
+2. Handle partial dates, weird formats, typos, and international formats
+3. If ambiguous (like 01/02/2024), assume European format (DD/MM/YYYY)
+4. Return ONLY the date in YYYY-MM-DD format
+5. If completely unparseable, return "invalid"
+
+EXAMPLES:
+- "01/07/2025" → "2025-07-01" (European: 1st July)
+- "7/1/2025" → "2025-01-07" (7th January)
+- "2025-07-01" → "2025-07-01"
+- "01.07.2025" → "2025-07-01"
+- "July 1, 2025" → "2025-07-01"
+- "1 Jul 25" → "2025-07-01"
+- "gibberish" → "invalid"
+
+RESPOND WITH ONLY THE DATE IN YYYY-MM-DD FORMAT OR "invalid":`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a precise date parser. Return only YYYY-MM-DD format or 'invalid'. No other text."
+        },
+        {
+          role: "user", 
+          content: prompt
+        }
+      ],
+      temperature: 0.1,
+      max_tokens: 50,
+    })
+
+    const response = completion.choices[0]?.message?.content?.trim()
+    
+    if (!response) {
+      return "invalid"
+    }
+
+    // Validate response format
+    if (response === "invalid" || !response.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return "invalid"
+    }
+
+    // Validate it's a real date
+    const testDate = new Date(response)
+    if (isNaN(testDate.getTime())) {
+      return "invalid"
+    }
+
+    return response
+
+  } catch (error) {
+    console.error('AI date parsing failed:', error)
+    return "invalid"
   }
 }
 
@@ -157,7 +225,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { description, amount, type, availableCategories, userContext }: CategoryRequest = req.body
 
-    // Validate required fields
+    // Check if this is a date parsing request
+    if (userContext?.task === 'date_parsing' && userContext?.dateString) {
+      const parsedDate = await parseDateWithAI(userContext.dateString)
+      return res.status(200).json({ 
+        category: parsedDate, // Return the parsed date in the category field
+        confidence: parsedDate === "invalid" ? 0 : 1,
+        reasoning: parsedDate === "invalid" ? "Could not parse date" : "Date successfully parsed"
+      })
+    }
+
+    // Validate required fields for categorization
     if (!description || !amount || !type || !availableCategories) {
       return res.status(400).json({ error: 'Missing required fields' })
     }

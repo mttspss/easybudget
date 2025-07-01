@@ -114,7 +114,7 @@ export default function ImportPage() {
   })
 
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
-  
+
   // Simple function to find category from existing transactions
   const findCategoryFromHistory = useCallback(async (description: string, type: 'income' | 'expense'): Promise<{ category: string, confidence: number } | null> => {
     if (!user) return null
@@ -345,69 +345,164 @@ export default function ImportPage() {
     return mapping
   }
 
-  const parseDate = (dateStr: string): string | null => {
-    try {
+  // AI-powered date parsing function
+  const parseDate = async (dateStr: string): Promise<string | null> => {
       if (!dateStr || typeof dateStr !== 'string') return null
       
       const cleanDateStr = dateStr.trim()
+    if (!cleanDateStr) return null
       
-      // Extract date part from common formats
+    // Console log for debugging
+    console.log(`🗓️ Parsing date: "${cleanDateStr}"`)
+      
+    // First try: Simple standard formats
+    try {
+      // Extract date part from common formats (remove time if present)
       let dateOnly = cleanDateStr
-      
-      // If it contains time/timestamp, extract only the date part
       if (cleanDateStr.includes(' ')) {
-        dateOnly = cleanDateStr.split(' ')[0] // Take everything before the first space
+        dateOnly = cleanDateStr.split(' ')[0]
       } else if (cleanDateStr.includes('T')) {
-        dateOnly = cleanDateStr.split('T')[0] // Take everything before 'T' (ISO format)
+        dateOnly = cleanDateStr.split('T')[0]
       }
       
-      // Try to parse the date
-      const date = new Date(dateOnly)
-      if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0]
+      // Try direct parsing first
+      const directDate = new Date(dateOnly)
+      if (!isNaN(directDate.getTime()) && directDate.getFullYear() > 1900 && directDate.getFullYear() < 2100) {
+        console.log(`✅ Direct parsing successful: ${directDate.toISOString().split('T')[0]}`)
+        return directDate.toISOString().split('T')[0]
       }
       
-      // If direct parsing fails, try with different separators
-      const dateParts = dateOnly.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,4})/)
-      if (dateParts) {
-        const [, part1, part2, part3] = dateParts
-        
-        // Determine if it's YYYY-MM-DD or DD/MM/YYYY or MM/DD/YYYY
-        let year, month, day
-        
+      // Try common separators
+      const patterns = [
+        /(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/, // YYYY-MM-DD or YYYY/MM/DD
+        /(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/, // DD-MM-YYYY or MM-DD-YYYY or DD/MM/YYYY or MM/DD/YYYY
+        /(\d{1,2})\.(\d{1,2})\.(\d{4})/, // DD.MM.YYYY
+      ]
+      
+      for (const pattern of patterns) {
+        const match = dateOnly.match(pattern)
+        if (match) {
+          const [, part1, part2, part3] = match
+          
+          let year, month, day
         if (part1.length === 4) {
           // YYYY-MM-DD format
           year = parseInt(part1)
           month = parseInt(part2)
           day = parseInt(part3)
         } else {
-          // Assume DD/MM/YYYY or MM/DD/YYYY, try both
+            // DD/MM/YYYY or MM/DD/YYYY format
           year = parseInt(part3)
-          // Try European format first (DD/MM/YYYY)
-          month = parseInt(part2)
-          day = parseInt(part1)
+            const num1 = parseInt(part1)
+            const num2 = parseInt(part2)
+            
+            // European format (DD/MM/YYYY) vs American format (MM/DD/YYYY)
+            if (num1 > 12) {
+              // Must be DD/MM/YYYY
+              day = num1
+              month = num2
+            } else if (num2 > 12) {
+              // Must be MM/DD/YYYY
+              month = num1
+              day = num2
+            } else {
+              // Ambiguous - default to DD/MM/YYYY (European)
+              day = num1
+              month = num2
+            }
+          }
           
-          // Validate and switch if day > 12 (likely MM/DD/YYYY)
-          if (day > 12 && month <= 12) {
-            [day, month] = [month, day]
+          // Validate ranges
+          if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            const testDate = new Date(year, month - 1, day)
+            if (testDate.getFullYear() === year && testDate.getMonth() === month - 1 && testDate.getDate() === day) {
+              const result = testDate.toISOString().split('T')[0]
+              console.log(`✅ Pattern parsing successful: ${result}`)
+              return result
+            }
           }
         }
+      }
+    } catch (error) {
+      console.log(`⚠️ Standard parsing failed: ${error}`)
+    }
+    
+    // AI fallback for problematic dates
+    const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
+    if (aiEnabled) {
+      try {
+        console.log(`🤖 Trying AI parsing for: "${cleanDateStr}"`)
         
-        // Create date and validate
-        const parsedDate = new Date(year, month - 1, day)
-        if (!isNaN(parsedDate.getTime()) && 
-            parsedDate.getFullYear() === year &&
-            parsedDate.getMonth() === month - 1 &&
-            parsedDate.getDate() === day) {
-          return parsedDate.toISOString().split('T')[0]
+        const response = await fetch('/api/ai/categorize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            description: `Parse this date string and return ONLY a valid date in YYYY-MM-DD format: "${cleanDateStr}"`,
+            amount: 0,
+            type: 'expense',
+            availableCategories: [],
+            userContext: {
+              task: 'date_parsing',
+              dateString: cleanDateStr,
+              instruction: 'Return only YYYY-MM-DD format. Examples: 2025-07-01, 2024-12-31. If you cannot parse the date, return "invalid".'
+            }
+          })
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          const aiDate = result.category || result.suggestion || ''
+          
+          // Validate AI response
+          if (aiDate && aiDate !== "invalid" && aiDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const testDate = new Date(aiDate)
+            if (!isNaN(testDate.getTime())) {
+              console.log(`🎯 AI parsing successful: ${aiDate}`)
+              return aiDate
+            }
+          }
+          
+          console.log(`❌ AI could not parse date: "${cleanDateStr}"`)
+        } else {
+          console.log(`⚠️ AI API failed with status: ${response.status}`)
+        }
+      } catch (error) {
+        console.log(`⚠️ AI parsing error: ${error}`)
+      }
+    } else {
+      console.log(`ℹ️ AI disabled, skipping AI date parsing`)
+    }
+    
+    // Last resort: try to extract any 4-digit year and reasonable month/day
+    console.log(`🔧 Trying last resort parsing for: "${cleanDateStr}"`)
+    
+    const yearMatch = cleanDateStr.match(/\b(19|20)\d{2}\b/)
+    const numberMatches = cleanDateStr.match(/\b\d{1,2}\b/g)
+    
+    if (yearMatch && numberMatches && numberMatches.length >= 2) {
+      const year = parseInt(yearMatch[0])
+      const nums = numberMatches.map(n => parseInt(n)).filter(n => n >= 1 && n <= 31)
+      
+      if (nums.length >= 2) {
+        const month = Math.min(nums[0], 12)
+        const day = Math.min(nums[1], 31)
+        
+        if (month >= 1 && day >= 1) {
+          const fallbackDate = new Date(year, month - 1, day)
+          if (!isNaN(fallbackDate.getTime())) {
+            const result = fallbackDate.toISOString().split('T')[0]
+            console.log(`🔧 Last resort successful: ${result}`)
+            return result
+          }
         }
       }
-
-      return null
-    } catch {
+    }
+    
+    console.log(`❌ All date parsing methods failed for: "${cleanDateStr}"`)
       return null
     }
-  }
 
   // Enhanced suggestion function with context
   const suggestCategoryWithContext = async (description: string, amount: number, type: 'income' | 'expense', contextExamples: string = ''): Promise<{ category: string, confidence: number }> => {
@@ -567,50 +662,50 @@ export default function ImportPage() {
         const row = batch[localIndex]
         
         const transactionPromise = (async () => {
-          const errors: string[] = []
-          
+      const errors: string[] = []
+      
           const description = row[columnMapping.description] || `Transaction ${globalIndex + 1}`
-          const amountStr = row[columnMapping.amount]
-          const dateStr = row[columnMapping.date]
-          const typeStr = row[columnMapping.type || '']
+      const amountStr = row[columnMapping.amount]
+      const dateStr = row[columnMapping.date]
+      const typeStr = row[columnMapping.type || '']
 
-          let amount = 0
-          let isNegative = false
-          if (amountStr) {
-            const cleanAmount = amountStr.toString().replace(/[,$\s]/g, '')
-            isNegative = cleanAmount.startsWith('-')
-            const parsed = parseFloat(cleanAmount)
-            if (!isNaN(parsed)) {
-              amount = Math.abs(parsed)
-            } else {
-              errors.push('Invalid amount format')
-            }
-          } else {
-            errors.push('Missing amount')
-          }
+      let amount = 0
+      let isNegative = false
+      if (amountStr) {
+        const cleanAmount = amountStr.toString().replace(/[,$\s]/g, '')
+        isNegative = cleanAmount.startsWith('-')
+        const parsed = parseFloat(cleanAmount)
+        if (!isNaN(parsed)) {
+          amount = Math.abs(parsed)
+        } else {
+          errors.push('Invalid amount format')
+        }
+      } else {
+        errors.push('Missing amount')
+      }
 
-          const parsedDate = parseDate(dateStr)
-          if (!parsedDate) {
-            errors.push('Invalid or missing date')
-          }
+          const parsedDate = await parseDate(dateStr)
+      if (!parsedDate) {
+        errors.push('Invalid or missing date')
+      }
 
-          let type: 'income' | 'expense' = 'expense'
-          
+      let type: 'income' | 'expense' = 'expense'
+      
           // Robust type detection - NEVER allow negative amounts to be income
-          if (amountStr) {
+      if (amountStr) {
             if (isNegative || amount < 0) {
               type = 'expense' // Negative amount = ALWAYS expense
-            } else {
+        } else {
               type = 'income'  // Positive amount = income
-            }
-          } else if (typeStr) {
-            const typeValue = typeStr.toString().toLowerCase()
-            if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
+        }
+      } else if (typeStr) {
+        const typeValue = typeStr.toString().toLowerCase()
+        if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
               // Double check: if it's supposed to be income but amount is negative, force expense
               if (isNegative || amount < 0) {
                 type = 'expense'
               } else {
-                type = 'income'
+          type = 'income'
               }
             } else {
               type = 'expense'
@@ -669,15 +764,15 @@ export default function ImportPage() {
 
           return {
             id: `temp_${globalIndex}`,
-            description,
-            amount,
-            date: parsedDate || new Date().toISOString().split('T')[0],
-            type,
-            suggested_category: suggestedCategory,
-            confidence,
+        description,
+        amount,
+        date: parsedDate || new Date().toISOString().split('T')[0],
+        type,
+        suggested_category: suggestedCategory,
+        confidence,
             category_id: categoryId, // Auto-applied if high confidence
             row_index: globalIndex + 1,
-            errors
+        errors
           }
         })()
 
@@ -1101,8 +1196,8 @@ export default function ImportPage() {
                               </>
                             ) : (
                               <>
-                                Continue to Mapping
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                            Continue to Mapping
+                            <ArrowRight className="h-4 w-4 ml-2" />
                               </>
                             )}
                           </Button>
