@@ -1034,7 +1034,7 @@ function ExpensesPageContent({ initialCategory }: ExpensesPageProps) {
 
 function ExpensesPageWrapper() {
   const searchParams = useSearchParams()
-  const categoryParam = searchParams.get('category')
+  const categoryParam = searchParams?.get('category')
   
   return <ExpensesPageContent initialCategory={categoryParam || undefined} />
 }
