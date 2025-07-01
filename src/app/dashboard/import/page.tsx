@@ -177,7 +177,7 @@ export default function ImportPage() {
   }, [user])
 
   // Fetch user's previous categorization patterns
-  const fetchUserCategorizationPatterns = useCallback(async () => {
+  const fetchUserCategorizationPatterns = useCallback(async (showToast = false) => {
     if (!user) return
     
     try {
@@ -221,8 +221,8 @@ export default function ImportPage() {
             count > max.count ? {category: cat, count} : max, {category: '', count: 0}
           )
           
-          if (totalCount >= 2) { // Only consider patterns with at least 2 occurrences
-            const confidence = Math.min(0.95, 0.5 + (mostUsedCategory.count / totalCount) * 0.4)
+          if (totalCount >= 1) { // Learn from even 1 occurrence for faster learning
+            const confidence = Math.min(0.95, 0.4 + (mostUsedCategory.count / totalCount) * 0.4) // Slightly lower base confidence for single occurrences
             patterns.set(key, {
               category: mostUsedCategory.category,
               confidence,
@@ -234,8 +234,31 @@ export default function ImportPage() {
       
       setUserCategorizationPatterns(patterns)
       console.log(`Loaded ${patterns.size} user categorization patterns for learning`)
+      
+      // Debug: Log all loaded patterns
+      if (patterns.size > 0) {
+        console.log('📊 User categorization patterns loaded:')
+        patterns.forEach((pattern, key) => {
+          console.log(`  "${key}" → ${pattern.category} (${Math.round(pattern.confidence * 100)}% confidence, used ${pattern.count}x)`)
+        })
+        
+        // Show success toast for manual refresh
+        if (showToast) {
+          toast.success(`🧠 Loaded ${patterns.size} learning patterns from your transaction history`)
+        }
+      } else {
+        console.log('⚠️ No user categorization patterns found. System will use AI/fallback only.')
+        
+        // Show info toast for manual refresh
+        if (showToast) {
+          toast.info('No learning patterns found yet. Import some transactions first!')
+        }
+      }
     } catch (error) {
       console.error('Error fetching user categorization patterns:', error)
+      if (showToast) {
+        toast.error('Failed to load learning patterns')
+      }
     }
   }, [user])
 
@@ -637,15 +660,18 @@ export default function ImportPage() {
               const userPattern = userCategorizationPatterns.get(userPatternKey)!
               suggestedCategory = userPattern.category
               confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
-              console.log(`Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence, used ${userPattern.count} times)`)
+              console.log(`✅ Using user historical pattern for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}% confidence, used ${userPattern.count} times)`)
             }
             // Then check current session cache
             else if (categoryHistory.has(normalizedDesc)) {
               const prevCategorization = categoryHistory.get(normalizedDesc)!
               suggestedCategory = prevCategorization.category
               confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
-              console.log(`Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
+              console.log(`🔄 Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
             } else {
+              console.log(`🤖 No user pattern found for "${normalizedDesc}|${type}". Using AI categorization...`)
+              console.log(`📋 Available user patterns: ${userCategorizationPatterns.size} total`)
+              
               // Build context from both user patterns and current session
               const userContextExamples = Array.from(userCategorizationPatterns.entries())
                 .filter(([key]) => key.endsWith(`|${type}`)) // Same type only
@@ -857,6 +883,11 @@ export default function ImportPage() {
       if (imported > 0) {
         // Record the successful import
         await recordCsvImport()
+        
+        // Refresh user categorization patterns to learn from new transactions
+        console.log('🔄 Refreshing user categorization patterns after import...')
+        await fetchUserCategorizationPatterns(true)
+        
         toast.success(`Import completed! ${imported} transactions imported to ${activeDashboard?.name || 'Main Dashboard'}.`)
       } else {
         toast.error(`Import failed. ${skipped} transactions had errors.`)
@@ -999,6 +1030,10 @@ export default function ImportPage() {
                     <Download className="h-4 w-4 mr-2" />
                     Download Template
                   </Button>
+                  <Button variant="outline" onClick={() => fetchUserCategorizationPatterns(true)} title="Refresh learning patterns from your transaction history">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh Learning
+                  </Button>
                   <Button variant="outline" onClick={resetImport}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Restart
@@ -1119,6 +1154,9 @@ export default function ImportPage() {
                                 🤖 AI categorizing transactions...
                               </p>
                             )}
+                            <p className="text-xs text-gray-500 mt-1">
+                              🧠 Learning from {userCategorizationPatterns.size} historical patterns
+                            </p>
                           </div>
                           <Button onClick={parseTransactions} disabled={isProcessing}>
                             {isProcessing ? (
