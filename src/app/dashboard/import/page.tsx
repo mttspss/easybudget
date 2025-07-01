@@ -274,106 +274,6 @@ export default function ImportPage() {
     return mapping
   }
 
-  const suggestCategory = async (description: string, amount: number, type: 'income' | 'expense'): Promise<{ category: string, confidence: number }> => {
-    // Check if AI is enabled via environment variable
-    const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
-    
-    if (aiEnabled) {
-      try {
-        // Call our secure server-side API endpoint
-        const response = await fetch('/api/ai/categorize', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            description,
-            amount,
-            type,
-            availableCategories: importState.categories.map(cat => ({ 
-              name: cat.name, 
-              type: cat.type 
-            })),
-            userContext: {
-              country: 'International', // Will be auto-detected by AI from transaction content
-              currency: userCurrency?.code || 'USD'
-            }
-          })
-        })
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
-        }
-
-        const result = await response.json()
-        
-        return {
-          category: result.category,
-          confidence: result.confidence
-        }
-      } catch (error) {
-        console.warn('AI categorization failed, using fallback:', error)
-        // Fall through to pattern matching fallback
-      }
-    }
-
-    // Fallback: Simple pattern matching (original logic)
-    const lowerDesc = description.toLowerCase()
-    
-    const patterns = [
-      // Food & Dining
-      { keywords: ['restaurant', 'cafe', 'food', 'dining', 'lunch', 'dinner', 'mcdonald', 'burger', 'pizza'], category: 'Food & Dining', confidence: 0.8 },
-      
-      // Transportation  
-      { keywords: ['gas', 'fuel', 'taxi', 'uber', 'parking', 'metro', 'transport'], category: 'Transportation', confidence: 0.8 },
-      
-      // Shopping
-      { keywords: ['amazon', 'shop', 'store', 'purchase', 'buy', 'market'], category: 'Shopping', confidence: 0.8 },
-      
-      // Bills
-      { keywords: ['electric', 'internet', 'phone', 'bill', 'utility', 'subscription'], category: 'Bills & Utilities', confidence: 0.8 },
-      
-      // Entertainment
-      { keywords: ['netflix', 'spotify', 'cinema', 'movie', 'gaming', 'entertainment'], category: 'Entertainment', confidence: 0.8 },
-      
-      // Healthcare
-      { keywords: ['pharmacy', 'hospital', 'doctor', 'medical', 'health'], category: 'Healthcare', confidence: 0.8 },
-      
-      // Income patterns
-      { keywords: ['salary', 'payroll', 'wage', 'income', 'bonus'], category: 'Salary', confidence: 0.9 },
-      { keywords: ['freelance', 'contract', 'consulting'], category: 'Freelancing', confidence: 0.8 },
-    ]
-
-    for (const pattern of patterns) {
-      for (const keyword of pattern.keywords) {
-        if (lowerDesc.includes(keyword)) {
-          // Check if category exists in user's categories
-          const matchingCategory = importState.categories.find(cat => 
-            cat.type === type && cat.name.toLowerCase() === pattern.category.toLowerCase()
-          )
-          
-          if (matchingCategory) {
-            return { 
-              category: matchingCategory.name, 
-              confidence: pattern.confidence 
-            }
-          }
-        }
-      }
-    }
-
-    // Default fallback
-    const defaultCategories = importState.categories.filter(cat => cat.type === type)
-    const defaultCategory = type === 'expense' 
-      ? defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
-      : defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
-
-    return { 
-      category: defaultCategory?.name || (type === 'expense' ? 'Other Expenses' : 'Other Income'), 
-      confidence: 0.1 
-    }
-  }
-
   const parseDate = (dateStr: string): string | null => {
     try {
       if (!dateStr || typeof dateStr !== 'string') return null
@@ -438,6 +338,90 @@ export default function ImportPage() {
     }
   }
 
+  // Enhanced suggestion function with context
+  const suggestCategoryWithContext = async (description: string, amount: number, type: 'income' | 'expense', contextExamples: string = ''): Promise<{ category: string, confidence: number }> => {
+    const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
+    
+    if (aiEnabled) {
+      try {
+        const response = await fetch('/api/ai/categorize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            description,
+            amount,
+            type,
+            availableCategories: importState.categories.map(cat => ({ 
+              name: cat.name, 
+              type: cat.type 
+            })),
+            userContext: {
+              country: 'International',
+              currency: userCurrency?.code || 'USD',
+              previousCategorizations: contextExamples // Add context for consistency
+            }
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        const result = await response.json()
+        
+        return {
+          category: result.category,
+          confidence: result.confidence
+        }
+      } catch (error) {
+        console.warn('AI categorization failed, using fallback:', error)
+      }
+    }
+
+    // Fallback logic
+    const lowerDesc = description.toLowerCase()
+    
+    const patterns = [
+      { keywords: ['restaurant', 'cafe', 'food', 'dining', 'lunch', 'dinner', 'mcdonald', 'burger', 'pizza'], category: 'Food & Dining', confidence: 0.8 },
+      { keywords: ['gas', 'fuel', 'taxi', 'uber', 'parking', 'metro', 'transport'], category: 'Transportation', confidence: 0.8 },
+      { keywords: ['amazon', 'shop', 'store', 'purchase', 'buy', 'market'], category: 'Shopping', confidence: 0.8 },
+      { keywords: ['electric', 'internet', 'phone', 'bill', 'utility', 'subscription'], category: 'Bills & Utilities', confidence: 0.8 },
+      { keywords: ['netflix', 'spotify', 'cinema', 'movie', 'gaming', 'entertainment'], category: 'Entertainment', confidence: 0.8 },
+      { keywords: ['pharmacy', 'hospital', 'doctor', 'medical', 'health'], category: 'Healthcare', confidence: 0.8 },
+      { keywords: ['salary', 'payroll', 'wage', 'income', 'bonus'], category: 'Salary', confidence: 0.9 },
+      { keywords: ['freelance', 'contract', 'consulting'], category: 'Freelancing', confidence: 0.8 },
+    ]
+
+    for (const pattern of patterns) {
+      for (const keyword of pattern.keywords) {
+        if (lowerDesc.includes(keyword)) {
+          const matchingCategory = importState.categories.find(cat => 
+            cat.type === type && cat.name.toLowerCase() === pattern.category.toLowerCase()
+          )
+          
+          if (matchingCategory) {
+            return { 
+              category: matchingCategory.name, 
+              confidence: pattern.confidence 
+            }
+          }
+        }
+      }
+    }
+
+    const defaultCategories = importState.categories.filter(cat => cat.type === type)
+    const defaultCategory = type === 'expense' 
+      ? defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
+      : defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
+
+    return { 
+      category: defaultCategory?.name || (type === 'expense' ? 'Other Expenses' : 'Other Income'), 
+      confidence: 0.1 
+    }
+  }
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) {
@@ -494,92 +478,145 @@ export default function ImportPage() {
     setIsProcessing(true)
     let processed = 0
 
-    console.log(`Starting AI categorization for ${rawData.length} transactions...`)
+    console.log(`Starting optimized AI categorization for ${rawData.length} transactions...`)
 
-    for (let index = 0; index < rawData.length; index++) {
-      const row = rawData[index]
-      const errors: string[] = []
+    // Process in batches for efficiency
+    const BATCH_SIZE = 10
+    const batches = []
+    for (let i = 0; i < rawData.length; i += BATCH_SIZE) {
+      batches.push(rawData.slice(i, i + BATCH_SIZE))
+    }
+
+    // Keep track of categorizations for consistency
+    const categoryHistory = new Map<string, { category: string, confidence: number }>()
+
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex]
+      const batchPromises = []
+
+      for (let localIndex = 0; localIndex < batch.length; localIndex++) {
+        const globalIndex = batchIndex * BATCH_SIZE + localIndex
+        const row = batch[localIndex]
+        
+        const transactionPromise = (async () => {
+          const errors: string[] = []
+          
+          const description = row[columnMapping.description] || `Transaction ${globalIndex + 1}`
+          const amountStr = row[columnMapping.amount]
+          const dateStr = row[columnMapping.date]
+          const typeStr = row[columnMapping.type || '']
+
+          let amount = 0
+          let isNegative = false
+          if (amountStr) {
+            const cleanAmount = amountStr.toString().replace(/[,$\s]/g, '')
+            isNegative = cleanAmount.startsWith('-')
+            const parsed = parseFloat(cleanAmount)
+            if (!isNaN(parsed)) {
+              amount = Math.abs(parsed)
+            } else {
+              errors.push('Invalid amount format')
+            }
+          } else {
+            errors.push('Missing amount')
+          }
+
+          const parsedDate = parseDate(dateStr)
+          if (!parsedDate) {
+            errors.push('Invalid or missing date')
+          }
+
+          let type: 'income' | 'expense' = 'expense'
+          
+          if (amountStr) {
+            if (!isNegative) {
+              type = 'income'
+            } else {
+              type = 'expense'
+            }
+          } else if (typeStr) {
+            const typeValue = typeStr.toString().toLowerCase()
+            if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
+              type = 'income'
+            }
+          }
+
+          // Enhanced AI Categorization with consistency
+          let suggestedCategory = type === 'income' ? 'Other Income' : 'Other Expenses'
+          let confidence = 0.1
+          let categoryId: string | undefined = undefined
+
+          try {
+            // Check if we've seen this exact description before
+            const normalizedDesc = description.toLowerCase().trim()
+            if (categoryHistory.has(normalizedDesc)) {
+              const prevCategorization = categoryHistory.get(normalizedDesc)!
+              suggestedCategory = prevCategorization.category
+              confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
+              console.log(`Using cached categorization for "${description}": ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
+            } else {
+              // Build context from previous categorizations
+              const contextExamples = Array.from(categoryHistory.entries())
+                .slice(-5) // Last 5 categorizations
+                .map(([desc, cat]) => `"${desc}" → ${cat.category}`)
+                .join('\n')
+
+              const result = await suggestCategoryWithContext(description, amount, type, contextExamples)
+              suggestedCategory = result.category
+              confidence = result.confidence
+              
+              // Cache this categorization
+              categoryHistory.set(normalizedDesc, { category: suggestedCategory, confidence })
+            }
+
+            // Auto-apply high-confidence suggestions
+            if (confidence >= 0.8) {
+              const matchingCategory = importState.categories.find(cat => 
+                cat.type === type && cat.name.toLowerCase() === suggestedCategory.toLowerCase()
+              )
+              if (matchingCategory) {
+                categoryId = matchingCategory.id
+                console.log(`Auto-applied high-confidence category: ${suggestedCategory} (${Math.round(confidence * 100)}%)`)
+              }
+            }
+
+          } catch (error) {
+            console.warn(`AI categorization failed for transaction ${globalIndex + 1}:`, error)
+            suggestedCategory = type === 'income' ? 'Other Income' : 'Other Expenses'
+          }
+
+          return {
+            id: `temp_${globalIndex}`,
+            description,
+            amount,
+            date: parsedDate || new Date().toISOString().split('T')[0],
+            type,
+            suggested_category: suggestedCategory,
+            confidence,
+            category_id: categoryId, // Auto-applied if high confidence
+            row_index: globalIndex + 1,
+            errors
+          }
+        })()
+
+        batchPromises.push(transactionPromise)
+      }
+
+      // Process batch in parallel
+      const batchResults = await Promise.all(batchPromises)
+      transactions.push(...batchResults)
+
+      processed += batch.length
+      console.log(`AI processing: ${processed}/${rawData.length} transactions (batch ${batchIndex + 1}/${batches.length})`)
       
-      const description = row[columnMapping.description] || `Transaction ${index + 1}`
-      const amountStr = row[columnMapping.amount]
-      const dateStr = row[columnMapping.date]
-      const typeStr = row[columnMapping.type || '']
-
-      let amount = 0
-      let isNegative = false
-      if (amountStr) {
-        const cleanAmount = amountStr.toString().replace(/[,$\s]/g, '')
-        // Check if the original amount was negative
-        isNegative = cleanAmount.startsWith('-')
-        const parsed = parseFloat(cleanAmount)
-        if (!isNaN(parsed)) {
-          amount = Math.abs(parsed)
-        } else {
-          errors.push('Invalid amount format')
-        }
-      } else {
-        errors.push('Missing amount')
-      }
-
-      const parsedDate = parseDate(dateStr)
-      if (!parsedDate) {
-        errors.push('Invalid or missing date')
-      }
-
-      let type: 'income' | 'expense' = 'expense'
-      
-      // Priority 1: Amount sign (most reliable)
-      if (amountStr) {
-        if (!isNegative) {
-          type = 'income'  // Positive amount = Income
-        } else {
-          type = 'expense' // Negative amount = Expense
-        }
-      } else if (typeStr) {
-        // Priority 2: Type column (fallback only if no amount)
-        const typeValue = typeStr.toString().toLowerCase()
-        if (typeValue.includes('income') || typeValue.includes('credit') || typeValue.includes('deposit') || typeValue.includes('topup')) {
-          type = 'income'
-        }
-      }
-
-      // AI Categorization with progress tracking
-      let suggestedCategory = 'Other Expenses'
-      let confidence = 0.1
-      
-      try {
-        const result = await suggestCategory(description, amount, type)
-        suggestedCategory = result.category
-        confidence = result.confidence
-      } catch (error) {
-        console.warn(`AI categorization failed for transaction ${index + 1}:`, error)
-        // Fallback to simple categorization
-        suggestedCategory = type === 'income' ? 'Other Income' : 'Other Expenses'
-      }
-
-      transactions.push({
-        id: `temp_${index}`,
-        description,
-        amount,
-        date: parsedDate || new Date().toISOString().split('T')[0],
-        type,
-        suggested_category: suggestedCategory,
-        confidence,
-        row_index: index + 1,
-        errors
-      })
-
-      // Update progress
-      processed++
-      if (processed % 10 === 0 || processed === rawData.length) {
-        console.log(`AI processing: ${processed}/${rawData.length} transactions`)
-        // Force a small delay to prevent UI blocking
-        await new Promise(resolve => setTimeout(resolve, 10))
+      // Small delay between batches to prevent rate limiting
+      if (batchIndex < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100))
       }
     }
 
     setIsProcessing(false)
-    console.log(`AI categorization completed for ${rawData.length} transactions`)
+    console.log(`AI categorization completed! Processed ${rawData.length} transactions with ${categoryHistory.size} unique descriptions`)
 
     setImportState(prev => ({
       ...prev,

@@ -20,6 +20,7 @@ interface CategoryRequest {
   userContext?: {
     country?: string
     currency?: string
+    previousCategorizations?: string
   }
 }
 
@@ -46,7 +47,10 @@ TRANSACTION DETAILS:
 AVAILABLE CATEGORIES (choose ONE from this list):
 ${categoryNames.map((name, i) => `${i + 1}. ${name}`).join('\n')}
 
-INSTRUCTIONS:
+${userContext?.previousCategorizations ? `PREVIOUS CATEGORIZATIONS (for consistency):
+${userContext.previousCategorizations}
+
+` : ''}INSTRUCTIONS:
 1. Use your FULL knowledge of global merchants, brands, and companies
 2. Recognize ANY company/brand from ANY country (US, UK, EU, Asia, etc.)
 3. Understand payment processors, banks, fintech companies, trading platforms
@@ -54,6 +58,7 @@ INSTRUCTIONS:
 5. Consider transaction description patterns (ATM, transfer, payroll, etc.)
 6. Return high confidence (0.8+) when you're sure about the merchant/pattern
 7. Consider amount and currency context for reasonableness
+8. BE CONSISTENT with previous categorizations shown above for similar merchants
 
 Your knowledge includes but is NOT limited to:
 - E-commerce: Amazon, eBay, Shopify, AliExpress, etc.
