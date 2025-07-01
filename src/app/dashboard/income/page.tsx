@@ -143,7 +143,7 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
 
   // Auto-open dialog if add=true in URL
   useEffect(() => {
-    const shouldAdd = searchParams.get('add')
+    const shouldAdd = searchParams?.get('add')
     if (shouldAdd === 'true') {
       setIsDialogOpen(true)
       // Clean the URL by removing the add parameter
@@ -1045,7 +1045,7 @@ function IncomePageContent({ initialCategory }: IncomePageProps) {
 
 function IncomePageWrapper() {
   const searchParams = useSearchParams()
-  const categoryParam = searchParams.get('category')
+  const categoryParam = searchParams?.get('category')
   
   return <IncomePageContent initialCategory={categoryParam || undefined} />
 }
