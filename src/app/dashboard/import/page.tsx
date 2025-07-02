@@ -14,7 +14,6 @@ import {
   Upload,
   FileText,
   Database,
-  Download,
   CheckCircle,
   AlertCircle,
   ArrowRight,
@@ -114,6 +113,11 @@ export default function ImportPage() {
   })
 
   const [userCurrency, setUserCurrency] = useState<CurrencyConfig | null>(null)
+  
+  // Drag & Drop state
+  const [isDragOver, setIsDragOver] = useState(false)
+  
+  // Form state
 
   // Simple function to find category from existing transactions
   const findCategoryFromHistory = useCallback(async (description: string, type: 'income' | 'expense'): Promise<{ category: string, confidence: number } | null> => {
@@ -347,15 +351,15 @@ export default function ImportPage() {
 
   // AI-powered date parsing function
   const parseDate = async (dateStr: string): Promise<string | null> => {
-      if (!dateStr || typeof dateStr !== 'string') return null
-      
-      const cleanDateStr = dateStr.trim()
+    if (!dateStr || typeof dateStr !== 'string') return null
+    
+    const cleanDateStr = dateStr.trim()
     if (!cleanDateStr) return null
-      
+    
     // Console log for debugging
     console.log(`🗓️ Parsing date: "${cleanDateStr}"`)
-      
-    // First try: Simple standard formats
+    
+    // First try: Standard formats (especially YYYY-MM-DD)
     try {
       // Extract date part from common formats (remove time if present)
       let dateOnly = cleanDateStr
@@ -365,16 +369,25 @@ export default function ImportPage() {
         dateOnly = cleanDateStr.split('T')[0]
       }
       
-      // Try direct parsing first
+      // PRIORITY: Handle YYYY-MM-DD format (most common bank format)
+      if (dateOnly.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const testDate = new Date(dateOnly + 'T00:00:00.000Z')
+        if (!isNaN(testDate.getTime())) {
+          const result = testDate.toISOString().split('T')[0]
+          console.log(`✅ YYYY-MM-DD parsing successful: ${result}`)
+          return result
+        }
+      }
+      
+      // Try direct parsing for other ISO formats
       const directDate = new Date(dateOnly)
       if (!isNaN(directDate.getTime()) && directDate.getFullYear() > 1900 && directDate.getFullYear() < 2100) {
         console.log(`✅ Direct parsing successful: ${directDate.toISOString().split('T')[0]}`)
         return directDate.toISOString().split('T')[0]
       }
       
-      // Try common separators
+      // Try common separators for DD/MM/YYYY and MM/DD/YYYY
       const patterns = [
-        /(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/, // YYYY-MM-DD or YYYY/MM/DD
         /(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/, // DD-MM-YYYY or MM-DD-YYYY or DD/MM/YYYY or MM/DD/YYYY
         /(\d{1,2})\.(\d{1,2})\.(\d{4})/, // DD.MM.YYYY
       ]
@@ -384,32 +397,24 @@ export default function ImportPage() {
         if (match) {
           const [, part1, part2, part3] = match
           
-          let year, month, day
-        if (part1.length === 4) {
-          // YYYY-MM-DD format
-          year = parseInt(part1)
-          month = parseInt(part2)
-          day = parseInt(part3)
-        } else {
-            // DD/MM/YYYY or MM/DD/YYYY format
-          year = parseInt(part3)
-            const num1 = parseInt(part1)
-            const num2 = parseInt(part2)
-            
-            // European format (DD/MM/YYYY) vs American format (MM/DD/YYYY)
-            if (num1 > 12) {
-              // Must be DD/MM/YYYY
-              day = num1
-              month = num2
-            } else if (num2 > 12) {
-              // Must be MM/DD/YYYY
-              month = num1
-              day = num2
-            } else {
-              // Ambiguous - default to DD/MM/YYYY (European)
-              day = num1
-              month = num2
-            }
+          const year = parseInt(part3)
+          const num1 = parseInt(part1)
+          const num2 = parseInt(part2)
+          
+          let day, month
+          // European format (DD/MM/YYYY) vs American format (MM/DD/YYYY)
+          if (num1 > 12) {
+            // Must be DD/MM/YYYY
+            day = num1
+            month = num2
+          } else if (num2 > 12) {
+            // Must be MM/DD/YYYY
+            month = num1
+            day = num2
+          } else {
+            // Ambiguous - default to DD/MM/YYYY (European)
+            day = num1
+            month = num2
           }
           
           // Validate ranges
@@ -425,8 +430,8 @@ export default function ImportPage() {
       }
     } catch (error) {
       console.log(`⚠️ Standard parsing failed: ${error}`)
-        }
-        
+    }
+    
     // AI fallback for problematic dates
     const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
     if (aiEnabled) {
@@ -457,7 +462,7 @@ export default function ImportPage() {
           
           // Validate AI response
           if (aiDate && aiDate !== "invalid" && aiDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const testDate = new Date(aiDate)
+            const testDate = new Date(aiDate + 'T00:00:00.000Z')
             if (!isNaN(testDate.getTime())) {
               console.log(`🎯 AI parsing successful: ${aiDate}`)
               return aiDate
@@ -501,8 +506,8 @@ export default function ImportPage() {
     }
     
     console.log(`❌ All date parsing methods failed for: "${cleanDateStr}"`)
-      return null
-    }
+    return null
+  }
 
   // Enhanced suggestion function with context
   const suggestCategoryWithContext = async (description: string, amount: number, type: 'income' | 'expense', contextExamples: string = ''): Promise<{ category: string, confidence: number }> => {
@@ -588,8 +593,33 @@ export default function ImportPage() {
     }
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  // Drag & Drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      const file = files[0]
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        await processFile(file)
+      } else {
+        toast.error('Please drop a CSV file')
+      }
+    }
+  }
+
+  const processFile = async (file: File) => {
     if (!file) {
       toast.error('Please upload a CSV or Excel file')
       return
@@ -633,6 +663,13 @@ export default function ImportPage() {
       console.error('File upload error:', error)
     } finally {
       setIsProcessing(false)
+    }
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      await processFile(file)
     }
   }
 
@@ -963,20 +1000,6 @@ export default function ImportPage() {
     }
   }
 
-  const downloadTemplate = () => {
-    const csvContent = "description,amount,date,type\nGrocery Store,-50.00,2024-01-15,expense\nSalary,3000.00,2024-01-01,income\nGas Station,-40.00,2024-01-10,expense"
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'easybudget_import_template.csv'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    window.URL.revokeObjectURL(url)
-    toast.success('Template downloaded!')
-  }
-
   const goToPreviousStep = () => {
     const steps = ['upload', 'preview', 'mapping', 'processing', 'complete']
     const currentIndex = steps.indexOf(importState.step)
@@ -1063,10 +1086,6 @@ export default function ImportPage() {
                 </div>
                 <div className="flex gap-2">
                   <DashboardIndicator />
-                  <Button variant="outline" onClick={downloadTemplate}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Template
-                  </Button>
                   <Button variant="outline" onClick={resetImport}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Restart
@@ -1113,10 +1132,10 @@ export default function ImportPage() {
                       <div className="mb-6">
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <FileSpreadsheet className="h-10 w-10 text-blue-600" />
-                      </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Your Transaction File</h3>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Import Your Bank Transactions</h3>
                         <p className="text-gray-600 text-sm">
-                          Upload a CSV file with your transaction data. We&apos;ll automatically detect columns and categorize transactions.
+                          Upload your bank&apos;s CSV export file. We&apos;ll automatically detect columns and categorize transactions using AI.
                         </p>
                       </div>
 
@@ -1124,14 +1143,38 @@ export default function ImportPage() {
                         <input
                           ref={fileInputRef}
                           type="file"
-                          accept=".csv,.xlsx,.xls"
+                          accept=".csv"
                           onChange={handleFileUpload}
                           className="hidden"
                         />
                         
+                        {/* Drag & Drop Area */}
+                        <div
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          className={`border-2 border-dashed rounded-lg p-8 transition-colors cursor-pointer ${
+                            isDragOver 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <div className="text-center">
+                            <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragOver ? 'text-blue-600' : 'text-gray-400'}`} />
+                            <p className={`text-sm font-medium ${isDragOver ? 'text-blue-600' : 'text-gray-900'}`}>
+                              {isDragOver ? 'Drop your CSV file here' : 'Drag & drop your CSV file here'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              or click to browse files
+                            </p>
+                          </div>
+                        </div>
+                        
                         <Button 
                           onClick={() => fileInputRef.current?.click()}
                           disabled={isProcessing || !canImportCsv()}
+                          variant="outline"
                           className="w-full"
                         >
                           {isProcessing ? (
@@ -1142,7 +1185,7 @@ export default function ImportPage() {
                           ) : (
                             <>
                               <Upload className="h-4 w-4 mr-2" />
-                              Choose Files
+                              Choose File
                             </>
                           )}
                         </Button>
@@ -1158,7 +1201,10 @@ export default function ImportPage() {
                         )}
 
                         <div className="text-xs text-gray-500">
-                          Supported formats: CSV, Excel (.xlsx, .xls)
+                          <p className="font-medium mb-1">Supported formats:</p>
+                          <p>✅ CSV files from any bank</p>
+                          <p>✅ YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY date formats</p>
+                          <p>✅ Automatic amount and type detection</p>
                         </div>
                       </div>
                     </div>
