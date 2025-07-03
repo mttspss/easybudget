@@ -516,13 +516,8 @@ export default function ImportPage() {
   const suggestCategoryWithContext = async (description: string, amount: number, type: 'income' | 'expense', contextExamples: string = ''): Promise<{ category: string, confidence: number }> => {
     const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
     
-    console.log(`🔍 Categorizing: "${description}" (${type}) - AI enabled: ${aiEnabled}`)
-    
     if (aiEnabled) {
       try {
-        console.log(`🤖 Calling AI for: "${description}"`)
-        console.log(`📋 Available categories:`, importState.categories.map(cat => ({ name: cat.name, type: cat.type })))
-        
         const response = await fetch('/api/ai/categorize', {
           method: 'POST',
           headers: {
@@ -545,27 +540,21 @@ export default function ImportPage() {
         })
 
         if (!response.ok) {
-          console.error(`❌ AI API failed with status: ${response.status}`)
           throw new Error(`API error: ${response.status}`)
         }
 
         const result = await response.json()
-        console.log(`✅ AI response for "${description}":`, result)
         
         return {
           category: result.category,
           confidence: result.confidence
         }
       } catch (error) {
-        console.error(`❌ AI categorization failed for "${description}":`, error)
         console.warn('AI categorization failed, using fallback:', error)
       }
-        } else {
-      console.log(`ℹ️ AI disabled, using fallback for: "${description}"`)
     }
 
     // Fallback logic
-    console.log(`🔄 Using fallback categorization for: "${description}"`)
     const lowerDesc = description.toLowerCase()
     
     const patterns = [
@@ -582,7 +571,6 @@ export default function ImportPage() {
     for (const pattern of patterns) {
       for (const keyword of pattern.keywords) {
         if (lowerDesc.includes(keyword)) {
-          console.log(`🎯 Fallback match: "${description}" → ${pattern.category} (keyword: "${keyword}")`)
           const matchingCategory = importState.categories.find(cat => 
             cat.type === type && cat.name.toLowerCase() === pattern.category.toLowerCase()
           )
@@ -592,26 +580,20 @@ export default function ImportPage() {
               category: matchingCategory.name, 
               confidence: pattern.confidence 
             }
-          } else {
-            console.warn(`⚠️ Pattern category "${pattern.category}" not found in user categories`)
           }
         }
       }
     }
 
-    console.log(`🤷 No pattern match for "${description}", using default`)
     const defaultCategories = importState.categories.filter(cat => cat.type === type)
     const defaultCategory = type === 'expense' 
       ? defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
       : defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
 
-    const result = { 
+    return { 
       category: defaultCategory?.name || (type === 'expense' ? 'Other Expenses' : 'Other Income'), 
       confidence: 0.1 
     }
-    
-    console.log(`📝 Final fallback result for "${description}":`, result)
-    return result
   }
 
   // Drag & Drop handlers
@@ -779,23 +761,18 @@ export default function ImportPage() {
             // Check if we've seen this exact description before
             const normalizedDesc = description.toLowerCase().trim()
             
-            console.log(`🔍 Categorizing: "${description}" (${type})`)
-            
             // First, check user's historical transactions (highest priority)
             const userPattern = await findCategoryFromHistory(normalizedDesc, type)
             if (userPattern) {
-              console.log(`📚 Found user history for "${description}": ${userPattern.category} (${Math.round(userPattern.confidence * 100)}% confidence)`)
               suggestedCategory = userPattern.category
               confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
             }
             // Then check current session cache
             else if (categoryHistory.has(normalizedDesc)) {
               const prevCategorization = categoryHistory.get(normalizedDesc)!
-              console.log(`🔄 Found session cache for "${description}": ${prevCategorization.category} (${Math.round(prevCategorization.confidence * 100)}% confidence)`)
               suggestedCategory = prevCategorization.category
               confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
             } else {
-              console.log(`🤖 Calling AI for new transaction: "${description}"`)
               // Build context from current session
               const contextExamplesStr = Array.from(categoryHistory.entries())
                 .slice(-2) // Last 2 session categorizations
