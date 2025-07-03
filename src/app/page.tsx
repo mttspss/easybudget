@@ -51,42 +51,32 @@ function UserCountSection() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="bg-gradient-to-r from-blue-50 to-green-50 px-8 py-6 rounded-2xl border border-gray-200 shadow-sm">
-        <div className="flex flex-col items-center gap-4">
-          {/* User Avatars */}
-          <div className="flex -space-x-2">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-blue-400 to-green-400 flex items-center justify-center"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${200 + i * 30}, 70%, 60%), hsl(${220 + i * 25}, 65%, 50%))`
-                }}
-              >
-                <span className="text-white text-sm font-semibold">
-                  {String.fromCharCode(65 + i)}
-                </span>
-              </div>
-            ))}
-          </div>
+    <div className="flex flex-col items-center justify-center gap-4">
+      {/* User Avatars - Simple circles like CodeFast */}
+      <div className="flex -space-x-2">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="w-10 h-10 rounded-full border-2 border-white"
+            style={{
+              background: `linear-gradient(135deg, hsl(${200 + i * 30}, 70%, 60%), hsl(${220 + i * 25}, 65%, 50%))`
+            }}
+          />
+        ))}
+      </div>
 
-          {/* User Count */}
-          <div className="text-center">
-            <p className="text-gray-600 text-sm mb-1">Trusted by</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {isLoading ? (
-                <span className="animate-pulse">Loading...</span>
-              ) : (
-                <>
-                  <span className="text-green-600">{formatNumber(userCount)}</span>
-                  <span className="text-gray-700"> people</span>
-                </>
-              )}
-            </p>
-            <p className="text-gray-600 text-sm mt-1">managing their finances</p>
-          </div>
-        </div>
+      {/* User Count Text */}
+      <div className="text-center">
+        <p className="text-gray-600 text-base">
+          {isLoading ? (
+            <span className="animate-pulse">Loading...</span>
+          ) : (
+            <>
+              <span className="font-semibold text-gray-900">{formatNumber(userCount)} people</span>
+              <span className="italic"> managing their finances</span>
+            </>
+          )}
+        </p>
       </div>
     </div>
   )
