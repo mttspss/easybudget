@@ -560,7 +560,7 @@ export default function ImportPage() {
         console.error(`❌ AI categorization failed for "${description}":`, error)
         console.warn('AI categorization failed, using fallback:', error)
       }
-    } else {
+        } else {
       console.log(`ℹ️ AI disabled, using fallback for: "${description}"`)
     }
 
@@ -779,18 +779,23 @@ export default function ImportPage() {
             // Check if we've seen this exact description before
             const normalizedDesc = description.toLowerCase().trim()
             
+            console.log(`🔍 Categorizing: "${description}" (${type})`)
+            
             // First, check user's historical transactions (highest priority)
             const userPattern = await findCategoryFromHistory(normalizedDesc, type)
             if (userPattern) {
+              console.log(`📚 Found user history for "${description}": ${userPattern.category} (${Math.round(userPattern.confidence * 100)}% confidence)`)
               suggestedCategory = userPattern.category
               confidence = Math.min(0.99, userPattern.confidence + 0.1) // Boost confidence for user patterns
             }
             // Then check current session cache
             else if (categoryHistory.has(normalizedDesc)) {
               const prevCategorization = categoryHistory.get(normalizedDesc)!
+              console.log(`🔄 Found session cache for "${description}": ${prevCategorization.category} (${Math.round(prevCategorization.confidence * 100)}% confidence)`)
               suggestedCategory = prevCategorization.category
               confidence = Math.min(prevCategorization.confidence + 0.1, 0.99) // Increase confidence for consistency
             } else {
+              console.log(`🤖 Calling AI for new transaction: "${description}"`)
               // Build context from current session
               const contextExamplesStr = Array.from(categoryHistory.entries())
                 .slice(-2) // Last 2 session categorizations
