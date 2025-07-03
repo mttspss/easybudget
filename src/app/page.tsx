@@ -23,6 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // User Count Section Component
 function UserCountSection() {
   const [userCount, setUserCount] = useState(0)
+  const [userInitials, setUserInitials] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -32,11 +33,13 @@ function UserCountSection() {
         if (response.ok) {
           const data = await response.json()
           setUserCount(data.totalUsers || 0)
+          setUserInitials(data.userInitials || ['M', 'A', 'S', 'L', 'E', 'R', 'C', 'D'])
         }
       } catch (error) {
         console.error('Error fetching user count:', error)
-        // Fallback to a reasonable number if API fails
+        // Fallback to reasonable defaults if API fails
         setUserCount(1247)
+        setUserInitials(['M', 'A', 'S', 'L', 'E', 'R', 'C', 'D'])
       } finally {
         setIsLoading(false)
       }
@@ -52,16 +55,18 @@ function UserCountSection() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      {/* User Avatars - Simple circles like CodeFast */}
+      {/* User Avatars - Simple circles with initials like CodeFast */}
       <div className="flex -space-x-2">
-        {[...Array(8)].map((_, i) => (
+        {userInitials.slice(0, 8).map((initial, i) => (
           <div
             key={i}
-            className="w-10 h-10 rounded-full border-2 border-white"
+            className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold"
             style={{
               background: `linear-gradient(135deg, hsl(${200 + i * 30}, 70%, 60%), hsl(${220 + i * 25}, 65%, 50%))`
             }}
-          />
+          >
+            {initial}
+          </div>
         ))}
       </div>
 
@@ -632,7 +637,8 @@ export default function LandingPage() {
             <span className="text-green-400">Budgeting</span> is for&nbsp;<span className="text-pink-400">everyone</span>,<br className="hidden md:block"/> not just spreadsheet pros.
           </h2>
           <p className="max-w-3xl mx-auto text-center text-lg text-slate-300 mb-16">
-            A clear budget means fewer surprises and better sleep. Let EasyBudget crunch the numbers so you can focus on life, not formulas.
+            A clear budget means fewer surprises and better sleep.<br />
+            Let EasyBudget crunch the numbers so you can focus on life, not formulas.
           </p>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Spreadsheets & old methods */}
