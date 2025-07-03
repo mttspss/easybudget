@@ -899,12 +899,30 @@ export default function LandingPage() {
       {/* Testimonials Section - After Pricing */}
       <section className="py-12 px-6 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Join thousands managing their money better
-            </h2>
+          <div className="flex flex-col items-center justify-center gap-4">
+            {/* User Avatars - Simple circles with initials like CodeFast */}
+            <div className="flex -space-x-2">
+              {['M', 'A', 'S', 'L', 'E', 'R', 'C', 'D'].map((initial, i) => (
+                <div
+                  key={i}
+                  className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${200 + i * 30}, 70%, 60%), hsl(${220 + i * 25}, 65%, 50%))`
+                  }}
+                >
+                  {initial}
+                </div>
+              ))}
+            </div>
+
+            {/* User Count Text */}
+            <div className="text-center">
+              <p className="text-gray-600 text-base">
+                <span className="font-semibold text-gray-900">44 people</span>
+                <span className="italic"> saving their money</span>
+              </p>
+            </div>
           </div>
-          <UserCountSection />
         </div>
       </section>
 
