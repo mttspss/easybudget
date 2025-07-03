@@ -117,6 +117,9 @@ export default function ImportPage() {
   // Drag & Drop state
   const [isDragOver, setIsDragOver] = useState(false)
   
+  // Inline editing state
+  const [editingField, setEditingField] = useState<{index: number, field: 'description' | 'date'} | null>(null)
+  
   // Form state
 
   // Simple function to find category from existing transactions
@@ -1069,6 +1072,33 @@ export default function ImportPage() {
     })
   }
 
+  // Update transaction inline
+  const updateTransactionField = async (index: number, field: 'description' | 'date', value: string) => {
+    const updated = [...importState.parsedTransactions]
+    const transaction = updated[index]
+    
+    if (field === 'description') {
+      transaction.description = value
+    } else if (field === 'date') {
+      // Try to parse the new date
+      const parsedDate = await parseDate(value)
+      if (parsedDate) {
+        transaction.date = parsedDate
+        // Remove date error if it existed
+        transaction.errors = transaction.errors.filter(error => !error.includes('date'))
+      } else {
+        transaction.date = value // Keep raw value
+        // Add date error if not present
+        if (!transaction.errors.some(error => error.includes('date'))) {
+          transaction.errors = [...transaction.errors.filter(error => !error.includes('date')), 'Invalid or missing date']
+        }
+      }
+    }
+    
+    setImportState(prev => ({ ...prev, parsedTransactions: updated }))
+    setEditingField(null)
+  }
+
   return (
     <div className="flex h-screen bg-[#FAFAFA]">
       <Sidebar />
@@ -1432,7 +1462,36 @@ export default function ImportPage() {
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
                                     <div className="flex items-center gap-3">
-                                      <span className="font-medium">{transaction.description}</span>
+                                      {/* Editable Description */}
+                                      {editingField?.index === index && editingField?.field === 'description' ? (
+                                        <Input
+                                          value={transaction.description}
+                                          onChange={(e) => {
+                                            const updated = [...importState.parsedTransactions]
+                                            updated[index].description = e.target.value
+                                            setImportState(prev => ({ ...prev, parsedTransactions: updated }))
+                                          }}
+                                          onBlur={(e) => updateTransactionField(index, 'description', e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              updateTransactionField(index, 'description', e.currentTarget.value)
+                                            } else if (e.key === 'Escape') {
+                                              setEditingField(null)
+                                            }
+                                          }}
+                                          className="font-medium h-auto p-0 border-none shadow-none bg-transparent text-gray-900"
+                                          autoFocus
+                                        />
+                                      ) : (
+                                        <span 
+                                          className="font-medium cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
+                                          onClick={() => setEditingField({index, field: 'description'})}
+                                          title="Click to edit description"
+                                        >
+                                          {transaction.description}
+                                        </span>
+                                      )}
+
                                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                         transaction.type === 'income' 
                                           ? 'bg-green-100 text-green-700' 
@@ -1440,7 +1499,41 @@ export default function ImportPage() {
                                       }`}>
                                         {transaction.type === 'income' ? '+' : '-'}{userCurrency ? formatCurrency(transaction.amount, userCurrency).replace(/^[+\-]/, '') : `€${transaction.amount.toFixed(2)}`}
                                       </span>
-                                      <span className="text-sm text-gray-600">{transaction.date}</span>
+
+                                      {/* Editable Date */}
+                                      {editingField?.index === index && editingField?.field === 'date' ? (
+                                        <Input
+                                          type="date"
+                                          value={transaction.date.match(/^\d{4}-\d{2}-\d{2}$/) ? transaction.date : ''}
+                                          onChange={(e) => {
+                                            const updated = [...importState.parsedTransactions]
+                                            updated[index].date = e.target.value
+                                            setImportState(prev => ({ ...prev, parsedTransactions: updated }))
+                                          }}
+                                          onBlur={(e) => updateTransactionField(index, 'date', e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              updateTransactionField(index, 'date', e.currentTarget.value)
+                                            } else if (e.key === 'Escape') {
+                                              setEditingField(null)
+                                            }
+                                          }}
+                                          className={`text-sm h-auto p-0 border-none shadow-none bg-transparent ${
+                                            transaction.errors.some(e => e.includes('date')) ? 'text-red-600' : 'text-gray-600'
+                                          }`}
+                                          autoFocus
+                                        />
+                                      ) : (
+                                        <span 
+                                          className={`text-sm cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded ${
+                                            transaction.errors.some(e => e.includes('date')) ? 'text-red-600' : 'text-gray-600'
+                                          }`}
+                                          onClick={() => setEditingField({index, field: 'date'})}
+                                          title="Click to edit date"
+                                        >
+                                          {transaction.date}
+                                        </span>
+                                      )}
                                     </div>
                                     
                                     {transaction.suggested_category && (
