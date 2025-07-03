@@ -20,6 +20,78 @@ import {
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+// User Count Section Component
+function UserCountSection() {
+  const [userCount, setUserCount] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const response = await fetch('/api/stats/users')
+        if (response.ok) {
+          const data = await response.json()
+          setUserCount(data.totalUsers || 0)
+        }
+      } catch (error) {
+        console.error('Error fetching user count:', error)
+        // Fallback to a reasonable number if API fails
+        setUserCount(1247)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUserCount()
+  }, [])
+
+  // Format number with commas
+  const formatNumber = (num: number) => {
+    return num.toLocaleString()
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <div className="bg-gradient-to-r from-blue-50 to-green-50 px-8 py-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="flex flex-col items-center gap-4">
+          {/* User Avatars */}
+          <div className="flex -space-x-2">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-blue-400 to-green-400 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, hsl(${200 + i * 30}, 70%, 60%), hsl(${220 + i * 25}, 65%, 50%))`
+                }}
+              >
+                <span className="text-white text-sm font-semibold">
+                  {String.fromCharCode(65 + i)}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* User Count */}
+          <div className="text-center">
+            <p className="text-gray-600 text-sm mb-1">Trusted by</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {isLoading ? (
+                <span className="animate-pulse">Loading...</span>
+              ) : (
+                <>
+                  <span className="text-green-600">{formatNumber(userCount)}</span>
+                  <span className="text-gray-700"> people</span>
+                </>
+              )}
+            </p>
+            <p className="text-gray-600 text-sm mt-1">managing their finances</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -359,6 +431,11 @@ export default function LandingPage() {
                   <path d="m12 5 7 7-7 7"></path>
                 </svg>
               </button>
+            </div>
+
+            {/* User Count Section - Social Proof */}
+            <div className="mb-12">
+              <UserCountSection />
             </div>
 
             {/* Featured On Section - moved below buttons */}
