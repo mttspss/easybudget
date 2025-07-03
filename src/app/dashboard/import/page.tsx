@@ -1484,7 +1484,7 @@ export default function ImportPage() {
                                         />
                                       ) : (
                                         <span 
-                                          className="font-medium cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
+                                          className="font-medium cursor-pointer bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
                                           onClick={() => setEditingField({index, field: 'description'})}
                                           title="Click to edit description"
                                         >
@@ -1525,7 +1525,7 @@ export default function ImportPage() {
                                         />
                                       ) : (
                                         <span 
-                                          className={`text-sm cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded ${
+                                          className={`text-sm cursor-pointer bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors ${
                                             transaction.errors.some(e => e.includes('date')) ? 'text-red-600' : 'text-gray-600'
                                           }`}
                                           onClick={() => setEditingField({index, field: 'date'})}
