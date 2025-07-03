@@ -896,6 +896,18 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials Section - After Pricing */}
+      <section className="py-12 px-6 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              Join thousands managing their money better
+            </h2>
+          </div>
+          <UserCountSection />
+        </div>
+      </section>
+
       {/* FAQ */}
       <section id="faq" className="py-12 relative">
         <div className="relative max-w-4xl mx-auto px-6">
