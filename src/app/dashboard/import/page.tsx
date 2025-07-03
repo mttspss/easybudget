@@ -390,12 +390,12 @@ export default function ImportPage() {
       }
       
       // Try common separators for DD/MM/YYYY and MM/DD/YYYY
-      const patterns = [
+    const patterns = [
         /(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/, // DD-MM-YYYY or MM-DD-YYYY or DD/MM/YYYY or MM/DD/YYYY
         /(\d{1,2})\.(\d{1,2})\.(\d{4})/, // DD.MM.YYYY
-      ]
-      
-      for (const pattern of patterns) {
+    ]
+
+    for (const pattern of patterns) {
         const match = dateOnly.match(pattern)
         if (match) {
           const [, part1, part2, part3] = match
@@ -509,15 +509,20 @@ export default function ImportPage() {
     }
     
     console.log(`❌ All date parsing methods failed for: "${cleanDateStr}"`)
-    return null
-  }
+      return null
+    }
 
   // Enhanced suggestion function with context
   const suggestCategoryWithContext = async (description: string, amount: number, type: 'income' | 'expense', contextExamples: string = ''): Promise<{ category: string, confidence: number }> => {
     const aiEnabled = process.env.NEXT_PUBLIC_ENABLE_AI_CATEGORIZATION === 'true'
     
+    console.log(`🔍 Categorizing: "${description}" (${type}) - AI enabled: ${aiEnabled}`)
+    
     if (aiEnabled) {
       try {
+        console.log(`🤖 Calling AI for: "${description}"`)
+        console.log(`📋 Available categories:`, importState.categories.map(cat => ({ name: cat.name, type: cat.type })))
+        
         const response = await fetch('/api/ai/categorize', {
           method: 'POST',
           headers: {
@@ -540,27 +545,33 @@ export default function ImportPage() {
         })
 
         if (!response.ok) {
+          console.error(`❌ AI API failed with status: ${response.status}`)
           throw new Error(`API error: ${response.status}`)
         }
 
         const result = await response.json()
+        console.log(`✅ AI response for "${description}":`, result)
         
         return {
           category: result.category,
           confidence: result.confidence
         }
       } catch (error) {
+        console.error(`❌ AI categorization failed for "${description}":`, error)
         console.warn('AI categorization failed, using fallback:', error)
       }
+    } else {
+      console.log(`ℹ️ AI disabled, using fallback for: "${description}"`)
     }
 
     // Fallback logic
+    console.log(`🔄 Using fallback categorization for: "${description}"`)
     const lowerDesc = description.toLowerCase()
     
     const patterns = [
       { keywords: ['restaurant', 'cafe', 'food', 'dining', 'lunch', 'dinner', 'mcdonald', 'burger', 'pizza'], category: 'Food & Dining', confidence: 0.8 },
-      { keywords: ['gas', 'fuel', 'taxi', 'uber', 'parking', 'metro', 'transport'], category: 'Transportation', confidence: 0.8 },
-      { keywords: ['amazon', 'shop', 'store', 'purchase', 'buy', 'market'], category: 'Shopping', confidence: 0.8 },
+      { keywords: ['gas', 'fuel', 'taxi', 'uber', 'parking', 'metro', 'transport', 'tamoil', 'eni', 'shell', 'bp', 'q8'], category: 'Transportation', confidence: 0.8 },
+      { keywords: ['amazon', 'shop', 'store', 'purchase', 'buy', 'market', 'lidl', 'aldi', 'carrefour', 'tesco', 'walmart', 'ikea'], category: 'Shopping', confidence: 0.8 },
       { keywords: ['electric', 'internet', 'phone', 'bill', 'utility', 'subscription'], category: 'Bills & Utilities', confidence: 0.8 },
       { keywords: ['netflix', 'spotify', 'cinema', 'movie', 'gaming', 'entertainment'], category: 'Entertainment', confidence: 0.8 },
       { keywords: ['pharmacy', 'hospital', 'doctor', 'medical', 'health'], category: 'Healthcare', confidence: 0.8 },
@@ -571,6 +582,7 @@ export default function ImportPage() {
     for (const pattern of patterns) {
       for (const keyword of pattern.keywords) {
         if (lowerDesc.includes(keyword)) {
+          console.log(`🎯 Fallback match: "${description}" → ${pattern.category} (keyword: "${keyword}")`)
           const matchingCategory = importState.categories.find(cat => 
             cat.type === type && cat.name.toLowerCase() === pattern.category.toLowerCase()
           )
@@ -580,20 +592,26 @@ export default function ImportPage() {
               category: matchingCategory.name, 
               confidence: pattern.confidence 
             }
+          } else {
+            console.warn(`⚠️ Pattern category "${pattern.category}" not found in user categories`)
           }
         }
       }
     }
 
+    console.log(`🤷 No pattern match for "${description}", using default`)
     const defaultCategories = importState.categories.filter(cat => cat.type === type)
     const defaultCategory = type === 'expense' 
       ? defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
       : defaultCategories.find(cat => cat.name.toLowerCase().includes('other')) || defaultCategories[0]
 
-    return { 
+    const result = { 
       category: defaultCategory?.name || (type === 'expense' ? 'Other Expenses' : 'Other Income'), 
       confidence: 0.1 
     }
+    
+    console.log(`📝 Final fallback result for "${description}":`, result)
+    return result
   }
 
   // Drag & Drop handlers
@@ -1162,7 +1180,7 @@ export default function ImportPage() {
                       <div className="mb-6">
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <FileSpreadsheet className="h-10 w-10 text-blue-600" />
-                        </div>
+                      </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Import Your Bank Transactions</h3>
                         <p className="text-gray-600 text-sm">
                           Upload your bank&apos;s CSV export file. We&apos;ll automatically detect columns and categorize transactions using AI.
