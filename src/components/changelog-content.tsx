@@ -6,7 +6,8 @@ import {
   ArrowLeft,
   Calendar,
   Sparkles,
-  Zap
+  Zap,
+  Twitter
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -178,12 +179,21 @@ export default function ChangelogPageContent() {
           <p className="text-gray-600 mb-6">
             Help shape the future of EasyBudget by sharing your feedback and feature requests.
           </p>
-          <Button 
-            onClick={() => window.open('mailto:noreply@easybudget.ing')}
-          >
-            <Sparkles className="h-4 w-4 mr-2" />
-            Share Your Feedback
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Button 
+              onClick={() => window.open('mailto:noreply@easybudget.ing')}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Share Your Feedback
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => window.open('https://x.com/creatorLLM', '_blank')}
+            >
+              <Twitter className="h-4 w-4 mr-2" />
+              Follow on X
+            </Button>
+          </div>
         </div>
       </div>
     </div>

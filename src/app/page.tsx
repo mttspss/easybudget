@@ -15,7 +15,6 @@ import {
   Menu,
   ArrowRight,
   Twitter,
-  Linkedin,
   TicketPercent
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -1045,10 +1044,7 @@ export default function LandingPage() {
               
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-4">
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
-                    <Linkedin className="w-5 h-5" />
-                  </a>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
+                  <a href="https://x.com/creatorLLM" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
                     <Twitter className="w-5 h-5" />
                   </a>
                 </div>
