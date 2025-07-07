@@ -15,15 +15,15 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthProvider>
-      <DashboardProvider>
+    <DashboardProvider>
         <OnboardingProvider>
           <MobileBlock>
-            {children}
-            <WelcomeTour />
-            <Toaster />
+        {children}
+          <WelcomeTour />
+          <Toaster />
           </MobileBlock>
         </OnboardingProvider>
-      </DashboardProvider>
+    </DashboardProvider>
     </AuthProvider>
   )
 } 

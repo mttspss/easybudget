@@ -414,12 +414,23 @@ export default function LandingPage() {
               Your money deserves better than Excel. Easybudget turns every account, transaction, goal, and income stream into one live dashboard—giving you a complete financial overview in seconds.
             </p>
             
-            <div className="flex justify-center mb-12">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
               <button 
                 onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')} 
-                className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105 bg-green-500 hover:bg-green-600 cursor-pointer"
+                className="text-white text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105 bg-green-500 hover:bg-green-600 cursor-pointer w-full sm:w-auto"
               >
                 {user ? 'Go to Dashboard' : 'Get instant access'}
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/auth/register')} 
+                className="text-gray-900 text-lg font-semibold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 transform hover:scale-105 bg-white hover:bg-gray-50 border-2 border-gray-900 cursor-pointer w-full sm:w-auto"
+              >
+                Start for Free
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>
