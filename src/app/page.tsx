@@ -94,13 +94,45 @@ export default function LandingPage() {
   const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
   const [priceAnimating, setPriceAnimating] = useState(false)
 
+  // Animated Number Component for individual digits
+  function AnimatedNumber({ value, isAnimating }: { value: number; isAnimating: boolean }) {
+    const currentPrice = value
+    const digits = currentPrice.toString().split('')
+    
+    return (
+      <div className="flex items-baseline">
+        <span className="text-4xl font-bold text-slate-900 mr-1">$</span>
+        <div className="flex">
+          {digits.map((digit, index) => (
+            <div key={`${currentPrice}-${index}`} className="relative overflow-hidden h-12">
+              <div
+                className={`transition-all duration-500 ease-out ${
+                  isAnimating ? 'transform opacity-70' : 'opacity-100'
+                }`}
+                style={{
+                  transform: isAnimating 
+                    ? 'translateY(-8px) scale(0.95)' 
+                    : 'translateY(0px) scale(1)',
+                }}
+              >
+                <span className="text-4xl font-bold text-slate-900 block w-8 text-center leading-12">
+                  {digit}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   // Function to handle billing toggle with price animation
   const handleBillingToggle = () => {
     setPriceAnimating(true)
     setTimeout(() => {
       setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')
-      setTimeout(() => setPriceAnimating(false), 300)
-    }, 150)
+      setTimeout(() => setPriceAnimating(false), 500)
+    }, 250)
   }
 
   // New plans configuration
@@ -760,11 +792,7 @@ export default function LandingPage() {
               {/* Pricing Display */}
               <div className="mb-6">
                 <div className="flex items-baseline mb-2">
-                  <span className={`text-4xl font-bold text-slate-900 transition-transform duration-300 ${
-                    priceAnimating ? 'rotate-180 scale-110' : 'rotate-0 scale-100'
-                  }`}>
-                    ${billingInterval === 'monthly' ? fullPlan.monthlyPrice : fullPlan.monthlyPerMonth}
-                  </span>
+                  <AnimatedNumber value={billingInterval === 'monthly' ? fullPlan.monthlyPrice : fullPlan.monthlyPerMonth} isAnimating={priceAnimating} />
                   <span className="text-lg text-slate-600 ml-2">/month</span>
                 </div>
                 <p className="text-sm text-slate-500">
