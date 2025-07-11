@@ -95,62 +95,34 @@ export default function LandingPage() {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
 
-  const plans = [
-    {
-      name: "Starter", 
-      price: billingInterval === 'monthly' ? "$14" : "$150", 
-      yearlyPrice: "$150",
-      monthlyPrice: "$14",
-      desc: "Perfect for individuals getting started with budgeting",
-      highlight: "Personal Finance",
-      features: [
-        "Up to 100 transactions per month",
-        "1 CSV import per month",
-        "Smart transaction categorization",
-        "Track up to 5 financial goals",
-        "Single personal account"
-      ],
-      cta: isCreatingCheckout === 'starter' ? "Processing..." : "Get Starter",
-      planType: 'starter' as const
-    },
-    {
-      name: "Pro", 
-      price: billingInterval === 'monthly' ? "$29" : "$290", 
-      yearlyPrice: "$290",
-      monthlyPrice: "$29",
-      desc: "Ideal for professionals and small business owners",
-      highlight: "Professional",
-      popular: true,
-      features: [
-        "Up to 500 transactions",
-        "Up to 3 CSV imports per month",
-        "Advanced analytics & reporting",
-        "Unlimited financial goals",
-        "Connect 2 business accounts",
-        "Priority email support"
-      ],
-      cta: isCreatingCheckout === 'pro' ? "Processing..." : "Get Pro",
-      planType: 'pro' as const
-    },
-    {
-      name: "Growth", 
-      price: billingInterval === 'monthly' ? "$49" : "$390", 
-      yearlyPrice: "$390",
-      monthlyPrice: "$49",
-      desc: "For growing businesses and power users",
-      highlight: "Business & Teams",
-      features: [
-        "Unlimited transactions",
-        "Unlimited CSV imports",
-        "Full analytics suite",
-        "Unlimited financial goals",
-        "Connect up to 8 business accounts",
-        "Priority support & mobile app access"
-      ],
-      cta: isCreatingCheckout === 'growth' ? "Processing..." : "Get Growth",
-      planType: 'growth' as const
-    }
-  ]
+  // New plans configuration
+  const fullPlan = {
+    name: "Full Access",
+    monthlyPrice: 22,
+    yearlyPrice: 108, // $9/month * 12 months
+    monthlyPerMonth: 9, // For yearly display
+    features: [
+      "Unlimited transactions",
+      "Unlimited dashboards", 
+      "Unlimited CSV imports",
+      "Advanced analytics & reporting",
+      "Unlimited financial goals",
+      "Priority support",
+      "Mobile app access",
+      "Export capabilities"
+    ]
+  }
+
+  const lifetimePlan = {
+    name: "Lifetime Access",
+    price: 159,
+    features: [
+      "Everything in Full Access",
+      "Lifetime updates",
+      "Priority support forever",
+      "One-time payment"
+    ]
+  }
 
   const faqs = [
     {
@@ -186,25 +158,29 @@ export default function LandingPage() {
 
   // Price mapping for Stripe
   const PRICE_IDS = {
-    starter_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_MONTH,
-    starter_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_YEAR,
-    pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTH,
-    pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEAR,
-    growth_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH_MONTH,
-    growth_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH_YEAR,
+    full_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FULL_MONTHLY,
+    full_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FULL_YEARLY,
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME,
   }
 
-  const handleCheckout = async (planType: 'starter' | 'pro' | 'growth') => {
+  const handleCheckout = async (planType: 'full_monthly' | 'full_yearly' | 'lifetime') => {
     if (!user) {
       router.push('/auth/register')
       return
     }
 
-    const priceKey = `${planType}_${billingInterval}` as keyof typeof PRICE_IDS
-    const priceId = PRICE_IDS[priceKey]
+    let priceId: string | undefined
+    
+    if (planType === 'full_monthly') {
+      priceId = PRICE_IDS.full_monthly
+    } else if (planType === 'full_yearly') {
+      priceId = PRICE_IDS.full_yearly  
+    } else if (planType === 'lifetime') {
+      priceId = PRICE_IDS.lifetime
+    }
 
     if (!priceId) {
-      console.error('Price ID not found for:', priceKey)
+      console.error('Price ID not found for:', planType)
       return
     }
 
@@ -828,80 +804,115 @@ export default function LandingPage() {
               </span>
             </div>
           </div>
-          <div className="grid lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {plans.map((plan, index) => (
-              <div key={index} className={`group rounded-xl p-4 border transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1 ${plan.popular ? 'border-2 shadow-xl shadow-green-200/50 scale-105 ring-2 ring-green-400' : 'border-2 border-black shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-200/60'}`} style={plan.popular ? {borderColor: '#60ea8b'} : {}}>
-                {billingInterval === 'yearly' && (
-                  <div className="text-center mb-2">
-                    <span className="text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg bg-gradient-to-r from-red-500 to-red-600">
-                      SAVE {plan.planType === 'starter' ? '$18' : plan.planType === 'pro' ? '$58' : '$198'}
-                    </span>
-                  </div>
-                )}
-                {plan.popular && (
-                  <div className="text-center mb-3">
-                    <span className="text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg bg-green-500">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-black mb-2 group-hover:text-gray-900 transition-colors duration-300">{plan.name}</h3>
-                  
-                  {billingInterval === 'yearly' ? (
-                    <div className="mb-3">
-                      {/* Yearly Pricing Display */}
-                      <div className="relative">
-                        {/* Original monthly price crossed out */}
-                        <div className="text-xs text-slate-500 mb-0.5">
-                          <span className="line-through">{plan.planType === 'starter' ? '$168/year' : plan.planType === 'pro' ? '$348/year' : '$588/year'}</span>
-                          <span className="ml-1.5 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
-                            Save {plan.planType === 'starter' ? '$18' : plan.planType === 'pro' ? '$58' : '$198'}
-                          </span>
-                        </div>
-                        {/* New yearly price */}
-                        <div className="flex items-baseline justify-center">
-                          <span className="text-3xl font-bold text-black">{plan.yearlyPrice}</span>
-                          <span className="text-black ml-1 text-sm">/year</span>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          billed yearly • {plan.planType === 'starter' ? '1 month' : plan.planType === 'pro' ? '2 months' : '4 months'} free
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                  <div className="mb-3">
-                      {/* Monthly Pricing Display */}
-                      <div className="flex items-baseline justify-center">
-                        <span className="text-3xl font-bold text-black">{plan.monthlyPrice}</span>
-                        <span className="text-black ml-1 text-sm">/month</span>
-                      </div>
-                      <div className="text-xs text-slate-500 mt-0.5">billed monthly</div>
+          <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Left Column - Monthly/Yearly Plans */}
+            <div className="relative p-8 rounded-3xl bg-slate-900 text-white">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold mb-2">EasyBudget</h3>
+                <p className="text-slate-300">Simple pricing. All EasyBudget features.</p>
+              </div>
+
+              {/* Pricing Display */}
+              <div className="mb-6">
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl font-bold">
+                    ${billingInterval === 'monthly' ? fullPlan.monthlyPrice : fullPlan.monthlyPerMonth}
+                  </span>
+                  <span className="text-lg text-slate-300 ml-2">/month</span>
                 </div>
-                  )}
-                  <p className="text-sm text-black leading-relaxed group-hover:text-black transition-colors duration-300">{plan.desc}</p>
+                <p className="text-sm text-slate-400">
+                  {billingInterval === 'monthly' 
+                    ? 'Per month billed monthly. Switch to yearly anytime.' 
+                    : 'Per month billed yearly.'}
+                </p>
+              </div>
+
+              {/* Billing Toggle */}
+              <div className="mb-8">
+                <div className="flex items-center gap-4">
+                  <button
+                    className={`w-12 h-6 rounded-full relative transition-colors ${
+                      billingInterval === 'yearly' ? 'bg-white' : 'bg-slate-600'
+                    }`}
+                    onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-slate-900 rounded-full shadow-md transition-transform ${
+                        billingInterval === 'yearly' ? 'translate-x-6' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                  <span className="text-sm text-slate-300">Billed yearly</span>
                 </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <div className="w-3.5 h-3.5 bg-green-100 rounded-full flex items-center justify-center mr-2.5 flex-shrink-0 mt-0.5">
-                        <Check className="w-2 h-2 text-green-600" />
-                      </div>
-                      <span className="text-black text-sm leading-relaxed group-hover:text-black transition-colors duration-300">{feature}</span>
+              </div>
+
+              {/* Features */}
+              <div className="mb-8">
+                <ul className="space-y-3">
+                  {fullPlan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span className="text-slate-200">{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <button 
-                  className={`w-full py-5 px-8 rounded-full mb-4 font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg border-none cursor-pointer ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-2 border-black text-black hover:bg-slate-50 bg-white'}`}
-                  onClick={() => handleCheckout(plan.planType)}
-                >
-                  {plan.cta}
-                </button>
-                
-                {/* Subtle accent line */}
-                <div className={`w-12 h-0.5 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${plan.popular ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}></div>
               </div>
-            ))}
+
+              {/* CTA Button */}
+              <button 
+                className="w-full bg-white text-slate-900 font-semibold py-4 px-6 rounded-full hover:bg-slate-100 transition-colors"
+                onClick={() => handleCheckout(billingInterval === 'monthly' ? 'full_monthly' : 'full_yearly')}
+              >
+                {isCreatingCheckout === 'full_monthly' || isCreatingCheckout === 'full_yearly' 
+                  ? "Processing..." 
+                  : "Get Started"}
+              </button>
+            </div>
+
+            {/* Right Column - Lifetime Plan */}
+            <div className="relative p-8 rounded-3xl border-2 border-slate-200 bg-white">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Pay once</h3>
+                <p className="text-slate-600">Your copy forever & one year of updates.</p>
+              </div>
+
+              {/* Pricing Display */}
+              <div className="mb-8">
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl font-bold text-slate-900">${lifetimePlan.price}</span>
+                </div>
+                <p className="text-sm text-slate-600">One-time payment. Includes one year of updates.</p>
+              </div>
+
+              {/* Features */}
+              <div className="mb-8">
+                <ul className="space-y-3">
+                  {lifetimePlan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* CTA Button */}
+              <button 
+                className="w-full bg-slate-900 text-white font-semibold py-4 px-6 rounded-full hover:bg-slate-800 transition-colors"
+                onClick={() => handleCheckout('lifetime')}
+              >
+                {isCreatingCheckout === 'lifetime' ? "Processing..." : "Get Started"}
+              </button>
+
+              {/* Note */}
+              <div className="mt-6 p-4 bg-slate-50 rounded-lg">
+                <p className="text-xs text-slate-600">
+                  Optional renewal for another year at $109.
+                  Renew to get the latest updates or keep using the 
+                  version you have forever.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
