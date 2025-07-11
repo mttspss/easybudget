@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from './supabase'
 
 export interface Dashboard {
@@ -28,7 +28,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [activeDashboard, setActiveDashboard] = useState<Dashboard | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const refreshDashboards = async () => {
+  const refreshDashboards = useCallback(async () => {
     try {
       setLoading(true)
       
@@ -56,7 +56,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [activeDashboard])
 
   const createDashboard = async (name: string): Promise<Dashboard | null> => {
     try {

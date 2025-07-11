@@ -40,6 +40,45 @@ export const PLANS = {
       'On-premise deployment options',
       'Advanced security features'
     ]
+  },
+  // New Full Plans - All unlimited like Growth
+  full_monthly: {
+    name: 'Full Access',
+    maxAccounts: -1, // unlimited
+    features: [
+      'Unlimited transactions',
+      'Unlimited dashboards',
+      'Unlimited CSV imports',
+      'Advanced analytics & reporting',
+      'Unlimited financial goals',
+      'Priority support',
+      'Mobile app access',
+      'Export capabilities'
+    ]
+  },
+  full_yearly: {
+    name: 'Full Access',
+    maxAccounts: -1, // unlimited
+    features: [
+      'Unlimited transactions',
+      'Unlimited dashboards',
+      'Unlimited CSV imports',
+      'Advanced analytics & reporting',
+      'Unlimited financial goals',
+      'Priority support',
+      'Mobile app access',
+      'Export capabilities'
+    ]
+  },
+  lifetime: {
+    name: 'Lifetime Access',
+    maxAccounts: -1, // unlimited
+    features: [
+      'Everything in Full Access',
+      'Lifetime updates',
+      'Priority support forever',
+      'One-time payment'
+    ]
   }
 }
 
@@ -48,14 +87,15 @@ export function hasFeatureAccess(planType: keyof typeof PLANS, feature: string):
   const plan = PLANS[planType]
   if (!plan) return false
   
-  // Pro and Growth have all Starter features
-  if ((planType === 'pro' || planType === 'growth') && 
+  // Pro, Growth, and Full plans have all Starter features
+  if ((planType === 'pro' || planType === 'growth' || planType === 'full_monthly' || planType === 'full_yearly' || planType === 'lifetime') && 
       PLANS.starter.features.includes(feature)) {
     return true
   }
   
-  // Growth has all Pro features
-  if (planType === 'growth' && PLANS.pro.features.includes(feature)) {
+  // Growth and Full plans have all Pro features
+  if ((planType === 'growth' || planType === 'full_monthly' || planType === 'full_yearly' || planType === 'lifetime') && 
+      PLANS.pro.features.includes(feature)) {
     return true
   }
   
