@@ -92,35 +92,15 @@ export default function LandingPage() {
   const router = useRouter()
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
-  const [showMoneyAnimation, setShowMoneyAnimation] = useState(false)
+  const [priceAnimating, setPriceAnimating] = useState(false)
 
-  // Function to handle billing toggle with animation
+  // Function to handle billing toggle with price animation
   const handleBillingToggle = () => {
-    setShowMoneyAnimation(true)
-    setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')
-    setTimeout(() => setShowMoneyAnimation(false), 2000)
-  }
-
-  // Money animation component
-  function MoneyAnimation() {
-    return (
-      <div className="fixed inset-0 pointer-events-none z-50">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-bounce"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.2}s`,
-              animationDuration: '2s'
-            }}
-          >
-            <span className="text-2xl">💰</span>
-          </div>
-        ))}
-      </div>
-    )
+    setPriceAnimating(true)
+    setTimeout(() => {
+      setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')
+      setTimeout(() => setPriceAnimating(false), 300)
+    }, 150)
   }
 
   // New plans configuration
@@ -780,7 +760,9 @@ export default function LandingPage() {
               {/* Pricing Display */}
               <div className="mb-6">
                 <div className="flex items-baseline mb-2">
-                  <span className="text-4xl font-bold text-slate-900">
+                  <span className={`text-4xl font-bold text-slate-900 transition-transform duration-300 ${
+                    priceAnimating ? 'rotate-180 scale-110' : 'rotate-0 scale-100'
+                  }`}>
                     ${billingInterval === 'monthly' ? fullPlan.monthlyPrice : fullPlan.monthlyPerMonth}
                   </span>
                   <span className="text-lg text-slate-600 ml-2">/month</span>
