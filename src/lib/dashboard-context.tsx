@@ -47,16 +47,15 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
       setDashboards(data || [])
       
-      // Set first dashboard as active if none selected
-      if (!activeDashboard && data && data.length > 0) {
-        setActiveDashboard(data[0])
-      }
+      // Remove automatic dashboard selection - let user choose
+      // Users can manually select Main Dashboard (null) or any custom dashboard
+      
     } catch (error) {
       console.error('Error in refreshDashboards:', error)
     } finally {
       setLoading(false)
     }
-  }, [activeDashboard])
+  }, []) // Remove activeDashboard dependency to prevent loops
 
   const createDashboard = async (name: string): Promise<Dashboard | null> => {
     try {
