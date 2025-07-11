@@ -92,6 +92,36 @@ export default function LandingPage() {
   const router = useRouter()
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [isCreatingCheckout, setIsCreatingCheckout] = useState<string | null>(null)
+  const [showMoneyAnimation, setShowMoneyAnimation] = useState(false)
+
+  // Function to handle billing toggle with animation
+  const handleBillingToggle = () => {
+    setShowMoneyAnimation(true)
+    setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')
+    setTimeout(() => setShowMoneyAnimation(false), 2000)
+  }
+
+  // Money animation component
+  function MoneyAnimation() {
+    return (
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute animate-bounce"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.2}s`,
+              animationDuration: '2s'
+            }}
+          >
+            <span className="text-2xl">💰</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   // New plans configuration
   const fullPlan = {
@@ -127,7 +157,7 @@ export default function LandingPage() {
     return (
       <div className="mb-8 bg-gradient-to-r from-blue-50 to-green-50 border border-green-200 text-gray-700 px-4 py-2 text-sm rounded-full font-medium flex items-center gap-2 shadow-sm">
         <div className="w-2 h-2 rounded-full bg-green-500"></div>
-        <span>New: Enhanced budgeting features now available!</span>
+        <span>All your finances in one powerful dashboard</span>
       </div>
     )
   }
@@ -722,7 +752,7 @@ export default function LandingPage() {
               </span>
               <div className="relative">
                 <button
-                  onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
+                  onClick={handleBillingToggle}
                   className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer ${
                     billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
                   }`}
@@ -741,7 +771,7 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {/* Left Column - Monthly/Yearly Plans */}
-            <div className="relative p-8 rounded-3xl border-2 border-gray-200 bg-white">
+            <div className="relative p-8 rounded-3xl border-2 border-gray-200 bg-white flex flex-col">
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">EasyBudget</h3>
                 <p className="text-slate-600">Simple pricing. All EasyBudget features.</p>
@@ -769,7 +799,7 @@ export default function LandingPage() {
                     className={`w-12 h-6 rounded-full relative transition-colors ${
                       billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
                     }`}
-                    onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
+                    onClick={handleBillingToggle}
                   >
                     <div
                       className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
@@ -792,7 +822,7 @@ export default function LandingPage() {
               </button>
 
               {/* Features */}
-              <div>
+              <div className="flex-1">
                 <ul className="space-y-3">
                   {fullPlan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-3">
@@ -805,18 +835,23 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column - Lifetime Plan */}
-            <div className="relative p-8 rounded-3xl border-2 border-slate-200 bg-white">
+            <div className="relative p-8 rounded-3xl border-2 border-slate-200 bg-white flex flex-col">
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">Pay once</h3>
                 <p className="text-slate-600">Your copy forever & one year of updates.</p>
               </div>
 
               {/* Pricing Display */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl font-bold text-slate-900">${lifetimePlan.price}</span>
                 </div>
                 <p className="text-sm text-slate-500">One-time payment. Includes one year of updates.</p>
+              </div>
+
+              {/* Empty space to match toggle section */}
+              <div className="mb-8">
+                <div className="h-6"></div>
               </div>
 
               {/* CTA Button */}
@@ -828,7 +863,7 @@ export default function LandingPage() {
               </button>
 
               {/* Features */}
-              <div className="mb-8">
+              <div className="flex-1 mb-8">
                 <ul className="space-y-3">
                   {lifetimePlan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-3">
@@ -840,7 +875,7 @@ export default function LandingPage() {
               </div>
 
               {/* Note */}
-              <div className="p-4 bg-slate-50 rounded-lg">
+              <div className="p-4 bg-slate-50 rounded-lg mt-auto">
                 <p className="text-xs text-slate-600">
                   This is the only payment you&apos;ll ever make. No recurring fees, no subscriptions.
                 </p>
