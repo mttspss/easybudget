@@ -147,7 +147,7 @@ export default function LandingPage() {
     },
     {
       q: "What happens if I exceed my plan's limits?",
-      a: "The application will prevent you from performing actions that exceed your plan's limits. For example, if you reach your monthly transaction limit on the Starter plan, you won't be able to add new transactions until the next month or until you upgrade your plan. You will see clear messages in the app indicating your current usage."
+      a: "The application will prevent you from performing actions that exceed your plan's limits. For example, if you reach your monthly transaction limit on the Starter plan, you won&apos;t be able to add new transactions until the next month or until you upgrade your plan. You will see clear messages in the app indicating your current usage."
     },
     {
       q: "Can I change or cancel my plan at any time?",
@@ -842,7 +842,7 @@ export default function LandingPage() {
               {/* Note */}
               <div className="p-4 bg-slate-50 rounded-lg">
                 <p className="text-xs text-slate-600">
-                  This is the only payment you'll ever make. No recurring fees, no subscriptions.
+                  This is the only payment you&apos;ll ever make. No recurring fees, no subscriptions.
                 </p>
               </div>
             </div>

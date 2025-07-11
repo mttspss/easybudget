@@ -109,7 +109,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshDashboards()
-  }, [])
+  }, [refreshDashboards])
 
   const value: DashboardContextType = {
     dashboards,
