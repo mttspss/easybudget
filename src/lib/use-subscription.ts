@@ -7,8 +7,8 @@ export interface UserSubscription {
   user_id: string
   subscription_id: string | null
   status: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
-  plan_type: 'free' | 'starter' | 'pro' | 'growth'
-  billing_interval: 'month' | 'year' | null
+  plan_type: 'free' | 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime'
+  billing_interval: 'month' | 'year' | 'lifetime' | null
   current_period_start: string | null
   current_period_end: string | null
   canceled_at: string | null
@@ -60,7 +60,7 @@ export function useSubscription(userId: string | undefined) {
   }, [userId])
 
   // Helper functions
-  const getPlanType = (): 'free' | 'starter' | 'pro' | 'growth' => {
+  const getPlanType = (): 'free' | 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime' => {
     return subscription?.plan_type ?? 'free'
   }
 
@@ -77,14 +77,14 @@ export function useSubscription(userId: string | undefined) {
       // Safety check: ensure starter plan exists before checking features
       if (!PLANS.starter || !PLANS.starter.features || !Array.isArray(PLANS.starter.features)) return false
 
-    // Pro and Growth have all Starter features
-    if ((planType === 'pro' || planType === 'growth') && 
+    // Pro, Growth, and Full plans have all Starter features
+    if ((planType === 'pro' || planType === 'growth' || planType === 'full_monthly' || planType === 'full_yearly' || planType === 'lifetime') && 
         PLANS.starter.features.includes(feature)) {
       return true
     }
     
-    // Growth has all Pro features
-      if (planType === 'growth' && 
+    // Growth and Full plans have all Pro features
+      if ((planType === 'growth' || planType === 'full_monthly' || planType === 'full_yearly' || planType === 'lifetime') && 
           PLANS.pro && 
           PLANS.pro.features && 
           Array.isArray(PLANS.pro.features) && 
@@ -104,7 +104,8 @@ export function useSubscription(userId: string | undefined) {
   }
 
   const isPremium = (): boolean => {
-    return getPlanType() !== 'free' && isActive()
+    const planType = getPlanType()
+    return (planType !== 'free' && isActive()) || planType === 'lifetime' // Lifetime is always premium
   }
 
   const canAccessFeature = (feature: string): boolean => {

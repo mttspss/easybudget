@@ -233,7 +233,7 @@ export function Sidebar() {
         </div>
 
         {/* Upgrade Button */}
-        {!subscriptionLoading && plan.id !== 'growth' && (
+        {!subscriptionLoading && plan.id !== 'growth' && plan.id !== 'full_monthly' && plan.id !== 'full_yearly' && plan.id !== 'lifetime' && (
           <Button 
             size="sm" 
             className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"

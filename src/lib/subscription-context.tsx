@@ -6,7 +6,7 @@ import { useAuth } from './auth-context'
 
 // Define the structure of a user's subscription plan
 export interface Plan {
-  id: 'starter' | 'pro' | 'growth' | 'free'; // 'free' as a fallback
+  id: 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime' | 'free'; // Updated types
   name: string;
   maxDashboards: number;
   maxTransactions: number;
@@ -42,6 +42,37 @@ const PLANS: Record<string, Plan> = {
     id: 'growth',
     name: 'Growth',
     maxDashboards: 8,
+    maxTransactions: Infinity,
+    maxCsvImports: Infinity,
+    maxGoals: Infinity,
+    hasAdvancedAnalytics: true,
+    canEditCategories: true,
+  },
+  // New Full Plans - All unlimited like Growth
+  full_monthly: {
+    id: 'full_monthly',
+    name: 'Full Access',
+    maxDashboards: Infinity,
+    maxTransactions: Infinity,
+    maxCsvImports: Infinity,
+    maxGoals: Infinity,
+    hasAdvancedAnalytics: true,
+    canEditCategories: true,
+  },
+  full_yearly: {
+    id: 'full_yearly',
+    name: 'Full Access',
+    maxDashboards: Infinity,
+    maxTransactions: Infinity,
+    maxCsvImports: Infinity,
+    maxGoals: Infinity,
+    hasAdvancedAnalytics: true,
+    canEditCategories: true,
+  },
+  lifetime: {
+    id: 'lifetime',
+    name: 'Lifetime Access',
+    maxDashboards: Infinity,
     maxTransactions: Infinity,
     maxCsvImports: Infinity,
     maxGoals: Infinity,

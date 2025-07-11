@@ -70,6 +70,9 @@ export default function BillingPage() {
       case 'starter': return <Zap className="h-5 w-5" />;
       case 'pro': return <Crown className="h-5 w-5" />;
       case 'growth': return <Rocket className="h-5 w-5" />;
+      case 'full_monthly':
+      case 'full_yearly': 
+      case 'lifetime': return <Crown className="h-5 w-5" />;
       default: return <DollarSign className="h-5 w-5" />;
     }
   }
@@ -79,6 +82,9 @@ export default function BillingPage() {
       case 'starter': return 'bg-blue-100 text-blue-800 border-blue-300';
       case 'pro': return 'bg-purple-100 text-purple-800 border-purple-300';
       case 'growth': return 'bg-green-100 text-green-800 border-green-300';
+      case 'full_monthly':
+      case 'full_yearly':
+      case 'lifetime': return 'bg-green-100 text-green-800 border-green-300';
       default: return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   }

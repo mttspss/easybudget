@@ -14,10 +14,8 @@ import {
   X,
   Menu,
   ArrowRight,
-  Twitter,
-  TicketPercent
+  Twitter
 } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 // User Count Section Component
 function UserCountSection() {
@@ -37,7 +35,7 @@ function UserCountSection() {
       } catch (error) {
         console.error('Error fetching user count:', error)
         // Fallback to reasonable defaults if API fails
-        setUserCount(1247)
+        setUserCount(48)
         setUserInitials(['M', 'A', 'S', 'L', 'E', 'R', 'C', 'D'])
       } finally {
         setIsLoading(false)
@@ -108,7 +106,7 @@ export default function LandingPage() {
       "Advanced analytics & reporting",
       "Unlimited financial goals",
       "Priority support",
-      "Mobile app access",
+      "Mobile app access (coming soon)",
       "Export capabilities"
     ]
   }
@@ -122,6 +120,16 @@ export default function LandingPage() {
       "Priority support forever",
       "One-time payment"
     ]
+  }
+
+  // Simple announcement banner (replaces discount banner)
+  function AnnouncementBanner() {
+    return (
+      <div className="mb-8 bg-gradient-to-r from-blue-50 to-green-50 border border-green-200 text-gray-700 px-4 py-2 text-sm rounded-full font-medium flex items-center gap-2 shadow-sm">
+        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+        <span>New: Enhanced budgeting features now available!</span>
+      </div>
+    )
   }
 
   const faqs = [
@@ -210,74 +218,6 @@ export default function LandingPage() {
     } finally {
       setIsCreatingCheckout(null)
     }
-  }
-
-  // Reusable discount banner with 24-hour countdown
-  function CountdownTimer24h() {
-    const [timeLeft, setTimeLeft] = useState<{hours:string;minutes:string;seconds:string}>({ hours: '00', minutes: '00', seconds: '00' })
-
-    useEffect(() => {
-      const calcExpiry = () => {
-        const now = new Date()
-        const expiry = new Date()
-        expiry.setHours(24,0,0,0) // midnight next 24h window
-        if (expiry.getTime() <= now.getTime()) {
-          expiry.setDate(expiry.getDate() + 1)
-        }
-        return expiry
-      }
-
-      let expiryTime = calcExpiry()
-
-      const interval = setInterval(() => {
-        const now = new Date()
-        const distance = expiryTime.getTime() - now.getTime()
-
-        if (distance <= 0) {
-          expiryTime = calcExpiry()
-        }
-
-        const hours = Math.floor((distance / (1000*60*60)) % 24)
-        const minutes = Math.floor((distance / (1000*60)) % 60)
-        const seconds = Math.floor((distance / 1000) % 60)
-
-        setTimeLeft({
-          hours: hours.toString().padStart(2,'0'),
-          minutes: minutes.toString().padStart(2,'0'),
-          seconds: seconds.toString().padStart(2,'0')
-        })
-      }, 1000)
-
-      return () => clearInterval(interval)
-    }, [])
-
-    return <span className="font-mono text-xs tracking-widest">{timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}</span>
-  }
-
-  function DiscountBanner({large=false}:{large?:boolean}) {
-    return (
-      <TooltipProvider delayDuration={200}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className={`cursor-pointer mb-8 bg-gradient-to-r from-pink-500 to-green-500 text-white ${large ? 'px-4 py-2 text-base' : 'px-3 py-1.5 text-sm'} rounded-full font-bold flex items-center gap-2 shadow-md animate-pulse hover:animate-none`}>
-              <TicketPercent className="h-4 w-4" />
-              <span>43% OFF</span>
-              <span className="mx-1 text-pink-100">|</span>
-              <CountdownTimer24h />
-              {large && (
-                <span className="ml-2 bg-white/20 px-2 py-0.5 rounded font-mono">SUMMER25</span>
-              )}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              Save 43% on any plan with code&nbsp;
-              <span className="font-bold">SUMMER25</span>
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    )
   }
 
   return (
@@ -380,7 +320,7 @@ export default function LandingPage() {
       <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center">
-            <DiscountBanner />
+            <AnnouncementBanner />
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] max-w-4xl">
               Track your entire money life,<br />
               in one view<span className="inline-block w-3 h-3 bg-green-500 rounded-full ml-2"></span>
@@ -774,11 +714,6 @@ export default function LandingPage() {
             <p className="text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Start with what you need today, upgrade as you grow. All plans include core features and security.
             </p>
-            
-            {/* Discount banner inside pricing */}
-            <div className="flex justify-center mt-6">
-              <DiscountBanner large />
-            </div>
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-3 mt-6">
@@ -806,21 +741,21 @@ export default function LandingPage() {
           </div>
           <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {/* Left Column - Monthly/Yearly Plans */}
-            <div className="relative p-8 rounded-3xl bg-slate-900 text-white">
+            <div className="relative p-8 rounded-3xl border-2 border-gray-200 bg-white">
               <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">EasyBudget</h3>
-                <p className="text-slate-300">Simple pricing. All EasyBudget features.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">EasyBudget</h3>
+                <p className="text-slate-600">Simple pricing. All EasyBudget features.</p>
               </div>
 
               {/* Pricing Display */}
               <div className="mb-6">
                 <div className="flex items-baseline mb-2">
-                  <span className="text-4xl font-bold">
+                  <span className="text-4xl font-bold text-slate-900">
                     ${billingInterval === 'monthly' ? fullPlan.monthlyPrice : fullPlan.monthlyPerMonth}
                   </span>
-                  <span className="text-lg text-slate-300 ml-2">/month</span>
+                  <span className="text-lg text-slate-600 ml-2">/month</span>
                 </div>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-500">
                   {billingInterval === 'monthly' 
                     ? 'Per month billed monthly. Switch to yearly anytime.' 
                     : 'Per month billed yearly.'}
@@ -832,41 +767,41 @@ export default function LandingPage() {
                 <div className="flex items-center gap-4">
                   <button
                     className={`w-12 h-6 rounded-full relative transition-colors ${
-                      billingInterval === 'yearly' ? 'bg-white' : 'bg-slate-600'
+                      billingInterval === 'yearly' ? 'bg-green-500' : 'bg-slate-300'
                     }`}
                     onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
                   >
                     <div
-                      className={`w-5 h-5 bg-slate-900 rounded-full shadow-md transition-transform ${
+                      className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
                         billingInterval === 'yearly' ? 'translate-x-6' : 'translate-x-0.5'
                       }`}
                     />
                   </button>
-                  <span className="text-sm text-slate-300">Billed yearly</span>
+                  <span className="text-sm text-slate-600">Billed yearly</span>
                 </div>
-              </div>
-
-              {/* Features */}
-              <div className="mb-8">
-                <ul className="space-y-3">
-                  {fullPlan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span className="text-slate-200">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
               {/* CTA Button */}
               <button 
-                className="w-full bg-white text-slate-900 font-semibold py-4 px-6 rounded-full hover:bg-slate-100 transition-colors"
+                className="w-full bg-green-500 text-white font-semibold py-4 px-6 rounded-full hover:bg-green-600 transition-colors mb-8"
                 onClick={() => handleCheckout(billingInterval === 'monthly' ? 'full_monthly' : 'full_yearly')}
               >
                 {isCreatingCheckout === 'full_monthly' || isCreatingCheckout === 'full_yearly' 
                   ? "Processing..." 
                   : "Get Started"}
               </button>
+
+              {/* Features */}
+              <div>
+                <ul className="space-y-3">
+                  {fullPlan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Right Column - Lifetime Plan */}
@@ -881,8 +816,16 @@ export default function LandingPage() {
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl font-bold text-slate-900">${lifetimePlan.price}</span>
                 </div>
-                <p className="text-sm text-slate-600">One-time payment. Includes one year of updates.</p>
+                <p className="text-sm text-slate-500">One-time payment. Includes one year of updates.</p>
               </div>
+
+              {/* CTA Button */}
+              <button 
+                className="w-full bg-slate-900 text-white font-semibold py-4 px-6 rounded-full hover:bg-slate-800 transition-colors mb-8"
+                onClick={() => handleCheckout('lifetime')}
+              >
+                {isCreatingCheckout === 'lifetime' ? "Processing..." : "Get Started"}
+              </button>
 
               {/* Features */}
               <div className="mb-8">
@@ -896,20 +839,10 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* CTA Button */}
-              <button 
-                className="w-full bg-slate-900 text-white font-semibold py-4 px-6 rounded-full hover:bg-slate-800 transition-colors"
-                onClick={() => handleCheckout('lifetime')}
-              >
-                {isCreatingCheckout === 'lifetime' ? "Processing..." : "Get Started"}
-              </button>
-
               {/* Note */}
-              <div className="mt-6 p-4 bg-slate-50 rounded-lg">
+              <div className="p-4 bg-slate-50 rounded-lg">
                 <p className="text-xs text-slate-600">
-                  Optional renewal for another year at $109.
-                  Renew to get the latest updates or keep using the 
-                  version you have forever.
+                  This is the only payment you'll ever make. No recurring fees, no subscriptions.
                 </p>
               </div>
             </div>
@@ -939,7 +872,7 @@ export default function LandingPage() {
             {/* User Count Text */}
             <div className="text-center">
               <p className="text-gray-600 text-base">
-                <span className="font-semibold text-gray-900">44 people</span>
+                <span className="font-semibold text-gray-900">48 people</span>
                 <span className="italic"> saving their money</span>
               </p>
             </div>

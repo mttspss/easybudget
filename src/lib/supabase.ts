@@ -41,8 +41,8 @@ export type Database = {
           user_id: string
           subscription_id: string | null
           status: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
-          plan_type: 'free' | 'starter' | 'pro' | 'growth'
-          billing_interval: 'month' | 'year' | null
+          plan_type: 'free' | 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime'
+          billing_interval: 'month' | 'year' | 'lifetime' | null
           current_period_start: string | null
           current_period_end: string | null
           canceled_at: string | null
@@ -54,8 +54,8 @@ export type Database = {
           user_id: string
           subscription_id?: string | null
           status?: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
-          plan_type?: 'free' | 'starter' | 'pro' | 'growth'
-          billing_interval?: 'month' | 'year' | null
+          plan_type?: 'free' | 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime'
+          billing_interval?: 'month' | 'year' | 'lifetime' | null
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
@@ -67,8 +67,8 @@ export type Database = {
           user_id?: string
           subscription_id?: string | null
           status?: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing'
-          plan_type?: 'free' | 'starter' | 'pro' | 'growth'
-          billing_interval?: 'month' | 'year' | null
+          plan_type?: 'free' | 'starter' | 'pro' | 'growth' | 'full_monthly' | 'full_yearly' | 'lifetime'
+          billing_interval?: 'month' | 'year' | 'lifetime' | null
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
