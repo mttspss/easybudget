@@ -378,9 +378,6 @@ export default function LandingPage() {
                     muted
                     loop
                     playsInline
-                    style={{
-                      playbackRate: 2 // Velocità x2
-                    }}
                     onLoadedMetadata={(e) => {
                       // Imposta velocità x2 quando il video è caricato
                       const video = e.target as HTMLVideoElement;
