@@ -372,7 +372,7 @@ export default function LandingPage() {
                   onClick={() => window.open('https://www.youtube.com/watch?v=E-F76HSPCRk', '_blank')}
                 >
                   <iframe
-                    src="https://www.youtube.com/embed/E-F76HSPCRk?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=E-F76HSPCRk&disablekb=1&fs=0&iv_load_policy=3"
+                    src="https://www.youtube.com/embed/E-F76HSPCRk?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=E-F76HSPCRk&disablekb=1&fs=0&iv_load_policy=3&playback_rate=2"
                     title="EasyBudget Demo - See how it works"
                     className="absolute inset-0 w-full h-full pointer-events-none"
                     frameBorder="0"
@@ -388,13 +388,6 @@ export default function LandingPage() {
                       </svg>
                     </div>
                   </div>
-                </div>
-                
-                {/* Video Caption */}
-                <div className="text-center mt-6">
-                  <p className="text-gray-600 text-sm">
-                    <span className="font-medium text-gray-900">Watch:</span> See how EasyBudget transforms your financial data in minutes
-                  </p>
                 </div>
               </div>
             </div>

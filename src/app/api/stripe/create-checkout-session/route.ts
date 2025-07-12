@@ -5,12 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const { priceId, userId } = await request.json()
 
-    console.log('=== CHECKOUT SESSION REQUEST ===')
-    console.log('Price ID:', priceId)
-    console.log('User ID:', userId)
-    console.log('Plan Type:', getPlanType(priceId))
-    console.log('Billing Interval:', getBillingInterval(priceId))
-
     if (!priceId || !userId) {
       return NextResponse.json(
         { error: 'Price ID and User ID are required' },
@@ -18,26 +12,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Creating checkout session for:', { priceId, userId })
-
     // Determine base URL - PRIORITIZE PRODUCTION DOMAIN
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
                    'https://easybudget.ing'  // Always fallback to production domain
-
-    console.log('Base URL:', baseUrl)
 
     // Get plan details for metadata
     const planType = getPlanType(priceId)
     const billingInterval = getBillingInterval(priceId)
 
-    console.log('=== METADATA TO BE SET ===')
-    console.log('Plan Type:', planType)
-    console.log('Billing Interval:', billingInterval)
-    console.log('User ID:', userId)
+    // Determine mode based on billing interval
+    const mode = billingInterval === 'lifetime' ? 'payment' : 'subscription'
 
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
+    // Create checkout session configuration
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+      mode: mode,
       payment_method_types: ['card'],
       line_items: [
         {
@@ -52,22 +40,22 @@ export async function POST(request: NextRequest) {
         planType: planType,
         billingInterval: billingInterval,
       },
-      subscription_data: {
+      allow_promotion_codes: true,
+    }
+
+    // Add subscription_data only for subscription mode
+    if (mode === 'subscription') {
+      sessionConfig.subscription_data = {
         metadata: {
           userId: userId,
           planType: planType,
           billingInterval: billingInterval,
         },
-      },
-      allow_promotion_codes: true,
-    })
+      }
+    }
 
-    console.log('=== CHECKOUT SESSION CREATED ===')
-    console.log('Session ID:', session.id)
-    console.log('Checkout URL:', session.url)
-    console.log('Success URL:', session.success_url)
-    console.log('Cancel URL:', session.cancel_url)
-    console.log('Session Metadata:', session.metadata)
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create(sessionConfig)
     
     return NextResponse.json({ url: session.url })
   } catch (error) {

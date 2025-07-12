@@ -1,0 +1,15 @@
+-- Migration to add new plan types to user_subscriptions table
+-- File: 003_add_new_plan_types.sql
+
+-- First, remove the old constraint
+ALTER TABLE user_subscriptions DROP CONSTRAINT IF EXISTS user_subscriptions_plan_type_check;
+
+-- Add the new constraint with all plan types
+ALTER TABLE user_subscriptions ADD CONSTRAINT user_subscriptions_plan_type_check 
+  CHECK (plan_type IN ('free', 'starter', 'pro', 'growth', 'full_monthly', 'full_yearly', 'lifetime'));
+
+-- Also update billing_interval to include 'lifetime'
+ALTER TABLE user_subscriptions DROP CONSTRAINT IF EXISTS user_subscriptions_billing_interval_check;
+
+ALTER TABLE user_subscriptions ADD CONSTRAINT user_subscriptions_billing_interval_check 
+  CHECK (billing_interval IN ('month', 'year', 'lifetime')); 
