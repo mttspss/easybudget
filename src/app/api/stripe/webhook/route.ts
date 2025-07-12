@@ -90,14 +90,52 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return
   }
 
+  console.log('💰 Processing checkout completion for session mode:', session.mode)
+
   if (session.subscription) {
+    // Handle subscription-based plans (monthly/yearly)
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     )
     await upsertSubscription(subscription, userId)
-    console.log('✅ Checkout completed successfully for user:', userId)
+    console.log('✅ Subscription checkout completed successfully for user:', userId)
+  } else if (session.mode === 'payment') {
+    // Handle one-time payments (lifetime plans)
+    console.log('💰 Processing lifetime payment for user:', userId)
+    
+    // Get plan details from session metadata
+    const planType = session.metadata?.planType as string
+    const billingInterval = session.metadata?.billingInterval as string
+    
+    if (planType && billingInterval === 'lifetime') {
+      // Create lifetime subscription record
+      const dataToUpsert = {
+        user_id: userId,
+        subscription_id: null, // No subscription for lifetime
+        status: 'active',
+        plan_type: planType,
+        billing_interval: billingInterval,
+        current_period_start: new Date().toISOString(),
+        current_period_end: null, // Lifetime never expires
+        canceled_at: null,
+        updated_at: new Date().toISOString(),
+      }
+
+      const { error } = await supabaseAdmin
+        .from('user_subscriptions')
+        .upsert(dataToUpsert, { onConflict: 'user_id' })
+
+      if (error) {
+        console.error('❌ ERROR upserting lifetime subscription:', error)
+        throw error
+      }
+
+      console.log('✅ Lifetime payment processed successfully for user:', userId, 'Plan:', planType)
+    } else {
+      console.error('❌ ERROR: Invalid lifetime payment metadata:', { planType, billingInterval })
+    }
   } else {
-    console.error('⚠️ WARNING: Session has no subscription!')
+    console.error('❌ ERROR: Unknown session mode:', session.mode)
   }
 }
 
