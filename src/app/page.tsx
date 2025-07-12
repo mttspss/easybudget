@@ -365,17 +365,29 @@ export default function LandingPage() {
             </div>
 
             {/* Demo Video Section */}
-            <div className="mb-16">
-              <div className="relative max-w-4xl mx-auto">
-                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+            <div className="mb-16 w-full">
+              <div className="relative w-full max-w-5xl mx-auto">
+                <div 
+                  className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200 cursor-pointer group"
+                  onClick={() => window.open('https://www.youtube.com/watch?v=E-F76HSPCRk', '_blank')}
+                >
                   <iframe
-                    src="https://www.youtube.com/embed/E-F76HSPCRk?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=E-F76HSPCRk"
+                    src="https://www.youtube.com/embed/E-F76HSPCRk?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=E-F76HSPCRk&disablekb=1&fs=0&iv_load_policy=3"
                     title="EasyBudget Demo - See how it works"
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full pointer-events-none"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
                   ></iframe>
+                  
+                  {/* Invisible clickable overlay */}
+                  <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors duration-200 flex items-center justify-center">
+                    {/* Optional: Play icon that appears on hover */}
+                    <div className="opacity-0 group-hover:opacity-80 transition-opacity duration-200 bg-black/70 rounded-full p-4">
+                      <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Video Caption */}
