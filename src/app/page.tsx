@@ -364,6 +364,29 @@ export default function LandingPage() {
               </button>
             </div>
 
+            {/* Demo Video Section */}
+            <div className="mb-16">
+              <div className="relative max-w-4xl mx-auto">
+                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <iframe
+                    src="https://www.youtube.com/embed/E-F76HSPCRk?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=E-F76HSPCRk"
+                    title="EasyBudget Demo - See how it works"
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                
+                {/* Video Caption */}
+                <div className="text-center mt-6">
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-medium text-gray-900">Watch:</span> See how EasyBudget transforms your financial data in minutes
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* User Count Section - Social Proof */}
             <div className="mb-12">
               <UserCountSection />
