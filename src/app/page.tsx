@@ -702,9 +702,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Multiple Dashboards Video</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -721,9 +718,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Manual Entry Video</p>
-                  </div>
                 </div>
               </div>
               
@@ -794,9 +788,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Bank Import Video</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -813,9 +804,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Financial Goals Video</p>
-                  </div>
                 </div>
               </div>
               
@@ -886,9 +874,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Analytics Video</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -905,9 +890,6 @@ export default function LandingPage() {
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-sm">Custom Categories Video</p>
-                  </div>
                 </div>
               </div>
               
