@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DashboardPreview } from "@/components/ui/dashboard-preview"
 import {
   Mail,
   ChevronDown,
@@ -648,95 +647,316 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Dashboard Preview Section */}
-      <DashboardPreview user={user} />
+      {/* Features in Action - Screen Studio Style */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              See EasyBudget in action
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover the powerful features that make financial management effortless
+            </p>
+          </div>
 
-      {/* Transaction Transformation Section */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Column - Visual */}
-            <div className="relative order-2 lg:order-1">
-              <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-                {/* Before State - Messy Transactions */}
-                <div className="mb-8">
-                  <h4 className="text-sm font-medium text-gray-500 mb-4">Before - Raw Bank Data</h4>
-                  <div className="space-y-3">
-                    {[
-                      { desc: "AMZN MKTP US*2K4LK8901", amount: "-$23.47", raw: true },
-                      { desc: "SQ *COFFEE SHOP NYC", amount: "-$8.99", raw: true },
-                      { desc: "PAYPAL *NETFLIX", amount: "-$15.99", raw: true },
-                      { desc: "WHOLEFDS #123 NYC", amount: "-$127.84", raw: true }
-                    ].map((tx, i) => (
-                      <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-500 font-mono truncate">{tx.desc}</div>
-                        <div className="text-sm font-medium text-gray-900">{tx.amount}</div>
-                      </div>
-                    ))}
-                  </div>
+          {/* Features List */}
+          <div className="space-y-20">
+            
+            {/* Feature 1: Multiple Dashboards */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Organize with multiple dashboards
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Keep your finances perfectly organized by creating separate dashboards for different purposes. 
+                    Track personal expenses, business transactions, or family budgets independently while maintaining 
+                    a complete overview of your financial picture.
+                  </p>
                 </div>
-
-                {/* Arrow */}
-                <div className="flex justify-center mb-8">
-                  <div className="flex items-center">
-                    <div className="w-12 h-0.5 bg-gray-300"></div>
-                    <ArrowRight className="h-5 w-5 text-gray-400 mx-2" />
-                    <div className="w-12 h-0.5 bg-gray-300"></div>
-                  </div>
-                </div>
-
-                {/* After State - Clean Categorized */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-4">After - Automatically Categorized</h4>
-                  <div className="space-y-3">
-                    {[
-                      { desc: "Amazon Purchase", amount: "-$23.47", category: "Shopping", icon: "🛒", color: "bg-blue-50 border-blue-200" },
-                      { desc: "Coffee Shop", amount: "-$8.99", category: "Food & Dining", icon: "☕", color: "bg-orange-50 border-orange-200" },
-                      { desc: "Netflix Subscription", amount: "-$15.99", category: "Entertainment", icon: "🎬", color: "bg-purple-50 border-purple-200" },
-                      { desc: "Whole Foods", amount: "-$127.84", category: "Groceries", icon: "🛒", color: "bg-green-50 border-green-200" }
-                    ].map((tx, i) => (
-                      <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${tx.color}`}>
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">{tx.icon}</span>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{tx.desc}</div>
-                            <div className="text-xs text-gray-500">{tx.category}</div>
-                          </div>
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">{tx.amount}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Content */}
-            <div className="space-y-6 order-1 lg:order-2">
-              <div className="space-y-4">
-                <h3 className="text-4xl font-bold underline" style={{color: '#60ea8b'}}>
-                  The Spreadsheet Killer
-                </h3>
-                <h2 className="text-4xl font-bold text-gray-900 leading-tight">
-                  100% accuracy from the first import.
-                </h2>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Create unlimited custom dashboards",
+                    "Separate personal and business finances", 
+                    "Dedicated family budget tracking",
+                    "Quick dashboard switching"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
               
-              <p className="text-xl text-gray-600 leading-relaxed">
-                easybudget.ing was trained to understand any bank statement format. No more manual sorting. We do the heavy lifting so you can focus on your goals.
-              </p>
-
-              <div className="flex items-center space-x-4 pt-4">
-                <div className="flex items-center space-x-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-gray-600 font-medium">Works with 10,000+ banks</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-gray-600 font-medium">AI-powered categorization</span>
+              <div className="relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-dashboards.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Multiple Dashboards Video</p>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Feature 2: Manual Income/Expense Entry */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1 relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-manual-entry.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Manual Entry Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="order-1 lg:order-2 space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Add transactions manually with ease
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Quickly log income and expenses with our intuitive interface. Perfect for cash transactions, 
+                    freelance payments, or any financial activity that doesn&apos;t appear in your bank statements. 
+                    Smart categorization makes data entry fast and accurate.
+                  </p>
+                </div>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Lightning-fast transaction entry",
+                    "Smart category suggestions",
+                    "Bulk transaction editing",
+                    "Customizable transaction templates"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Feature 3: Automatic Bank Import */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Import bank statements automatically
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Upload your bank CSV files and watch as EasyBudget automatically processes, categorizes, 
+                    and organizes thousands of transactions in seconds. Our smart import system works with 
+                    any bank format and eliminates duplicate entries.
+                  </p>
+                </div>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Support for 1000+ bank formats",
+                    "Automatic duplicate detection",
+                    "Intelligent transaction categorization",
+                    "Instant processing of large files"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-bank-import.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Bank Import Video</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 4: Financial Goals */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1 relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-goals.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Financial Goals Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="order-1 lg:order-2 space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Set and track financial goals
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Transform your financial dreams into achievable goals. Set targets for savings, 
+                    debt reduction, or major purchases. Visual progress tracking and smart insights 
+                    keep you motivated and on track to reach your objectives.
+                  </p>
+                </div>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Visual progress tracking",
+                    "Custom goal categories",
+                    "Automatic savings calculations",
+                    "Achievement milestones and rewards"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Feature 5: Advanced Analytics */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Discover insights with powerful analytics
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Uncover spending patterns and trends with comprehensive analytics. Interactive charts, 
+                    category breakdowns, and trend analysis help you understand where your money goes 
+                    and make informed financial decisions.
+                  </p>
+                </div>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Interactive spending charts",
+                    "Category-wise expense analysis", 
+                    "Monthly and yearly comparisons",
+                    "Custom date range reports"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-analytics.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Analytics Video</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 6: Custom Categories */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1 relative">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200">
+                  <video
+                    src="/feature-categories.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-sm">Custom Categories Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="order-1 lg:order-2 space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Create categories that fit your lifestyle
+                  </h3>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Organize your finances exactly how you think about money. Create custom categories 
+                    and subcategories that reflect your unique spending habits. Perfect organization 
+                    leads to better insights and smarter financial decisions.
+                  </p>
+                </div>
+                
+                <ul className="space-y-3">
+                  {[
+                    "Unlimited custom categories",
+                    "Drag-and-drop organization",
+                    "Automatic transaction sorting",
+                    "Category-based budgeting rules"
+                  ].map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+          </div>
+
+          {/* CTA Section */}
+          <div className="text-center mt-20">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Ready to take control of your finances?
+            </h3>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Join thousands of users who&apos;ve transformed their financial management with EasyBudget
+            </p>
+            <Button 
+              onClick={() => user ? router.push('/dashboard') : router.push('/auth/register')}
+              size="lg"
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg"
+            >
+              {user ? 'Go to Dashboard' : 'Start Free Today'}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
